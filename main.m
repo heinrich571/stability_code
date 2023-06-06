@@ -4,9 +4,9 @@ close all
 clearvars
 clc
 
-Path_List = {'.\grid_generation'
-             '.\baseflow_definition'
-             '.\'};
+Path_List = {'./grid_generation'
+             './baseflow_definition'
+             './'};
 for i = 1:numel(Path_List)
     addpath(genpath(Path_List{i}));
 end
