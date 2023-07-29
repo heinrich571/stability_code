@@ -25,20 +25,12 @@ Ny       = Nx/2;
 Definitions.initguess            = [1.22 1.24];
 Definitions.maxIterations        = 1e2;
 Definitions.convergenceTolerance = 1e-6;
-Definitions.interval             = [0 Y_Limit];
-Definitions.a                    = 1;
-Definitions.nu                   = 1.46e-5;
-
-
-%% Create computational domain & derivative matrices
-
-Domain = generate_domain(X_Limit, Y_Limit, Y_Median, Nx, Ny);
 
 
 %% Get the base flow
 
 Definitions.interval = Domain.vec_Y;
-Base_Flow = get_base_flow(Domain, Definitions);
+Base_Flow = get_base_flow(Definitions);
 
 
 %% Create Matrices A & B for the BiGlobal eigenvalue problem

@@ -11,7 +11,7 @@ x_limit  = 2;
 y_limit = 2;
 y_median = 0.5;
 
-Nx = 200;
+Nx = 100;
 Ny = Nx/2;
 
 
