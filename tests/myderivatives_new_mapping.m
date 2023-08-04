@@ -94,15 +94,17 @@ end
 xlabel('$\hat{y}$', 'Interpreter', 'LaTeX', 'FontSize', 20)
 ylabel('$y$', 'Interpreter', 'LaTeX', 'FontSize', 20)
 
-f = X.*Y;
-fx = Y;
-fy = X;
-f = f(:);
+% f = X.*Y;
+% fx = Y;
+% fy = X;
+% f = f(:);
 
-% f  =  sin(X).*cos(Y);
-% fx =  cos(X).*cos(Y);
-% fy = -sin(X).*sin(Y);
-% f  =  f(:);
+f   =  sin(X).*cos(Y);
+fx  =  cos(X).*cos(Y);
+fy  = -sin(X).*sin(Y);
+fxx = -sin(X).*cos(Y);
+fyy = -sin(X).*cos(Y);
+f   =  f(:);
 
 figure('Name', 'df/dx derivative test', 'NumberTitle', 'off')
 subplot(1,2,1)
@@ -141,3 +143,52 @@ ylabel('y')
 grid off
 
 
+figure('Name', 'df/dy derivative differences', 'NumberTitle', 'off')
+surf(X, Y, reshape(fy,Ny+1,Nx+1)-reshape(Dy*f,Ny+1,Nx+1))
+title('df/dy numerical derivative error')
+xlabel('x')
+ylabel('y')
+
+
+figure('Name', 'd2f/dx2 derivative test', 'NumberTitle', 'off')
+subplot(1,2,1)
+contour(X, Y, reshape(fxx,Ny+1,Nx+1))
+title('d^2f/dx^2 exact derivative')
+xlabel('x')
+ylabel('y')
+grid off
+subplot(1,2,2)
+contour(X, Y, reshape(Dx*Dx*f,Ny+1,Nx+1))
+title('df/dx numerical derivative')
+xlabel('x')
+ylabel('y')
+grid off
+
+
+figure('Name', 'd^2f/dx^2 derivative differences', 'NumberTitle', 'off')
+surf(X, Y, reshape(fxx,Ny+1,Nx+1)-reshape(Dx*Dx*f,Ny+1,Nx+1))
+title('df/dx numerical derivative error')
+xlabel('x')
+ylabel('y')
+
+
+figure('Name', 'd^2f/dy^2 derivative test', 'NumberTitle', 'off')
+subplot(1,2,1)
+contour(X, Y, reshape(fyy,Ny+1,Nx+1))
+title('df/dx exact derivative')
+xlabel('x')
+ylabel('y')
+grid off
+subplot(1,2,2)
+contour(X, Y, reshape(Dy*Dy*f,Ny+1,Nx+1))
+title('df/dx numerical derivative')
+xlabel('x')
+ylabel('y')
+grid off
+
+
+figure('Name', 'd^2f/dy^2 derivative differences', 'NumberTitle', 'off')
+surf(X, Y, reshape(fyy,Ny+1,Nx+1)-reshape(Dy*Dy*f,Ny+1,Nx+1))
+title('df/dy numerical derivative error')
+xlabel('x')
+ylabel('y')

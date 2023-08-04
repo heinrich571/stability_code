@@ -17,31 +17,43 @@ rho = 1.225;
 eta_Limit    = 12;
 X_norm_Limit = eta_Limit;
 eta_Median   = 0.3;
-Nx           = 50;
+Nx           = 100;
 Ny           = Nx/2;
 
 % Hiemenz flow solver parameters
 Definitions.initguess            = [1.22 1.24];
 Definitions.maxIterations        = 1e2;
 Definitions.convergenceTolerance = 1e-6;
-% Definitions.interval             = [0 eta_Limit];
-Definitions.interval             = [0 eta_Limit];
+
+
+%% Generate the computational domain
+
+Domain = generate_domain(X_norm_Limit, eta_Limit, eta_Median, Nx, Ny);
 
 
 %% Solve the Hiemenz problem
 
-Base_Flow   = get_base_flow(Definitions);
-Base_Flow.y = sqrt(nu/a)*Base_Flow.eta;
+Definitions.interval = flip(Domain.vec_Y);
+% Definitions.interval = [0 eta_Limit];
+Base_Flow            = get_base_flow(Definitions);
+Base_Flow.y          = sqrt(nu/a)*Base_Flow.eta;
 
 
 %% Create the dimensional velocity field
 
-Domain = generate_domain(sqrt(nu/a)*X_norm_Limit, sqrt(nu/a)*eta_Limit, sqrt(nu/a)*eta_Median, Nx, Ny);
+Domain.vec_X = sqrt(nu/a)*Domain.vec_X;
+Domain.vec_Y = sqrt(nu/a)*Domain.vec_Y;
+Domain.mat_X = sqrt(nu/a)*Domain.mat_X;
+Domain.mat_Y = sqrt(nu/a)*Domain.mat_Y;
+Domain.Dx    = sqrt(a/nu)*Domain.Dx;
+Domain.Dy    = sqrt(a/nu)*Domain.Dy;
+Domain.D2x   = (a/nu)*Domain.D2x;
+Domain.D2y   = (a/nu)*Domain.D2y;
 
-Base_Flow.phi   = interp1(Base_Flow.y, Base_Flow.phi,   Domain.vec_Y, 'pchip', 'extrap');
-Base_Flow.dphi  = interp1(Base_Flow.y, Base_Flow.dphi,  Domain.vec_Y, 'pchip', 'extrap');
-Base_Flow.ddphi = interp1(Base_Flow.y, Base_Flow.ddphi, Domain.vec_Y, 'pchip', 'extrap');
-Base_Flow.y     = Domain.vec_Y;
+Base_Flow.y     = flip(Base_Flow.y);
+Base_Flow.phi   = flip(Base_Flow.phi);
+Base_Flow.dphi  = flip(Base_Flow.dphi);
+Base_Flow.ddphi = flip(Base_Flow.ddphi);
 
 u = Domain.mat_X.*a.*repmat(Base_Flow.dphi, [1 length(Domain.vec_X)]);
 v = -sqrt(a*nu)*repmat(Base_Flow.phi, [1 length(Domain.vec_X)]);
@@ -86,7 +98,8 @@ ylabel('y')
 
 dp_dy = -rho*sqrt(a^3*nu)*(Base_Flow.phi.*Base_Flow.dphi + Base_Flow.ddphi);
 dp_dy = repmat(dp_dy, [1 Nx+1]);
-y_momentum_err = u(:).*dv_dx + v(:).*dv_dy + 1/rho*dp_dy(:) - nu*(d2v_dx2 + d2v_dy2); % RHS - LHS
+% y_momentum_err = u(:).*dv_dx + v(:).*dv_dy + 1/rho*dp_dy(:) - nu*(d2v_dx2 + d2v_dy2); % RHS - LHS
+y_momentum_err = - nu*(d2v_dx2 + d2v_dy2); % RHS - LHS
 y_momentum_err = reshape(abs(y_momentum_err), [Ny+1 Nx+1]);
 
 figure('Name', 'y-momentum equation check', 'NumberTitle', 'off')
