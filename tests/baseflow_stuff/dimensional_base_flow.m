@@ -16,7 +16,7 @@ rho = 1.225;
 % Grid parameters
 eta_Limit    = 12;
 X_norm_Limit = eta_Limit;
-eta_Median     = 0.3;
+eta_Median   = 0.3;
 Nx           = 50;
 Ny           = Nx/2;
 
