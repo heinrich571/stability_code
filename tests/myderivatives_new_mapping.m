@@ -7,11 +7,11 @@ clc
 
 %% Define the computational domain
 
-x_limit  = 2;
-y_limit = 2;
-y_median = 0.5;
+x_limit  = 10;
+y_limit = 10;
+y_median = 2.4;
 
-Nx = 200;
+Nx = 100;
 Ny = Nx/2;
 
 
@@ -31,7 +31,7 @@ y = (a_y*(1+yhat)./(b_y-yhat));
 
 f = 0.01;
 e = 1-f;
-x1 = e*xhat.^3 + f*xhat;
+x1 = x_limit*(e*xhat.^3 + f*xhat);
 ix_mid = Nx/2 + 1;
 m = 1;
 n = 0;
@@ -44,7 +44,7 @@ x = x1;
 [X, Y] = meshgrid(x, y);
 
 % Dx_physical_domain = diag(-x_limit*sign(xhat).*pi/2.*(3*e*xhat.^2+f).*sin(pi/2*(e*xhat.^3+f*xhat)+pi))*Dx_cheb;
-Dx_physical_domain = diag(1./(3*e*xhat.^2+f))*Dx_cheb;
+Dx_physical_domain = diag(1./(x_limit*(3*e*xhat.^2+f)))*Dx_cheb;
 Dy_physical_domain = diag(a_y*(1+b_y)./((y+a_y).^2))*Dy_cheb;
 Ix = eye(Nx+1);
 Iy = eye(Ny+1);
@@ -94,15 +94,21 @@ end
 xlabel('$\hat{y}$', 'Interpreter', 'LaTeX', 'FontSize', 20)
 ylabel('$y$', 'Interpreter', 'LaTeX', 'FontSize', 20)
 
-f = X.*Y;
-fx = Y;
-fy = X;
-f = f(:);
+%%
 
-% f  =  sin(X).*cos(Y);
-% fx =  cos(X).*cos(Y);
-% fy = -sin(X).*sin(Y);
-% f  =  f(:);
+% f = X.*Y;
+% fx = Y;
+% fy = X;
+% f = f(:);
+
+f   =  sin(X).*cos(Y);
+fx  =  cos(X).*cos(Y);
+fy  = -sin(X).*sin(Y);
+fxx = -sin(X).*cos(Y);
+fyy = -sin(X).*cos(Y);
+f   =  f(:);
+
+%% 
 
 figure('Name', 'df/dx derivative test', 'NumberTitle', 'off')
 subplot(1,2,1)
@@ -141,3 +147,52 @@ ylabel('y')
 grid off
 
 
+figure('Name', 'df/dy derivative differences', 'NumberTitle', 'off')
+surf(X, Y, reshape(fy,Ny+1,Nx+1)-reshape(Dy*f,Ny+1,Nx+1))
+title('df/dy numerical derivative error')
+xlabel('x')
+ylabel('y')
+
+
+figure('Name', 'd2f/dx2 derivative test', 'NumberTitle', 'off')
+subplot(1,2,1)
+contour(X, Y, reshape(fxx,Ny+1,Nx+1))
+title('d^2f/dx^2 exact derivative')
+xlabel('x')
+ylabel('y')
+grid off
+subplot(1,2,2)
+contour(X, Y, reshape(Dx*Dx*f,Ny+1,Nx+1))
+title('df/dx numerical derivative')
+xlabel('x')
+ylabel('y')
+grid off
+
+
+figure('Name', 'd^2f/dx^2 derivative differences', 'NumberTitle', 'off')
+surf(X, Y, reshape(fxx,Ny+1,Nx+1)-reshape(Dx*Dx*f,Ny+1,Nx+1))
+title('df/dx numerical derivative error')
+xlabel('x')
+ylabel('y')
+
+
+figure('Name', 'd^2f/dy^2 derivative test', 'NumberTitle', 'off')
+subplot(1,2,1)
+contour(X, Y, reshape(fyy,Ny+1,Nx+1))
+title('df/dx exact derivative')
+xlabel('x')
+ylabel('y')
+grid off
+subplot(1,2,2)
+contour(X, Y, reshape(Dy*Dy*f,Ny+1,Nx+1))
+title('df/dx numerical derivative')
+xlabel('x')
+ylabel('y')
+grid off
+
+
+figure('Name', 'd^2f/dy^2 derivative differences', 'NumberTitle', 'off')
+surf(X, Y, reshape(fyy,Ny+1,Nx+1)-reshape(Dy*Dy*f,Ny+1,Nx+1))
+title('df/dy numerical derivative error')
+xlabel('x')
+ylabel('y')

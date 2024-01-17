@@ -34,13 +34,13 @@ D2y = kron(Ix, D2y_physical_domain);
 
 % Create the output structure
 
-Domain.vec_X = vec_X; % Vector of the x stations
-Domain.vec_Y = vec_Y; % Vector of the y stations
-Domain.mat_X = mat_X; % Matrix of the x stations
-Domain.mat_Y = mat_Y; % Matrix of the y stations
-Domain.Dx    = Dx   ; % 1st derivative w.r.t. x matrix
-Domain.Dy    = Dy   ; % 1st derivative w.r.t. y matrix
-Domain.D2x   = D2x  ; % 2nd derivative w.r.t. x matrix
-Domain.D2y   = D2y  ; % 2nd derivative w.r.t. y matrix
+Domain.vec_X = vec_X;                                                       % Vector of the x stations
+Domain.vec_Y = vec_Y;                                                       % Vector of the y stations
+Domain.mat_X = mat_X;                                                       % Matrix of the x stations
+Domain.mat_Y = mat_Y;                                                       % Matrix of the y stations
+Domain.Dx    = Dx   ;                                                       % 1st derivative w.r.t. x matrix
+Domain.Dy    = Dy   ;                                                       % 1st derivative w.r.t. y matrix
+Domain.D2x   = D2x  ;                                                       % 2nd derivative w.r.t. x matrix
+Domain.D2y   = D2y  ;                                                       % 2nd derivative w.r.t. y matrix
 
 end
