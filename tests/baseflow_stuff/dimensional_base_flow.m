@@ -14,9 +14,9 @@ nu = 14.61e-6;
 rho = 1.225;
 
 % Grid parameters
-eta_Limit    = 12;
+eta_Limit    = 20;
 X_norm_Limit = eta_Limit;
-eta_Median   = 0.3;
+eta_Median   = 2.4;
 Nx           = 100;
 Ny           = Nx/2;
 
@@ -98,8 +98,8 @@ ylabel('y')
 
 dp_dy = -rho*sqrt(a^3*nu)*(Base_Flow.phi.*Base_Flow.dphi + Base_Flow.ddphi);
 dp_dy = repmat(dp_dy, [1 Nx+1]);
-% y_momentum_err = u(:).*dv_dx + v(:).*dv_dy + 1/rho*dp_dy(:) - nu*(d2v_dx2 + d2v_dy2); % RHS - LHS
-y_momentum_err = - nu*(d2v_dx2 + d2v_dy2); % RHS - LHS
+y_momentum_err = u(:).*dv_dx + v(:).*dv_dy + 1/rho*dp_dy(:) - nu*(d2v_dx2 + d2v_dy2); % RHS - LHS
+% y_momentum_err = - nu*(d2v_dx2 + d2v_dy2); % RHS - LHS
 y_momentum_err = reshape(abs(y_momentum_err), [Ny+1 Nx+1]);
 
 figure('Name', 'y-momentum equation check', 'NumberTitle', 'off')
