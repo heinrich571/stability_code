@@ -4,17 +4,18 @@ close all
 clearvars
 clc
 path_manager('add')
+startup
 
 
 %% Define problem parameters
 
 % Grid parameters
 
-X_normalized_Limit  = 5;
+X_normalized_Limit  = 10;
 Y_normalized_Limit  = 10;
 Y_normalized_Median = 2.4;
 
-Nx = 50;
+Nx = 100;
 Ny = Nx/2;
 
 
@@ -25,15 +26,27 @@ Definitions.maxIterations        = 1e2;
 Definitions.convergenceTolerance = 1e-6;
 
 
+% Flags and other settings
+
+Flags.Display_Domain    = 1;
+Flags.Display_Base_Flow = 1;
+
+
 %% Get the computational domain
 
 Domain = generate_domain(X_normalized_Limit, Y_normalized_Limit, Y_normalized_Median, Nx, Ny);
+if Flags.Display_Domain
+    show_domain(Domain);
+end
 
 
 %% Get the base flow
 
 Definitions.interval = Domain.vec_Y;
 Base_Flow = get_base_flow(Definitions);
+if Flags.Display_Base_Flow
+    show_baseflow(Domain, Base_Flow);
+end
 
 
 %% Create Matrices A & B for the BiGlobal eigenvalue problem

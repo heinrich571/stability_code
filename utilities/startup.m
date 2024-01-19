@@ -1,26 +1,29 @@
 %% -------------------------- User toggles --------------------------- %%
-% StartupSettings.FontName            = 'Arial';
-StartupSettings.FontName            = 'Verdana';
+StartupSettings.FontName            = 'Times New Roman';
 StartupSettings.FontWeight          = 'Normal';
-StartupSettings.AxesFontSize        = 12;
+StartupSettings.AxesFontSize        = 22;
 StartupSettings.TitleTextMultiplier = 1.4;
-StartupSettings.LineWidth           = 1;
+StartupSettings.LabelTextMultiplier = 1.2;
+StartupSettings.LineWidth           = 2.5;
 StartupSettings.MarkerSize          = 7;
 StartupSettings.LegendLocation      = 'northeast';
-StartupSettings.LegendFontSize      = 12;
+StartupSettings.LegendFontSize      = 16;
 StartupSettings.LegendFontWeight    = 'Normal';
-StartupSettings.AxesTickLength      = [0.005 0.005];
+StartupSettings.AxesTickLength      = [0.01 0.01];
 StartupSettings.AxesTickDir         = 'in';
 StartupSettings.ColorMap            = jet;
-StartupSettings.ColorOrder          = [ 000, 000, 255
+StartupSettings.GridMode            = 'on';
+StartupSettings.GridMinorMode       = 'off';
+StartupSettings.ColorOrder          = [ 000, 090, 255
                                         255, 000, 000
                                         000, 180, 000
                                         255, 000, 255
-                                        000, 190, 190
                                         253, 127, 001
-                                        130, 130, 130
-                                        193, 194, 52
-                                        34, 193, 209]/255;
+                                        000, 190, 190
+                                        176, 080, 255
+                                        180, 210, 000
+                                        107, 117, 150
+                                        170, 170, 170]/255;
 % --------------------------------------------------------------------- %
 
 %% ---------------------- Default line settings ---------------------- %%
@@ -37,11 +40,12 @@ set(groot, 'defaultTextFontSize', 16)
 % --------------------------------------------------------------------- %
 
 %% --------------------- Default figure settings --------------------- %%
-set(groot, 'defaultFigureColor', ones(1,3))
+set(groot, 'defaultFigureColor', 0.96*ones(1,3))
 set(groot, 'defaultFigureColormap', StartupSettings.ColorMap)
 set(groot, 'defaultFigureWindowStyle', 'Docked')
 set(groot, 'defaultFigureNextPlot', 'add')
 set(groot, 'defaultFigureCreateFcn', @(varargin) figcreateufcn)
+set(groot, 'defaultFigureGraphicsSmoothing', 'on')
 % --------------------------------------------------------------------- %
 
 %% ----------------------- Default UI settings ----------------------- %%
@@ -55,31 +59,43 @@ set(groot, 'defaultTextFontName', StartupSettings.FontName)
 % --------------------------------------------------------------------- %
 
 %% ---------------------- Default axes settings ---------------------- %%
+set(groot, 'defaultAxesBox', 'off')
 set(groot, 'defaultAxesCreateFcn', @(ax,~)set(ax.Toolbar,'Visible','off'))
 set(groot, 'defaultAxesFontName', StartupSettings.FontName)
 set(groot, 'defaultAxesFontWeight', StartupSettings.FontWeight)
-set(groot, 'defaultAxesTitleFontWeight', 'Bold')
+set(groot, 'defaultAxesTitleFontWeight', StartupSettings.FontWeight)
 set(groot, 'defaultAxesFontSize', StartupSettings.AxesFontSize)
+set(groot, 'defaultAxesLabelFontSizeMultiplier', StartupSettings.LabelTextMultiplier)
 set(groot, 'defaultAxesTitleFontSize', StartupSettings.TitleTextMultiplier)
 set(groot, 'defaultAxesXColor', 0.1*ones(1,3), 'defaultAxesYColor', 0.1*ones(1,3))
-set(groot, 'defaultAxesLineWidth', 1.0)
+set(groot, 'defaultAxesLineWidth', 1)
+set(groot, 'defaultLineMarkerFaceColor', ones(1, 3))
 set(groot, 'defaultAxesXMinorGridMode', 'manual', 'defaultAxesYMinorGridMode', 'manual', 'defaultAxesZMinorGridMode', 'manual')
-set(groot, 'defaultAxesXGrid', 'on', 'defaultAxesYGrid', 'on', 'defaultAxesZGrid', 'on')
-set(groot, 'defaultAxesXMinorGrid', 'off', 'defaultAxesYMinorGrid', 'off', 'defaultAxesZMinorGrid', 'off')
-set(groot, 'defaultAxesGridAlpha', 0.2)
+set(groot, 'defaultAxesXGrid', StartupSettings.GridMode, 'defaultAxesYGrid', StartupSettings.GridMode, 'defaultAxesZGrid', StartupSettings.GridMode)
+set(groot, 'defaultAxesXMinorGrid', StartupSettings.GridMinorMode, 'defaultAxesYMinorGrid', StartupSettings.GridMinorMode, 'defaultAxesZMinorGrid', StartupSettings.GridMinorMode)
 set(groot, 'defaultAxesGridLineStyle', '-')
-set(groot, 'defaultAxesMinorGridLineStyle', ':')
-set(groot, 'defaultAxesMinorGridAlpha', 0.1)
+set(groot, 'defaultAxesGridAlpha', 0.1)
+set(groot, 'defaultAxesMinorGridLineStyle', '-')
+set(groot, 'defaultAxesMinorGridAlpha', 0.04)
 set(groot, 'defaultAxesColor', 1*ones(1,3))
 set(groot, 'defaultAxesTickDirMode', 'manual')
 set(groot, 'defaultAxesTickDir', StartupSettings.AxesTickDir)
 set(groot, 'defaultAxesTickLength', StartupSettings.AxesTickLength.*ones(1,2))
-set(groot, 'defaultAxesXMinorTick', 'off', 'defaultAxesYMinorTick', 'off', 'defaultAxesZMinorTick','off')
+set(groot, 'defaultAxesXMinorTick', 'on', 'defaultAxesYMinorTick', 'on', 'defaultAxesZMinorTick', 'on')
 set(groot, 'defaultAxesNextPlot', 'add')
-set(groot, 'defaultAxesBox', 'on')
+set(groot, 'defaultAxesBox', 'off')
 set(groot, 'defaultAxesUnits', 'Normalized')
-set(groot, 'defaultHistogramEdgeColor', 'none')
 set(groot, 'defaultAxesColorOrder', StartupSettings.ColorOrder)
+
+set(groot, 'defaultScatterLineWidth', 1.5)
+
+set(groot, 'defaultHistogramFaceAlpha', 1)
+set(groot, 'defaultHistogramEdgeColor', [0 0.5 0.85])
+set(groot, 'defaultHistogramFaceColor', [0 0.6 1])
+
+set(groot, 'defaultQuiverAutoScaleFactor', 1.0)
+set(groot, 'defaultQuiverLineWidth', StartupSettings.LineWidth)
+set(groot, 'defaultQuiverMaxHeadSize', 0.1)
 % --------------------------------------------------------------------- %
 
 %% --------------------- Default legend settings --------------------- %%
@@ -223,6 +239,15 @@ setFigureForDocumentButtonImage = ind2rgb(img,map);
 setFigureForDocumentButton.CData = setFigureForDocumentButtonImage;
 setFigureForDocumentButton.TooltipString = 'Use symbols';
 setFigureForDocumentButton.ClickedCallback = @setPlotSymbols;
+
+% toggle minor grid
+toggleMinorGridButton = uitoggletool(toolbar);
+[img,map] = imread(fullfile(matlabroot,...
+    'toolbox','matlab','icons','HDF_grid.gif'));
+toggleMinorGridButtonImage = ind2rgb(img,map);
+toggleMinorGridButton.CData = toggleMinorGridButtonImage;
+toggleMinorGridButton.TooltipString = 'Toggle grid';
+toggleMinorGridButton.ClickedCallback = @toggleGrid;
 
 % supporting functions
     function copyFigure(~,~)
@@ -460,6 +485,16 @@ setFigureForDocumentButton.ClickedCallback = @setPlotSymbols;
             p(N_lines-n+1) = plot(x,y,[symbolSet{N_lines-n+1}],'Color',lineColor,'DisplayName',lines(n).DisplayName);
         end
         legend(p)
+    end
+
+    function toggleGrid(src,~)
+        state = src.State;
+        if strcmp(state, 'on')
+            grid minor
+        else
+            grid off
+            grid on
+        end
     end
 end
 % --------------------------------------------------------------------- %
