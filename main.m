@@ -15,7 +15,7 @@ X_normalized_Limit  = 10;
 Y_normalized_Limit  = 10;
 Y_normalized_Median = 2.4;
 
-Nx = 100;
+Nx = 30;
 Ny = Nx/2;
 
 

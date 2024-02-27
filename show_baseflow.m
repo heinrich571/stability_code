@@ -11,8 +11,8 @@ legend('Interpreter', 'LaTeX', 'Location', 'southeast')
 
 fig_baseflow_with_streamlines = figure('Name', 'Base flow with streamlines', 'NumberTitle', 'off');
 
-plot(Domain.mat_X, Domain.mat_Y, 'k', 'LineWidth', 1, 'Color', 0.9*ones(1, 3))
-plot(Domain.mat_X', Domain.mat_Y', 'k', 'LineWidth', 1, 'Color', 0.9*ones(1, 3))
+% plot(Domain.mat_X, Domain.mat_Y, 'k', 'LineWidth', 1, 'Color', 0.9*ones(1, 3))
+% plot(Domain.mat_X', Domain.mat_Y', 'k', 'LineWidth', 1, 'Color', 0.9*ones(1, 3))
 
 U      =  Domain.mat_X.*repmat(flip(Base_Flow.dphi), [1 size(Domain.mat_X, 2)]);
 V      = -repmat(flip(Base_Flow.phi), [1 size(Domain.mat_X, 2)]);
@@ -47,5 +47,6 @@ ylabel('y')
 legend([p_wall lines(1) p_stagnation_point p_boundary_layer_profile_right])
 axis equal
 grid off
+box on
 
 end
