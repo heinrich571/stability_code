@@ -28,8 +28,8 @@ Definitions.convergenceTolerance = 1e-6;
 
 % Flags and other settings
 
-Flags.Display_Domain    = 1;
-Flags.Display_Base_Flow = 1;
+Flags.Display_Domain    = 0;
+Flags.Display_Base_Flow = 0;
 
 
 %% Get the computational domain

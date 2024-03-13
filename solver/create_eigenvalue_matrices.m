@@ -102,6 +102,8 @@ mat_B = [b11 b12 b13 b14
 % Apply boundary conditions - NOTE THAT HENCEFORTH Nx and Ny are the number
 % of points and not the number of sections!
 
+factor = 200;
+
 block_row    = @(equation_number) 1 + (Nx*Ny)*(equation_number - 1);
 block_column = @(variable_number) 1 + (Nx*Ny)*(variable_number - 1);
 nx           = 1:1:Nx;
@@ -114,7 +116,7 @@ var_columns = var_columns(:);
 idx         = sub2ind(size(mat_A), eq_rows, var_columns);
 
 mat_A(eq_rows,:) = 0;
-mat_A(idx)       = 1;
+mat_A(idx)       = factor;
 
 % No-penetration on the wall; v(y = 0) w(y = 0) = 0
 eq_rows     = block_row(3)    + (Ny-1) + (nx-1)*Ny;
@@ -124,7 +126,7 @@ var_columns = var_columns(:);
 idx         = sub2ind(size(mat_A), eq_rows, var_columns);
 
 mat_A(eq_rows,:) = 0;
-mat_A(idx)       = 1;
+mat_A(idx)       = factor;
 
 eq_rows     = block_row(4)    + (Ny-1) + (nx-1)*Ny;
 var_columns = block_column(3) + (Ny-1) + (nx-1)*Ny;
@@ -133,7 +135,22 @@ var_columns = var_columns(:);
 idx         = sub2ind(size(mat_A), eq_rows, var_columns);
 
 mat_A(eq_rows,:) = 0;
-mat_A(idx)       = 1;
+mat_A(idx)       = factor;
+
+% No pressure changes in the y-direction right near the wall
+eq_rows     = block_row(3)    + (Ny-1) + (nx-1)*Ny;
+var_columns = block_column(4) : block_column(4) + (Ny-1) + (nx(end)-1)*Ny;
+eq_rows     = repelem(eq_rows, Ny);
+eq_rows     = eq_rows(:);
+var_columns = var_columns(:);
+idx         = sub2ind(size(mat_A), eq_rows, var_columns);
+
+A_tmp = mat_A(idx);
+mat_A(eq_rows,:) = 0;
+mat_A(idx)       = A_tmp*factor;
+mat_B(eq_rows,:) = 0;
+mat_B(idx)       = 1;
+
 
 % Disturbance decay far away from the wall
 % u(y --> inf) = 0
@@ -144,7 +161,7 @@ var_columns = var_columns(:);
 idx         = sub2ind(size(mat_A), eq_rows, var_columns);
 
 mat_A(eq_rows,:) = 0;
-mat_A(idx)       = 1;
+mat_A(idx)       = factor;
 
 % v(y --> inf) = 0
 eq_rows     = block_row(3)    + (nx-1)*Ny;
@@ -154,7 +171,7 @@ var_columns = var_columns(:);
 idx         = sub2ind(size(mat_A), eq_rows, var_columns);
 
 mat_A(eq_rows,:) = 0;
-mat_A(idx)       = 1;
+mat_A(idx)       = factor;
 
 % w(y --> inf) = 0
 eq_rows     = block_row(4)    + (nx-1)*Ny;
@@ -164,8 +181,20 @@ var_columns = var_columns(:);
 idx         = sub2ind(size(mat_A), eq_rows, var_columns);
 
 mat_A(eq_rows,:) = 0;
-mat_A(idx)       = 1;
+mat_A(idx)       = factor;
 
+
+% p(y --> inf) = 0
+eq_rows     = block_row(3)    + (nx-1)*Ny;
+var_columns = block_column(4) + (nx-1)*Ny;
+eq_rows     = eq_rows(:);
+var_columns = var_columns(:);
+idx         = sub2ind(size(mat_A), eq_rows, var_columns);
+
+mat_A(eq_rows,:) = 0;
+mat_A(idx)       = factor;
+mat_B(eq_rows,:) = 0;
+mat_B(idx)       = 1; % needed to ensure the "extra" eigenvalue is at w = -200 + 0*i
 
 
 end
