@@ -18,6 +18,7 @@ ddphi = flip(Base_Flow.ddphi);
 mat_X = Domain.mat_X;
 Dx    = Domain.Dx;
 Dy    = Domain.Dy;
+D2x   = Domain.D2x;
 
 mat_phi   = repmat(phi  , [1,Nx]);
 mat_dphi  = repmat(dphi , [1,Nx]);
@@ -104,137 +105,658 @@ mat_B = [b11 b12 b13 b14
 
 factor = 200;
 
-block_row    = @(equation_number) 1 + (Nx*Ny)*(equation_number - 1);
-block_column = @(variable_number) 1 + (Nx*Ny)*(variable_number - 1);
-nx           = 1:1:Nx;
+% No-slip on the wall:
+% u(y = 0) = 0
+row_inds    = get_eqn_bottom_inds('x momentum', Nx, Ny);
+column_inds = get_var_bottom_inds('u', Nx, Ny);
+linear_inds = get_linear_indices(mat_A, row_inds, column_inds);
 
-% No-slip on the wall; u(y = 0) = 0
-eq_rows     = block_row(2)    + (Ny-1) + (nx-1)*Ny;
-var_columns = block_column(1) + (Ny-1) + (nx-1)*Ny;
-eq_rows     = eq_rows(:);
-var_columns = var_columns(:);
-idx         = sub2ind(size(mat_A), eq_rows, var_columns);
-
-mat_A(eq_rows,:) = 0;
-mat_A(idx)       = factor;
-mat_B(eq_rows,:) = 0;
-mat_B(idx)       = 1i;
-
-% No-penetration on the wall; v(y = 0) w(y = 0) = 0
-eq_rows     = block_row(3)    + (Ny-1) + (nx-1)*Ny;
-var_columns = block_column(2) + (Ny-1) + (nx-1)*Ny;
-eq_rows     = eq_rows(:);
-var_columns = var_columns(:);
-idx         = sub2ind(size(mat_A), eq_rows, var_columns);
-
-mat_A(eq_rows,:) = 0;
-mat_A(idx)       = factor;
-mat_B(eq_rows,:) = 0;
-mat_B(idx)       = 1i;
-
-eq_rows     = block_row(4)    + (Ny-1) + (nx-1)*Ny;
-var_columns = block_column(3) + (Ny-1) + (nx-1)*Ny;
-eq_rows     = eq_rows(:);
-var_columns = var_columns(:);
-idx         = sub2ind(size(mat_A), eq_rows, var_columns);
-
-mat_A(eq_rows,:) = 0;
-mat_A(idx)       = factor;
-mat_B(eq_rows,:) = 0;
-mat_B(idx)       = 1i;
-
-% No-acceleration into the wall; dv/dy(y = 0) = 0
-eq_rows     = block_row(1)    + (Ny-1) + (nx-1)*Ny;
-var_columns = block_column(2) + (Ny-1) + (nx-1)*Ny;
-eq_rows     = eq_rows(:);
-var_columns = var_columns(:);
-idx         = sub2ind(size(mat_A), eq_rows, var_columns);
-
-A_tmp            = mat_A(idx);
-mat_A(eq_rows,:) = 0;
-mat_A(idx)       = A_tmp;
-mat_B(eq_rows,:) = 0;
-mat_B(idx)       = A_tmp;
-
-% No pressure changes in the y-direction right near the wall
-eq_rows     = block_row(3)    + (Ny-1) + (nx-1)*Ny;
-var_columns = block_column(4) : block_column(4) + (Ny-1) + (nx(end)-1)*Ny;
-eq_rows     = repelem(eq_rows, Ny);
-eq_rows     = eq_rows(:);
-var_columns = var_columns(:);
-idx         = sub2ind(size(mat_A), eq_rows, var_columns);
-
-A_tmp            = mat_A(idx);
-mat_A(eq_rows,:) = 0;
-mat_A(idx)       = A_tmp*factor;
-
-mat_B(eq_rows,:) = 0;
-mat_B(idx)       = 1i*A_tmp;
+mat_A(row_inds(:),:) = 0;
+mat_B(row_inds(:),:) = 0;
+mat_A(linear_inds)   = factor;
+mat_B(linear_inds)   = 1i;
 
 
-% Disturbance decay far away from the wall
+% w(y = 0) = 0
+row_inds    = get_eqn_bottom_inds('z momentum', Nx, Ny);
+column_inds = get_var_bottom_inds('w', Nx, Ny);
+linear_inds = get_linear_indices(mat_A, row_inds, column_inds);
+
+mat_A(row_inds(:),:) = 0;
+mat_B(row_inds(:),:) = 0;
+mat_A(linear_inds)   = factor;
+mat_B(linear_inds)   = 1i;
+
+
+% No-penetration on the wall
+% v(y = 0) = 0
+row_inds    = get_eqn_bottom_inds('y momentum', Nx, Ny);
+column_inds = get_var_bottom_inds('v', Nx, Ny);
+linear_inds = get_linear_indices(mat_A, row_inds, column_inds);
+
+mat_A(row_inds(:),:) = 0;
+mat_B(row_inds(:),:) = 0;
+mat_A(linear_inds)   = factor;
+mat_B(linear_inds)   = 1i;
+
+
+% No vertical acceleration towards the wall
+% dv/dy(y = 0) = 0
+row_inds = get_eqn_bottom_inds('continuity', Nx, Ny); % first, begin by erasing all irrelevant information from the relevant rows
+mat_A(row_inds(:),:) = 0;
+mat_B(row_inds(:),:) = 0;
+row_inds = repelem(row_inds, Ny); % second, insert the entries for the derivative operator
+j_v_TR = get_var_top_right_ind('v', Nx, Ny);
+j_v_BL = get_var_bottom_left_ind('v', Nx, Ny);
+column_inds = j_v_TR:j_v_BL;
+% just enter the derivatives at the walls of the domain and insert them to
+% the appropriate places inside the eigenvalue problem matrices
+mat_A(row_inds(:),column_inds(:)) = factor*Dy(row_inds(:),:);
+mat_B(row_inds(:),column_inds(:)) = 1i*Dy(row_inds(:),:);
+
+
+% Disturbances decay as y --> infinity
 % u(y --> inf) = 0
-eq_rows     = block_row(2)    + (nx-1)*Ny;
-var_columns = block_column(1) + (nx-1)*Ny;
-eq_rows     = eq_rows(:);
-var_columns = var_columns(:);
-idx         = sub2ind(size(mat_A), eq_rows, var_columns);
+row_inds    = get_eqn_top_inds('x momentum', Nx, Ny);
+column_inds = get_var_top_inds('u', Nx, Ny);
+linear_inds = get_linear_indices(mat_A, row_inds, column_inds);
 
-mat_A(eq_rows,:) = 0;
-mat_A(idx)       = factor;
-mat_B(eq_rows,:) = 0;
-mat_B(idx)       = 1i;
+mat_A(row_inds(:),:) = 0;
+mat_B(row_inds(:),:) = 0;
+mat_A(linear_inds)   = factor;
+mat_B(linear_inds)   = 1i;
 
 % v(y --> inf) = 0
-eq_rows     = block_row(3)    + (nx-1)*Ny;
-var_columns = block_column(2) + (nx-1)*Ny;
-eq_rows     = eq_rows(:);
-var_columns = var_columns(:);
-idx         = sub2ind(size(mat_A), eq_rows, var_columns);
+row_inds    = get_eqn_top_inds('y momentum', Nx, Ny);
+column_inds = get_var_top_inds('v', Nx, Ny);
+linear_inds = get_linear_indices(mat_A, row_inds, column_inds);
 
-mat_A(eq_rows,:) = 0;
-mat_A(idx)       = factor;
-mat_B(eq_rows,:) = 0;
-mat_B(idx)       = 1i;
+mat_A(row_inds(:),:) = 0;
+mat_B(row_inds(:),:) = 0;
+mat_A(linear_inds)   = factor;
+mat_B(linear_inds)   = 1i;
 
 % w(y --> inf) = 0
-eq_rows     = block_row(4)    + (nx-1)*Ny;
-var_columns = block_column(3) + (nx-1)*Ny;
-eq_rows     = eq_rows(:);
-var_columns = var_columns(:);
-idx         = sub2ind(size(mat_A), eq_rows, var_columns);
+row_inds    = get_eqn_top_inds('z momentum', Nx, Ny);
+column_inds = get_var_top_inds('w', Nx, Ny);
+linear_inds = get_linear_indices(mat_A, row_inds, column_inds);
 
-mat_A(eq_rows,:) = 0;
-mat_A(idx)       = factor;
-mat_B(eq_rows,:) = 0;
-mat_B(idx)       = 1i;
+mat_A(row_inds(:),:) = 0;
+mat_B(row_inds(:),:) = 0;
+mat_A(linear_inds)   = factor;
+mat_B(linear_inds)   = 1i;
 
 
-% p(y --> inf) = 0
-eq_rows     = block_row(3)    + (nx-1)*Ny;
-var_columns = block_column(4) + (nx-1)*Ny;
-eq_rows     = eq_rows(:);
-var_columns = var_columns(:);
-idx         = sub2ind(size(mat_A), eq_rows, var_columns);
+% No vertical acceleration at the top of the domain
+% dv/dy(y --> inf) = 0
+row_inds = get_eqn_top_inds('continuity', Nx, Ny); % first, begin by erasing all irrelevant information from the relevant rows
+row_inds = repelem(row_inds, Ny); % second, insert the entries for the derivative operator
+j_v_TR = get_var_top_right_ind('v', Nx, Ny);
+j_v_BL = get_var_bottom_left_ind('v', Nx, Ny);
+column_inds = j_v_TR:j_v_BL;
+% just enter the derivatives at the walls of the domain and insert them to
+% the appropriate places inside the eigenvalue problem matrices
+mat_A(row_inds(:),:) = 0;
+mat_B(row_inds(:),:) = 0;
+mat_A(row_inds(:),column_inds(:)) = factor*Dy(row_inds(:),:);
+mat_B(row_inds(:),column_inds(:)) = 1i*Dy(row_inds(:),:);
 
-mat_A(eq_rows,:) = 0;
-mat_A(idx)       = factor;
-mat_B(eq_rows,:) = 0;
-mat_B(idx)       = 1i; % needed to ensure the "extra" eigenvalue is at w = -200 + 0*i
+
+% Linear extrapolation of disturbances at the chordwise directions
+% d2u/dx2 = 0
+operator_row_inds = get_opr_right_inds(Nx, Ny);
+row_inds          = get_eqn_right_inds('x momentum', Nx, Ny);
+operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
+row_inds          = row_inds(2:end-1);
+
+j_u_TR = get_var_top_right_ind('u', Nx, Ny);
+j_u_BL = get_var_bottom_left_ind('u', Nx, Ny);
+column_inds = j_u_TR:j_u_BL;
+
+mat_A(row_inds,:) = 0;
+mat_B(row_inds,:) = 0;
+mat_A(row_inds,column_inds) = factor*D2x(operator_row_inds,:);
+mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+
+% d2v/dx2 = 0
+operator_row_inds = get_opr_right_inds(Nx, Ny);
+row_inds          = get_eqn_right_inds('y momentum', Nx, Ny);
+operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
+row_inds          = row_inds(2:end-1);
+
+j_u_TR = get_var_top_right_ind('v', Nx, Ny);
+j_u_BL = get_var_bottom_left_ind('v', Nx, Ny);
+column_inds = j_u_TR:j_u_BL;
+
+mat_A(row_inds,:) = 0;
+mat_B(row_inds,:) = 0;
+mat_A(row_inds,column_inds) = factor*D2x(operator_row_inds,:);
+mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+
+% d2w/dx2 = 0
+operator_row_inds = get_opr_right_inds(Nx, Ny);
+row_inds          = get_eqn_right_inds('z momentum', Nx, Ny);
+operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
+row_inds          = row_inds(2:end-1);
+
+j_u_TR = get_var_top_right_ind('w', Nx, Ny);
+j_u_BL = get_var_bottom_left_ind('w', Nx, Ny);
+column_inds = j_u_TR:j_u_BL;
+
+mat_A(row_inds,:) = 0;
+mat_B(row_inds,:) = 0;
+mat_A(row_inds,column_inds) = factor*D2x(operator_row_inds,:);
+mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+
+% d2p/dx2 = 0
+operator_row_inds = get_opr_right_inds(Nx, Ny);
+row_inds          = get_eqn_right_inds('continuity', Nx, Ny);
+operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
+row_inds          = row_inds(2:end-1);
+
+j_u_TR = get_var_top_right_ind('p', Nx, Ny);
+j_u_BL = get_var_bottom_left_ind('p', Nx, Ny);
+column_inds = j_u_TR:j_u_BL;
+
+mat_A(row_inds,:) = 0;
+mat_B(row_inds,:) = 0;
+mat_A(row_inds,column_inds) = factor*D2x(operator_row_inds,:);
+mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
 
 
-% dp/dx at (x = x_lim) = 0
-eq_rows     = block_row(4)    + 1:(Ny-1);
-var_columns = block_column(4) + 1:(Ny-1);
-eq_rows     = eq_rows(:);
-var_columns = var_columns(:);
-idx         = sub2ind(size(mat_A), eq_rows, var_columns);
 
-A_tmp            = mat_A(idx);
-mat_A(eq_rows,:) = 0;
-mat_A(idx)       = A_tmp;
-mat_B(eq_rows)   = 0;
-mat_B(idx)       = 1i*A_tmp;
 
 
 end
+
+
+%%% Supporting functions %%%
+
+function linear_inds = get_linear_indices(mat, row_inds, column_inds)
+
+% DESCRIPTION
+%   This function returns the linear indices for the specified matrix based on specified row and column indices.
+% INPUT
+%   mat             matrix          [matrix]
+%   row_inds        row indices     [vector]
+%   column_inds     column indices  [vector]
+% OUTPUT
+%   linear_inds     linear indices corresponding to 'row_inds' and 'column_inds' in the input matrix
+
+row_inds    = row_inds(:);
+column_inds = column_inds(:);
+linear_inds = sub2ind(size(mat), row_inds, column_inds);
+
+end
+
+
+function equation_number = eqn2num(equation_name)
+
+% DESCRIPTION
+%   This function returns the equation number according to their order in the eigenvalue matrix formulation
+% INPUT
+%   equation_name       name of the equation                                                                    [char]
+% OUTPUT
+%   equation_number     number of the equation according to its position in the eigenvalue problem formulation  [scalar]
+
+equation_names  = {'continuity' , 'x momentum' , 'y momentum' , 'z momentum'};
+equation_number = find(strcmp(equation_names, equation_name));
+
+if isempty(equation_number)
+    error('Equation name is invalid')
+end
+
+end
+
+
+function variable_number = var2num(variable_name)
+
+% DESCRIPTION
+%   This function returns the variable number according to their order in the eigenvalue vector formulation
+% INPUT
+%   variable_name       name of the variable                                                                    [char]
+% OUTPUT
+%   variable_number     number of the variable according to its position in the eigenvalue problem formulation  [scalar]
+
+variable_names  = {'u' , 'v' , 'w' , 'p'};
+variable_number = find(strcmp(variable_names, variable_name));
+
+if isempty(variable_number)
+    error('Variable name is invalid')
+end
+
+end
+
+
+function i_eqn_TR = get_eqn_top_right_ind(equation_name, Nx, Ny)
+
+% DESCRIPTION
+%   This function returns the index of the specified equation at the top-right corner of the domain in the eigenvalue problem matrices.
+% INPUT:
+%   equation_name       name of the equation                                                                                        [char]
+% OUTPUT:
+%   i_eqn_TR            row index of specified equation at the top-right corner of the domain in the eigenvalue problem matrices    [scalar]
+
+equation_number = eqn2num(equation_name);
+i_eqn_TR = 1 + Nx*Ny*(equation_number - 1);
+
+end
+
+
+function j_var_TR = get_var_top_right_ind(variable_name, Nx, Ny)
+
+% DESCRIPTION
+%   This function returns the index of the specified variable at the top-right corner of the domain in the eigenvalue problem matrices.
+% INPUT:
+%   variable_name       name of the variable                                                                                        [char]
+% OUTPUT:
+%   j_var_TR            column index of specified variable at the top-right corner of the domain in the eigenvalue problem matrices [scalar]
+
+variable_number = var2num(variable_name);
+j_var_TR = 1 + Nx*Ny*(variable_number - 1);
+
+end
+
+
+function i_eqn_BL = get_eqn_bottom_left_ind(equation_name, Nx, Ny)
+
+% DESCRIPTION
+%   This function returns the index of the specified equation at the bottom-left corner of the domain in the eigenvalue problem matrices.
+% INPUT:
+%   equation_name       name of the equation                                                                                        [char]
+% OUTPUT:
+%   i_eqn_BL            row index of specified equation at the bottom-left corner of the domain in the eigenvalue problem matrices  [scalar]
+
+% equation_number = eqn2num(equation_name);
+% i_eqn_BL = Nx*Ny*equation_number;
+
+i_eqn_TR = get_eqn_top_right_ind(equation_name, Nx, Ny);
+i_eqn_BL = i_eqn_TR + Nx*Ny - 1;
+
+end
+
+
+function j_var_BL = get_var_bottom_left_ind(variable_name, Nx, Ny)
+
+% DESCRIPTION
+%   This function returns the index of the specified variable at the bottom-left corner of the domain in the eigenvalue problem matrices.
+% INPUT:
+%   variable_name       name of the variable                                                                                            [char]
+% OUTPUT:
+%   i_eqn_BL            column index of specified variable at the bottom-left corner of the domain in the eigenvalue problem matrices   [scalar]
+
+% variable_number = var2num(variable_name);
+% j_var_BL = Nx*Ny*variable_number;
+
+j_var_TR = get_var_top_right_ind(variable_name, Nx, Ny);
+j_var_BL = j_var_TR + Nx*Ny - 1;
+
+end
+
+
+function i_eqn_BR = get_eqn_bottom_right_ind(equation_name, Nx, Ny)
+
+% DESCRIPTION
+%   This function returns the index of the specified equation at the bottom-right corner of the domain in the eigenvalue problem matrices.
+% INPUT:
+%   equation_name       name of the equation                                                                                            [char]
+% OUTPUT:
+%   i_eqn_BR            row index of specified equation at the bottom-right corner of the domain in the eigenvalue problem matrices     [scalar]
+
+i_eqn_TR = get_eqn_top_right_ind(equation_name, Nx, Ny);
+i_eqn_BR = i_eqn_TR + (Ny-1);
+
+end
+
+
+function j_var_BR = get_var_bottom_right_ind(variable_name, Nx, Ny)
+
+% DESCRIPTION
+%   This function returns the index of the specified variable at the bottom-right corner of the domain in the eigenvalue problem matrices.
+% INPUT:
+%   variable_name       name of the variable                                                                                            [char]
+% OUTPUT:
+%   j_var_BR            column index of specified variable at the bottom-right corner of the domain in the eigenvalue problem matrices  [scalar]
+
+j_var_TR = get_var_top_right_ind(variable_name, Nx, Ny);
+j_var_BR = j_var_TR + (Ny-1);
+
+end
+
+
+function i_eqn_TL = get_eqn_top_left_ind(equation_name, Nx, Ny)
+
+% DESCRIPTION
+%   This function returns the index of the specified equation at the top-left corner of the domain in the eigenvalue problem matrices.
+% INPUT:
+%   equation_name       name of the equation                                                                                        [char]
+% OUTPUT:
+%   i_eqn_TL            row index of specified equation at the top-left corner of the domain in the eigenvalue problem matrices     [scalar]
+
+i_eqn_BL = get_eqn_bottom_left_ind(equation_name, Nx, Ny);
+i_eqn_TL = i_eqn_BL - (Ny-1);
+
+end
+
+
+function j_var_TL = get_var_top_left_ind(variable_name, Nx, Ny)
+
+% DESCRIPTION
+%   This function returns the index of the specified variable at the top-left corner of the domain in the eigenvalue problem matrices.
+% INPUT:
+%   variable_name       name of the variable                                                                                            [char]
+% OUTPUT:
+%   j_var_TL            column index of specified variable at the top-left corner of the domain in the eigenvalue problem matrices      [scalar]
+
+j_var_BL = get_var_bottom_left_ind(variable_name, Nx, Ny);
+j_var_TL = j_var_BL - (Ny-1);
+
+end
+
+
+function i_eqn_T = get_eqn_top_inds(equation_name, Nx, Ny)
+
+% DESCRIPTION
+%   This function returns the indices of the specified equation at the top boundary of the domain in the eigenvalue problem matrices.
+% INPUT:
+%   equation_name       name of the equation                                                                                    [char]
+% OUTPUT:
+%   i_eqn_T             row index of specified equation at the top boundary of the domain in the eigenvalue problem matrices    [scalar]
+
+% nx = 1:Nx;
+% i_eqn_TR = get_eqn_top_right_ind(equation_name, Nx, Ny);
+% i_eqn_T = i_eqn_TR + (nx-1)*Ny;
+
+i_eqn_TR = get_eqn_top_right_ind(equation_name, Nx, Ny);
+i_eqn_TL = get_eqn_top_left_ind(equation_name, Nx, Ny);
+i_eqn_T  = i_eqn_TR : Ny : i_eqn_TL;
+
+end
+
+
+function j_var_T = get_var_top_inds(variable_name, Nx, Ny)
+
+% DESCRIPTION
+%   This function returns the indices of the specified variable at the top boundary of the domain in the eigenvalue problem matrices.
+% INPUT:
+%   variable_name       name of the variable                                                                                        [char]
+% OUTPUT:
+%   j_var_T             column index of specified variable at the top boundary of the domain in the eigenvalue problem matrices     [scalar]
+
+% nx = 1:Nx;
+% j_var_TR = get_var_top_right_ind(variable_name, Nx, Ny);
+% j_var_T = i_var_TR + (nx-1)*Ny;
+
+j_var_TR = get_var_top_right_ind(variable_name, Nx, Ny);
+j_var_TL = get_var_top_left_ind(variable_name, Nx, Ny);
+j_var_T  = j_var_TR : Ny : j_var_TL;
+
+end
+
+
+function i_eqn_B = get_eqn_bottom_inds(equation_name, Nx, Ny)
+
+% DESCRIPTION
+%   This function returns the indices of the specified equation at the bottom boundary of the domain in the eigenvalue problem matrices.
+% INPUT:
+%   equation_name       name of the equation                                                                                        [char]
+% OUTPUT:
+%   i_eqn_B             row index of specified equation at the bottom boundary of the domain in the eigenvalue problem matrices     [scalar]
+
+% nx = 1:Nx;
+% i_eqn_BR = get_eqn_bottom_right_ind(equation_name, Nx, Ny);
+% i_eqn_B = i_eqn_BR + (nx-1)*Ny;
+
+i_eqn_BR = get_eqn_bottom_right_ind(equation_name, Nx, Ny);
+i_eqn_BL = get_eqn_bottom_left_ind(equation_name, Nx, Ny);
+i_eqn_B  = i_eqn_BR : Ny : i_eqn_BL;
+
+end
+
+
+function j_var_B = get_var_bottom_inds(variable_name, Nx, Ny)
+
+% DESCRIPTION
+%   This function returns the indices of the specified variable at the bottom boundary of the domain in the eigenvalue problem matrices.
+% INPUT:
+%   variable_name       name of the variable                                                                                        [char]
+% OUTPUT:
+%   j_var_B             column index of specified variable at the bottom boundary of the domain in the eigenvalue problem matrices  [scalar]
+
+% nx = 1:Nx;
+% j_var_BR = get_var_bottom_right_ind(variable_name, Nx, Ny);
+% j_var_B = j_var_BR + (nx-1)*Ny;
+
+j_var_BR = get_var_bottom_right_ind(variable_name, Nx, Ny);
+j_var_BL = get_var_bottom_left_ind(variable_name, Nx, Ny);
+j_var_B  = j_var_BR : Ny : j_var_BL;
+
+end
+
+
+function i_eqn_R = get_eqn_right_inds(equation_name, Nx, Ny)
+
+% DESCRIPTION
+%   This function returns the indices of the specified variable at the right boundary of the domain in the eigenvalue problem matrices.
+% INPUT:
+%   equation_name       name of the equation                                                                                        [char]
+% OUTPUT:
+%   i_eqn_R             row index of specified equation at the right boundary of the domain in the eigenvalue problem matrices      [scalar]
+
+% ny = 1:Ny;
+% i_eqn_TR = get_eqn_top_right_ind(equation_name, Nx, Ny);
+% i_eqn_R = i_eqn_TR + (ny-1);
+
+i_eqn_TR = get_eqn_top_right_ind(equation_name, Nx, Ny);
+i_eqn_BR = get_eqn_bottom_right_ind(equation_name, Nx, Ny);
+i_eqn_R  = i_eqn_TR : i_eqn_BR;
+
+end
+
+
+function j_var_R = get_var_right_inds(variable_name, Nx, Ny)
+
+% DESCRIPTION
+%   This function returns the indices of the specified variable at the right boundary of the domain in the eigenvalue problem matrices.
+% INPUT:
+%   variable_name       name of the variable                                                                                        [char]
+% OUTPUT:
+%   j_var_R             column index of specified variable at the right boundary of the domain in the eigenvalue problem matrices     [scalar]
+
+% ny = 1:Ny;
+% j_var_TR = get_var_top_right_ind(variable_name, Nx, Ny);
+% j_var_R = j_var_TR + (ny-1);
+
+j_var_TR = get_var_top_right_ind(variable_name, Nx, Ny);
+j_var_BR = get_var_bottom_right_ind(variable_name, Nx, Ny);
+j_var_R = j_var_TR : j_var_BR;
+
+end
+
+
+function i_eqn_L = get_eqn_left_inds(equation_name, Nx, Ny)
+
+% DESCRIPTION
+%   This function returns the indices of the specified variable at the left boundary of the domain in the eigenvalue problem matrices.
+% INPUT:
+%   equation_name       name of the equation                                                                                    [char]
+% OUTPUT:
+%   i_eqn_L             row index of specified equation at the left boundary of the domain in the eigenvalue problem matrices   [scalar]
+
+% ny = 1:Ny;
+% i_eqn_TL = get_eqn_top_left_ind(equation_name, Nx, Ny);
+% i_eqn_L = i_eqn_TL + (ny-1);
+
+i_eqn_TL = get_eqn_top_left_ind(equation_name, Nx, Ny);
+i_eqn_BL = get_eqn_bottom_left_ind(equation_name, Nx, Ny);
+i_eqn_L  = i_eqn_TL : i_eqn_BL;
+
+end
+
+
+function j_var_L = get_var_left_inds(variable_name, Nx, Ny)
+
+% DESCRIPTION
+%   This function returns the indices of the specified variable at the left boundary of the domain in the eigenvalue problem matrices.
+% INPUT:
+%   variable_name       name of the variable                                                                                        [char]
+% OUTPUT:
+%   j_var_L             column index of specified variable at the left boundary of the domain in the eigenvalue problem matrices     [scalar]
+
+% ny = 1:Ny;
+% j_var_TL = get_var_top_left_ind(variable_name, Nx, Ny);
+% j_var_L = j_var_TL + (ny-1);
+
+j_var_TL = get_var_top_left_ind(variable_name, Nx, Ny);
+j_var_BL = get_var_bottom_left_ind(variable_name, Nx, Ny);
+j_var_L = j_var_TL : j_var_BL;
+
+end
+
+
+function i_opr_TR = get_opr_top_right_ind(~, ~)
+
+% DESCRIPTION
+%   This function returns the index of the operator matrix at the top-right corner of the domain.
+% INPUT:
+%   (~, ~)              two insignificant inputs (ment for compatibility of input method with other similar functions)
+% OUTPUT:
+%   i_opr_TR            row index of the operator matrix at the top-right corner of the domain      [scalar]
+
+i_opr_TR = 1;
+
+end
+
+
+function i_opr_BL = get_opr_bottom_left_ind(Nx, Ny)
+
+% DESCRIPTION
+%   This function returns the index of the operator matrix at the bottom-left corner of the domain.
+% INPUT:
+%   Nx                  Number of points along the chordwise direction                              [scalar]
+%   Ny                  Number of points along the vertical direction                               [scalar]
+% OUTPUT:
+%   i_opr_BL            row index of the operator matrix at the bottom-left corner of the domain    [scalar]
+
+i_opr_BL = Nx*Ny;
+
+end
+
+
+function i_opr_BR = get_opr_bottom_right_ind(Nx, Ny)
+
+% DESCRIPTION
+%   This function returns the index of the operator matrix at the bottom-right corner of the domain.
+% INPUT:
+%   Nx                  Number of points along the chordwise direction                              [scalar]
+%   Ny                  Number of points along the vertical direction                               [scalar]
+% OUTPUT:
+%   i_opr_BR            row index of the operator matrix at the bottom-right corner of the domain   [scalar]
+
+i_opr_TR = get_opr_top_right_ind(Nx, Ny);
+i_opr_BR = i_opr_TR + (Ny-1);
+
+end
+
+
+function i_opr_TL = get_opr_top_left_ind(Nx, Ny)
+
+% DESCRIPTION
+%   This function returns the index of the operator matrix at the top-left corner of the domain.
+% INPUT:
+%   Nx                  Number of points along the chordwise direction                          [scalar]
+%   Ny                  Number of points along the vertical direction                           [scalar]
+% OUTPUT:
+%   i_opr_TL            row index of the operator matrix at the top-left corner of the domain   [scalar]
+
+i_opr_BL = get_opr_bottom_left_ind(Nx, Ny);
+i_opr_TL = i_opr_BL - (Ny-1);
+
+end
+
+
+function i_opr_T = get_opr_top_inds(Nx, Ny)
+
+% DESCRIPTION
+%   This function returns the indices of the operator matrix at the top boundary of the domain.
+% INPUT:
+%   Nx                  Number of points along the chordwise direction                          [scalar]
+%   Ny                  Number of points along the vertical direction                           [scalar]
+% OUTPUT:
+%   i_opr_T             row indices of the operator matrix at the top boundary of the domain    [scalar]
+
+% nx = 1:Nx;
+% i_opr_TR = get_opr_top_right_ind(Nx, Ny);
+% i_opr_T = i_opr_TR + (nx-1)*Ny;
+
+i_opr_TR = get_opr_top_right_ind(Nx, Ny);
+i_opr_BR = get_opr_bottom_right_ind(Nx, Ny);
+i_opr_T  = i_opr_TR : Ny : i_opr_BR;
+
+end
+
+
+function i_opr_B = get_opr_bottom_inds(Nx, Ny)
+
+% DESCRIPTION
+%   This function returns the indices of the operator matrix at the bottom boundary of the domain.
+% INPUT:
+%   Nx                  Number of points along the chordwise direction                              [scalar]
+%   Ny                  Number of points along the vertical direction                               [scalar]
+% OUTPUT:
+%   i_opr_B             row indices of the operator matrix at the bottom boundary of the domain     [scalar]
+
+% nx = 1:Nx;
+% i_opr_BR = get_opr_bottom_right_ind(Nx, Ny);
+% i_opr_B = i_opr_TR + (nx-1)*Ny;
+
+i_opr_BR = get_opr_bottom_right_ind(Nx, Ny);
+i_opr_BL = get_opr_bottom_left_ind(Nx, Ny);
+i_opr_B  = i_opr_BR : Ny : i_opr_BL;
+
+end
+
+
+function i_opr_R = get_opr_right_inds(Nx, Ny)
+
+% DESCRIPTION
+%   This function returns the indices of the operator matrix at the right boundary of the domain.
+% INPUT:
+%   Nx                  Number of points along the chordwise direction                          [scalar]
+%   Ny                  Number of points along the vertical direction                           [scalar]
+% OUTPUT:
+%   i_opr_R             row indices of the operator matrix at the right boundary of the domain  [scalar]
+
+% ny = 1:Ny;
+% i_opr_TR = get_opr_top_right_ind(Nx, Ny);
+% i_opr_R  = i_opr_TR + (ny-1);
+
+i_opr_TR = get_opr_top_right_ind(Nx, Ny);
+i_opr_BR = get_opr_bottom_right_ind(Nx, Ny);
+i_opr_R  = i_opr_TR : i_opr_BR;
+
+end
+
+
+function i_opr_L = get_opr_left_inds(Nx, Ny)
+
+% DESCRIPTION
+%   This function returns the indices of the operator matrix at the left boundary of the domain.
+% INPUT:
+%   Nx                  Number of points along the chordwise direction                          [scalar]
+%   Ny                  Number of points along the vertical direction                           [scalar]
+% OUTPUT:
+%   i_opr_L             row indices of the operator matrix at the left boundary of the domain   [scalar]
+
+% ny = 1:Ny;
+% i_opr_TL = get_opr_top_left_ind(Nx, Ny);
+% i_opr_L  = i_opr_TL + (ny-1);
+
+i_opr_TL = get_opr_top_left_ind(Nx, Ny);
+i_opr_BL = get_opr_bottom_left_ind(Nx, Ny);
+i_opr_L  = i_opr_TL : i_opr_BL;
+
+end
+
+
+
