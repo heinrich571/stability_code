@@ -117,6 +117,8 @@ idx         = sub2ind(size(mat_A), eq_rows, var_columns);
 
 mat_A(eq_rows,:) = 0;
 mat_A(idx)       = factor;
+mat_B(eq_rows,:) = 0;
+mat_B(idx)       = 1i;
 
 % No-penetration on the wall; v(y = 0) w(y = 0) = 0
 eq_rows     = block_row(3)    + (Ny-1) + (nx-1)*Ny;
@@ -127,6 +129,8 @@ idx         = sub2ind(size(mat_A), eq_rows, var_columns);
 
 mat_A(eq_rows,:) = 0;
 mat_A(idx)       = factor;
+mat_B(eq_rows,:) = 0;
+mat_B(idx)       = 1i;
 
 eq_rows     = block_row(4)    + (Ny-1) + (nx-1)*Ny;
 var_columns = block_column(3) + (Ny-1) + (nx-1)*Ny;
@@ -136,6 +140,21 @@ idx         = sub2ind(size(mat_A), eq_rows, var_columns);
 
 mat_A(eq_rows,:) = 0;
 mat_A(idx)       = factor;
+mat_B(eq_rows,:) = 0;
+mat_B(idx)       = 1i;
+
+% No-acceleration into the wall; dv/dy(y = 0) = 0
+eq_rows     = block_row(1)    + (Ny-1) + (nx-1)*Ny;
+var_columns = block_column(2) + (Ny-1) + (nx-1)*Ny;
+eq_rows     = eq_rows(:);
+var_columns = var_columns(:);
+idx         = sub2ind(size(mat_A), eq_rows, var_columns);
+
+A_tmp            = mat_A(idx);
+mat_A(eq_rows,:) = 0;
+mat_A(idx)       = A_tmp;
+mat_B(eq_rows,:) = 0;
+mat_B(idx)       = A_tmp;
 
 % No pressure changes in the y-direction right near the wall
 eq_rows     = block_row(3)    + (Ny-1) + (nx-1)*Ny;
@@ -145,11 +164,12 @@ eq_rows     = eq_rows(:);
 var_columns = var_columns(:);
 idx         = sub2ind(size(mat_A), eq_rows, var_columns);
 
-A_tmp = mat_A(idx);
+A_tmp            = mat_A(idx);
 mat_A(eq_rows,:) = 0;
 mat_A(idx)       = A_tmp*factor;
+
 mat_B(eq_rows,:) = 0;
-mat_B(idx)       = 1;
+mat_B(idx)       = 1i*A_tmp;
 
 
 % Disturbance decay far away from the wall
@@ -162,6 +182,8 @@ idx         = sub2ind(size(mat_A), eq_rows, var_columns);
 
 mat_A(eq_rows,:) = 0;
 mat_A(idx)       = factor;
+mat_B(eq_rows,:) = 0;
+mat_B(idx)       = 1i;
 
 % v(y --> inf) = 0
 eq_rows     = block_row(3)    + (nx-1)*Ny;
@@ -172,6 +194,8 @@ idx         = sub2ind(size(mat_A), eq_rows, var_columns);
 
 mat_A(eq_rows,:) = 0;
 mat_A(idx)       = factor;
+mat_B(eq_rows,:) = 0;
+mat_B(idx)       = 1i;
 
 % w(y --> inf) = 0
 eq_rows     = block_row(4)    + (nx-1)*Ny;
@@ -182,6 +206,8 @@ idx         = sub2ind(size(mat_A), eq_rows, var_columns);
 
 mat_A(eq_rows,:) = 0;
 mat_A(idx)       = factor;
+mat_B(eq_rows,:) = 0;
+mat_B(idx)       = 1i;
 
 
 % p(y --> inf) = 0
@@ -194,7 +220,21 @@ idx         = sub2ind(size(mat_A), eq_rows, var_columns);
 mat_A(eq_rows,:) = 0;
 mat_A(idx)       = factor;
 mat_B(eq_rows,:) = 0;
-mat_B(idx)       = 1; % needed to ensure the "extra" eigenvalue is at w = -200 + 0*i
+mat_B(idx)       = 1i; % needed to ensure the "extra" eigenvalue is at w = -200 + 0*i
+
+
+% dp/dx at (x = x_lim) = 0
+eq_rows     = block_row(4)    + 1:(Ny-1);
+var_columns = block_column(4) + 1:(Ny-1);
+eq_rows     = eq_rows(:);
+var_columns = var_columns(:);
+idx         = sub2ind(size(mat_A), eq_rows, var_columns);
+
+A_tmp            = mat_A(idx);
+mat_A(eq_rows,:) = 0;
+mat_A(idx)       = A_tmp;
+mat_B(eq_rows)   = 0;
+mat_B(idx)       = 1i*A_tmp;
 
 
 end
