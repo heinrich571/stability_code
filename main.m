@@ -11,12 +11,14 @@ startup
 
 % Grid parameters
 
-X_normalized_Limit  = 10;
-Y_normalized_Limit  = 10;
+X_normalized_Limit  = 20;
+Y_normalized_Limit  = 20;
 Y_normalized_Median = 2.4;
 
-Nx = 20;
+Nx = 50;
 Ny = Nx/2;
+
+beta = 0.255;
 
 
 % Base flow parameters
@@ -28,8 +30,8 @@ Definitions.convergenceTolerance = 1e-6;
 
 % Flags and other settings
 
-Flags.Display_Domain    = 0;
-Flags.Display_Base_Flow = 0;
+Flags.Display_Domain    = 1;
+Flags.Display_Base_Flow = 1;
 
 
 %% Get the computational domain
@@ -51,7 +53,9 @@ end
 
 %% Create Matrices A & B for the BiGlobal eigenvalue problem
 
-[mat_A, mat_B] = create_eigenvalue_matrices(Domain, Base_Flow, 0);
+[mat_A, mat_B] = create_eigenvalue_matrices(Domain, Base_Flow, beta);
+[eigenfunctions_matrix,eigenvalues_matrix] = eig(mat_A, mat_B);
+w = diag(eigenvalues_matrix);
 smat_A = sparse(mat_A);
 smat_B = sparse(mat_B);
 
