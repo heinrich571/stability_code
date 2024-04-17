@@ -15,7 +15,7 @@ X_normalized_Limit  = 20;
 Y_normalized_Limit  = 20;
 Y_normalized_Median = 2.4;
 
-Nx = 50;
+Nx = 40;
 Ny = Nx/2;
 
 beta = 0.255;
@@ -55,23 +55,25 @@ end
 
 [mat_A, mat_B] = create_eigenvalue_matrices(Domain, Base_Flow, beta);
 [eigenfunctions_matrix,eigenvalues_matrix] = eig(mat_A, mat_B);
-w = diag(eigenvalues_matrix);
-smat_A = sparse(mat_A);
-smat_B = sparse(mat_B);
+% evalue = diag(eigenvalues_matrix);
+% smat_A = sparse(mat_A);
+% smat_B = sparse(mat_B);
+% 
+% 
+% %% Solve the eigenvalue problem
+% 
+% Solution = solve_BiGlobal_eigenvalue_problem();
+% Tests = check_solution(Solution, mat_A, mat_B);
+% 
+% %% Plot the results
+% 
+% plot_results
+% 
+% 
+% %% Cleanup and remove added paths
+% 
+% path_manager('remove')
 
-
-%% Solve the eigenvalue problem
-
-Solution = solve_BiGlobal_eigenvalue_problem();
-Tests = check_solution(Solution, mat_A, mat_B);
-
-%% Plot the results
-
-plot_results
-
-
-%% Cleanup and remove added paths
-
-path_manager('remove')
+save('output_test.mat', 'eigenfunctions_matrix', 'eigenvalues_matrix')
 
 

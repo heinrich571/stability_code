@@ -1,11 +1,11 @@
 %% -------------------------- User toggles --------------------------- %%
-StartupSettings.FontName            = 'Times New Roman';
+StartupSettings.FontName            = 'Arial';
 StartupSettings.FontWeight          = 'Normal';
-StartupSettings.AxesFontSize        = 22;
+StartupSettings.AxesFontSize        = 18;
 StartupSettings.TitleTextMultiplier = 1.4;
 StartupSettings.LabelTextMultiplier = 1.2;
 StartupSettings.LineWidth           = 2.5;
-StartupSettings.MarkerSize          = 7;
+StartupSettings.MarkerSize          = 9;
 StartupSettings.LegendLocation      = 'northeast';
 StartupSettings.LegendFontSize      = 16;
 StartupSettings.LegendFontWeight    = 'Normal';
@@ -15,8 +15,8 @@ StartupSettings.ColorMap            = jet;
 StartupSettings.GridMode            = 'on';
 StartupSettings.GridMinorMode       = 'off';
 StartupSettings.ColorOrder          = [ 000, 090, 255
-                                        255, 000, 000
                                         000, 180, 000
+                                        255, 000, 000
                                         255, 000, 255
                                         253, 127, 001
                                         000, 190, 190
@@ -68,13 +68,13 @@ set(groot, 'defaultAxesFontSize', StartupSettings.AxesFontSize)
 set(groot, 'defaultAxesLabelFontSizeMultiplier', StartupSettings.LabelTextMultiplier)
 set(groot, 'defaultAxesTitleFontSize', StartupSettings.TitleTextMultiplier)
 set(groot, 'defaultAxesXColor', 0.1*ones(1,3), 'defaultAxesYColor', 0.1*ones(1,3))
-set(groot, 'defaultAxesLineWidth', 1)
+set(groot, 'defaultAxesLineWidth', 1.0)
 set(groot, 'defaultLineMarkerFaceColor', ones(1, 3))
 set(groot, 'defaultAxesXMinorGridMode', 'manual', 'defaultAxesYMinorGridMode', 'manual', 'defaultAxesZMinorGridMode', 'manual')
 set(groot, 'defaultAxesXGrid', StartupSettings.GridMode, 'defaultAxesYGrid', StartupSettings.GridMode, 'defaultAxesZGrid', StartupSettings.GridMode)
 set(groot, 'defaultAxesXMinorGrid', StartupSettings.GridMinorMode, 'defaultAxesYMinorGrid', StartupSettings.GridMinorMode, 'defaultAxesZMinorGrid', StartupSettings.GridMinorMode)
-set(groot, 'defaultAxesGridLineStyle', '-')
-set(groot, 'defaultAxesGridAlpha', 0.1)
+set(groot, 'defaultAxesGridLineStyle', '--')
+set(groot, 'defaultAxesGridAlpha', 1.0)
 set(groot, 'defaultAxesMinorGridLineStyle', '-')
 set(groot, 'defaultAxesMinorGridAlpha', 0.04)
 set(groot, 'defaultAxesColor', 1*ones(1,3))
@@ -83,15 +83,13 @@ set(groot, 'defaultAxesTickDir', StartupSettings.AxesTickDir)
 set(groot, 'defaultAxesTickLength', StartupSettings.AxesTickLength.*ones(1,2))
 set(groot, 'defaultAxesXMinorTick', 'on', 'defaultAxesYMinorTick', 'on', 'defaultAxesZMinorTick', 'on')
 set(groot, 'defaultAxesNextPlot', 'add')
-set(groot, 'defaultAxesBox', 'off')
+set(groot, 'defaultAxesBox', 'on')
 set(groot, 'defaultAxesUnits', 'Normalized')
 set(groot, 'defaultAxesColorOrder', StartupSettings.ColorOrder)
 
-set(groot, 'defaultScatterLineWidth', 1.5)
+set(groot, 'defaultScatterLineWidth', 1.4)
 
 set(groot, 'defaultHistogramFaceAlpha', 1)
-set(groot, 'defaultHistogramEdgeColor', [0 0.5 0.85])
-set(groot, 'defaultHistogramFaceColor', [0 0.6 1])
 
 set(groot, 'defaultQuiverAutoScaleFactor', 1.0)
 set(groot, 'defaultQuiverLineWidth', StartupSettings.LineWidth)
