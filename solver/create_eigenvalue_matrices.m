@@ -142,6 +142,14 @@ mat_A(linear_inds)   = dirichlet_factor;
 mat_B(linear_inds)   = 1;
 
 
+% % % % Pressure compatibility condition
+% % % row_inds_continuity = get_eqn_bottom_inds('continuity', Nx, Ny);
+% % % row_inds_x_momentum = get_eqn_bottom_inds('x momentum', Nx, Ny);
+% % % row_inds_y_momentum = get_eqn_bottom_inds('y momentum', Nx, Ny);
+% % % 
+% % % mat_A(row_inds_continuity(:),:) = mat_A(row_inds_x_momentum(:),:);
+% % % mat_B(row_inds_continuity(:),:) = 0;
+
 % Disturbances decay as y --> infinity
 % u(y --> inf) = 0
 row_inds    = get_eqn_top_inds('x momentum', Nx, Ny);
@@ -245,8 +253,8 @@ column_inds = j_p_TR:j_p_BL;
 
 mat_A(row_inds,:) = 0;
 mat_B(row_inds,:) = 0;
-mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
-mat_B(row_inds,column_inds) = 1*D2x(operator_row_inds,:);
+mat_A(row_inds,column_inds) = linear_extrap_factor*Dx(operator_row_inds,:);
+mat_B(row_inds,column_inds) = 1*Dx(operator_row_inds,:);
 
 % LEFT BOUNDARY
 % d2u/dx2 = 0
@@ -306,8 +314,8 @@ column_inds = j_p_TR:j_p_BL;
 
 mat_A(row_inds,:) = 0;
 mat_B(row_inds,:) = 0;
-mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
-mat_B(row_inds,column_inds) = 1*D2x(operator_row_inds,:);
+mat_A(row_inds,column_inds) = linear_extrap_factor*Dx(operator_row_inds,:);
+mat_B(row_inds,column_inds) = 1*Dx(operator_row_inds,:);
 
 
 end

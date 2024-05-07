@@ -1,10 +1,10 @@
 %% -------------------------- User toggles --------------------------- %%
 StartupSettings.FontName            = 'Arial';
 StartupSettings.FontWeight          = 'Normal';
-StartupSettings.AxesFontSize        = 18;
+StartupSettings.AxesFontSize        = 16;
 StartupSettings.TitleTextMultiplier = 1.4;
 StartupSettings.LabelTextMultiplier = 1.2;
-StartupSettings.LineWidth           = 2.5;
+StartupSettings.LineWidth           = 2;
 StartupSettings.MarkerSize          = 9;
 StartupSettings.LegendLocation      = 'northeast';
 StartupSettings.LegendFontSize      = 16;
@@ -15,8 +15,8 @@ StartupSettings.ColorMap            = jet;
 StartupSettings.GridMode            = 'on';
 StartupSettings.GridMinorMode       = 'off';
 StartupSettings.ColorOrder          = [ 000, 090, 255
+                                        255, 000, 000                                        
                                         000, 180, 000
-                                        255, 000, 000
                                         255, 000, 255
                                         253, 127, 001
                                         000, 190, 190
@@ -69,12 +69,11 @@ set(groot, 'defaultAxesLabelFontSizeMultiplier', StartupSettings.LabelTextMultip
 set(groot, 'defaultAxesTitleFontSize', StartupSettings.TitleTextMultiplier)
 set(groot, 'defaultAxesXColor', 0.1*ones(1,3), 'defaultAxesYColor', 0.1*ones(1,3))
 set(groot, 'defaultAxesLineWidth', 1.0)
-set(groot, 'defaultLineMarkerFaceColor', ones(1, 3))
 set(groot, 'defaultAxesXMinorGridMode', 'manual', 'defaultAxesYMinorGridMode', 'manual', 'defaultAxesZMinorGridMode', 'manual')
 set(groot, 'defaultAxesXGrid', StartupSettings.GridMode, 'defaultAxesYGrid', StartupSettings.GridMode, 'defaultAxesZGrid', StartupSettings.GridMode)
 set(groot, 'defaultAxesXMinorGrid', StartupSettings.GridMinorMode, 'defaultAxesYMinorGrid', StartupSettings.GridMinorMode, 'defaultAxesZMinorGrid', StartupSettings.GridMinorMode)
-set(groot, 'defaultAxesGridLineStyle', '--')
-set(groot, 'defaultAxesGridAlpha', 1.0)
+set(groot, 'defaultAxesGridLineStyle', '-')
+set(groot, 'defaultAxesGridAlpha', 0.05)
 set(groot, 'defaultAxesMinorGridLineStyle', '-')
 set(groot, 'defaultAxesMinorGridAlpha', 0.04)
 set(groot, 'defaultAxesColor', 1*ones(1,3))
@@ -83,13 +82,16 @@ set(groot, 'defaultAxesTickDir', StartupSettings.AxesTickDir)
 set(groot, 'defaultAxesTickLength', StartupSettings.AxesTickLength.*ones(1,2))
 set(groot, 'defaultAxesXMinorTick', 'on', 'defaultAxesYMinorTick', 'on', 'defaultAxesZMinorTick', 'on')
 set(groot, 'defaultAxesNextPlot', 'add')
-set(groot, 'defaultAxesBox', 'on')
+set(groot, 'defaultAxesBox', 'off')
 set(groot, 'defaultAxesUnits', 'Normalized')
 set(groot, 'defaultAxesColorOrder', StartupSettings.ColorOrder)
 
 set(groot, 'defaultScatterLineWidth', 1.4)
 
 set(groot, 'defaultHistogramFaceAlpha', 1)
+
+set(groot, 'defaultContourLineWidth', 0.5)
+set(groot, 'defaultContourLineColor', 0.15*ones(1, 3))
 
 set(groot, 'defaultQuiverAutoScaleFactor', 1.0)
 set(groot, 'defaultQuiverLineWidth', StartupSettings.LineWidth)
@@ -102,7 +104,7 @@ set(groot, 'defaultLegendFontSize', StartupSettings.LegendFontSize)
 set(groot, 'defaultLegendFontWeightMode', 'manual')
 set(groot, 'defaultLegendFontWeight', StartupSettings.LegendFontWeight)
 set(groot, 'defaultLegendColor', 0.99*ones(1,3))
-set(groot, 'defaultLegendEdgeColor', 0.65*ones(1, 3))
+set(groot, 'defaultLegendEdgeColor', 0.8*ones(1, 3))
 set(groot, 'defaultLegendLocation', StartupSettings.LegendLocation)
 % --------------------------------------------------------------------- %
 
@@ -463,26 +465,21 @@ toggleMinorGridButton.ClickedCallback = @toggleGrid;
     end
 
     function setPlotSymbols(~,~)
-        symbolSet = {'o','s','^','d','x','v','p','>','+','<'};
-        lines = findobj(gcf,'type','line');
+        plotLineWidth = 1;
+        symbolSet = {'^','s','d','<','o','v','>','x','p','+'};
+        lines = findobj(gcf, 'type', 'line');
         N_lines = numel(lines);
-        lineSet = {'-','-.','--'};
+        lineSet = {'-' , '-.' , '--'};
         for n = N_lines:-1:1
-            XLim(1) = lines(n).XData(1);
-            XLim(2) = lines(n).XData(end);
-            if mod(n,2) ~= 0
-                x = [XLim(1),XLim(1):(XLim(2)-XLim(1))/10:XLim(2),XLim(2)];
-            else
-                x = [XLim(1),XLim(1):(XLim(2)-XLim(1))/13:XLim(2),XLim(2)];
-            end
-            lineColor = lines(n).Color;
-            if N_lines <= 3
-                lines(n).LineStyle = lineSet{N_lines-n+1};
-            end
-            y = interp1(lines(n).XData,lines(n).YData,x);
-            p(N_lines-n+1) = plot(x,y,[symbolSet{N_lines-n+1}],'Color',lineColor,'DisplayName',lines(n).DisplayName);
+            xdata = lines(n).XData;
+            ydata = lines(n).YData;
+            zdata = lines(n).ZData;
+            
+            n_inds = numel(xdata);
+            lines(n).MarkerIndices = 1:round(n_inds/10):n_inds;
+            lines(n).Marker = symbolSet{N_lines-n+1};
+            lines(n).LineWidth = plotLineWidth;
         end
-        legend(p)
     end
 
     function toggleGrid(src,~)

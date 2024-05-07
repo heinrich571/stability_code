@@ -4,7 +4,8 @@ if nargin < 2, additional_paths = {}; end
 path_list = {'./baseflow_definition'
              './grid_generation'
              './solver'
-             './utilities'};
+             './utilities'
+             './plots'};
 
 for i = 1:length(path_list)
     switch command
