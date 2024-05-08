@@ -112,9 +112,9 @@ dispstatus()
 
 %% Draw eigenfunctions
 
-omega_ind = 1000;
+omega_ind = 670;
 
-ploteigfun(Domain, Solution, 'u', omega_ind)
+% ploteigfun(Domain, Solution, 'u', omega_ind)
 ploteigfun(Domain, Solution, 'v', omega_ind)
-ploteigfun(Domain, Solution, 'w', omega_ind)
-ploteigfun(Domain, Solution, 'p', omega_ind)
+% ploteigfun(Domain, Solution, 'w', omega_ind)
+% ploteigfun(Domain, Solution, 'p', omega_ind)
