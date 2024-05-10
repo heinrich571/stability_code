@@ -1,6 +1,6 @@
 %% Fresh start
 
-close all
+% close all
 clearvars
 clc
 path_manager('add')
@@ -10,10 +10,12 @@ startup
 %% Define problem parameters
 
 % Parallel runs
-N_Workers = 1;
-% N_Workers = 4;
+% N_Workers = 1;
+N_Workers = 4;
 
-if N_Workers ~= 1
+p = gcp('nocreate');
+
+if N_Workers ~= 1 && isempty(p)
     parpool(N_Workers)
 end
 
@@ -23,10 +25,10 @@ X_normalized_Limit  = 20;
 Y_normalized_Limit  = 20;
 Y_normalized_Median = 2.4;
 
-Nx = 30;
-Ny = Nx/2;
+Nx = 40;
+Ny = 80;
 
-beta = 2;
+beta = 0.2;
 
 
 % Base flow parameters
@@ -38,7 +40,7 @@ Definitions.convergenceTolerance = 1e-6;
 
 % Flags and other settings
 
-Flags.Display_Domain    = 0;
+Flags.Display_Domain    = 1;
 Flags.Display_Base_Flow = 0;
 
 
@@ -112,9 +114,11 @@ dispstatus()
 
 %% Draw eigenfunctions
 
-omega_ind = 1;
+omega_ind = 9;
 
-% ploteigfun(Domain, Solution_Filtered, 'u', omega_ind)
+ploteigfun(Domain, Solution_Filtered, 'u', omega_ind)
 ploteigfun(Domain, Solution_Filtered, 'v', omega_ind)
-% ploteigfun(Domain, Solution_Filtered, 'w', omega_ind)
-% ploteigfun(Domain, Solution_Filtered, 'p', omega_ind)
+ploteigfun(Domain, Solution_Filtered, 'w', omega_ind)
+ploteigfun(Domain, Solution_Filtered, 'p', omega_ind)
+
+% ploteigenvalues(Solution_Filtered)

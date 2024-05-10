@@ -18,6 +18,7 @@ ddphi = flip(Base_Flow.ddphi);
 mat_X = Domain.mat_X;
 Dx    = Domain.Dx;
 Dy    = Domain.Dy;
+D2x   = Domain.D2x;
 
 mat_phi   = repmat(phi  , [1,Nx]);
 mat_dphi  = repmat(dphi , [1,Nx]);
@@ -105,6 +106,7 @@ mat_B = [b11 b12 b13 b14
 dirichlet_factor     = 200;
 neumann_factor       = 300;
 linear_extrap_factor = 400;
+pressure_compatibility_factor = 500;
 
 % No-slip on the wall:
 % u(y = 0) = 0
@@ -141,13 +143,13 @@ mat_A(linear_inds)   = dirichlet_factor;
 mat_B(linear_inds)   = 1;
 
 
-% % % % Pressure compatibility condition
-% % % row_inds_continuity = get_eqn_bottom_inds('continuity', Nx, Ny);
-% % % row_inds_x_momentum = get_eqn_bottom_inds('x momentum', Nx, Ny);
-% % % row_inds_y_momentum = get_eqn_bottom_inds('y momentum', Nx, Ny);
-% % % 
-% % % mat_A(row_inds_continuity(:),:) = mat_A(row_inds_x_momentum(:),:);
-% % % mat_B(row_inds_continuity(:),:) = 0;
+% % Pressure compatibility condition
+% row_inds_continuity = get_eqn_bottom_inds('continuity', Nx, Ny);
+% row_inds_x_momentum = get_eqn_bottom_inds('x momentum', Nx, Ny);
+% row_inds_y_momentum = get_eqn_bottom_inds('y momentum', Nx, Ny);
+
+% mat_A(row_inds_continuity(:),:) = mat_A(row_inds_x_momentum(:),:);
+% mat_B(row_inds_continuity(:),:) = 0;
 
 % Disturbances decay as y --> infinity
 % u(y --> inf) = 0
@@ -195,21 +197,21 @@ mat_B(linear_inds)   = 1;
 
 % Linear extrapolation of disturbances at the chordwise directions
 % RIGHT BOUNDARY
-% % d2u/dx2 = 0
-% operator_row_inds = get_opr_right_inds(Nx, Ny);
-% row_inds          = get_eqn_right_inds('x momentum', Nx, Ny);
-% operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
-% row_inds          = row_inds(2:end-1);
-% 
-% j_u_TR = get_var_top_right_ind('u', Nx, Ny);
-% j_u_BL = get_var_bottom_left_ind('u', Nx, Ny);
-% column_inds = j_u_TR:j_u_BL;
-% 
-% mat_A(row_inds,:) = 0;
-% mat_B(row_inds,:) = 0;
-% mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
-% mat_B(row_inds,column_inds) = 1*D2x(operator_row_inds,:);
-% 
+% d2u/dx2 = 0
+operator_row_inds = get_opr_right_inds(Nx, Ny);
+row_inds          = get_eqn_right_inds('x momentum', Nx, Ny);
+operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
+row_inds          = row_inds(2:end-1);
+
+j_u_TR = get_var_top_right_ind('u', Nx, Ny);
+j_u_BL = get_var_bottom_left_ind('u', Nx, Ny);
+column_inds = j_u_TR:j_u_BL;
+
+mat_A(row_inds,:) = 0;
+mat_B(row_inds,:) = 0;
+mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
+mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+
 % % d2v/dx2 = 0
 % operator_row_inds = get_opr_right_inds(Nx, Ny);
 % row_inds          = get_eqn_right_inds('y momentum', Nx, Ny);
@@ -224,54 +226,54 @@ mat_B(linear_inds)   = 1;
 % mat_B(row_inds,:) = 0;
 % mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
 % mat_B(row_inds,column_inds) = 1*D2x(operator_row_inds,:);
-% 
-% % d2w/dx2 = 0
-% operator_row_inds = get_opr_right_inds(Nx, Ny);
-% row_inds          = get_eqn_right_inds('z momentum', Nx, Ny);
-% operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
-% row_inds          = row_inds(2:end-1);
-% 
-% j_w_TR = get_var_top_right_ind('w', Nx, Ny);
-% j_w_BL = get_var_bottom_left_ind('w', Nx, Ny);
-% column_inds = j_w_TR:j_w_BL;
-% 
-% mat_A(row_inds,:) = 0;
-% mat_B(row_inds,:) = 0;
-% mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
-% mat_B(row_inds,column_inds) = 1*D2x(operator_row_inds,:);
-% 
-% % d2p/dx2 = 0 - replacing a continuity equation at the right boundary
-% operator_row_inds = get_opr_right_inds(Nx, Ny);
-% row_inds          = get_eqn_right_inds('continuity', Nx, Ny);
-% operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
-% row_inds          = row_inds(2:end-1);
-% 
-% j_p_TR = get_var_top_right_ind('p', Nx, Ny);
-% j_p_BL = get_var_bottom_left_ind('p', Nx, Ny);
-% column_inds = j_p_TR:j_p_BL;
-% 
-% mat_A(row_inds,:) = 0;
-% mat_B(row_inds,:) = 0;
-% mat_A(row_inds,column_inds) = linear_extrap_factor*Dx(operator_row_inds,:);
-% mat_B(row_inds,column_inds) = 1*Dx(operator_row_inds,:);
+
+% d2w/dx2 = 0
+operator_row_inds = get_opr_right_inds(Nx, Ny);
+row_inds          = get_eqn_right_inds('z momentum', Nx, Ny);
+operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
+row_inds          = row_inds(2:end-1);
+
+j_w_TR = get_var_top_right_ind('w', Nx, Ny);
+j_w_BL = get_var_bottom_left_ind('w', Nx, Ny);
+column_inds = j_w_TR:j_w_BL;
+
+mat_A(row_inds,:) = 0;
+mat_B(row_inds,:) = 0;
+mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
+mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+
+% d2p/dx2 = 0 - replacing a continuity equation at the right boundary
+operator_row_inds = get_opr_right_inds(Nx, Ny);
+row_inds          = get_eqn_right_inds('continuity', Nx, Ny);
+operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
+row_inds          = row_inds(2:end-1);
+
+j_p_TR = get_var_top_right_ind('p', Nx, Ny);
+j_p_BL = get_var_bottom_left_ind('p', Nx, Ny);
+column_inds = j_p_TR:j_p_BL;
+
+mat_A(row_inds,:) = 0;
+mat_B(row_inds,:) = 0;
+mat_A(row_inds,column_inds) = linear_extrap_factor*Dx(operator_row_inds,:);
+mat_B(row_inds,column_inds) = 1i*Dx(operator_row_inds,:);
 
 
 % LEFT BOUNDARY
 % d2u/dx2 = 0
-% operator_row_inds = get_opr_left_inds(Nx, Ny);
-% row_inds          = get_eqn_left_inds('x momentum', Nx, Ny);
-% operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
-% row_inds          = row_inds(2:end-1);
-% 
-% j_u_TR = get_var_top_right_ind('u', Nx, Ny);
-% j_u_BL = get_var_bottom_left_ind('u', Nx, Ny);
-% column_inds = j_u_TR:j_u_BL;
-% 
-% mat_A(row_inds,:) = 0;
-% mat_B(row_inds,:) = 0;
-% mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
-% mat_B(row_inds,column_inds) = 1*D2x(operator_row_inds,:);
-% 
+operator_row_inds = get_opr_left_inds(Nx, Ny);
+row_inds          = get_eqn_left_inds('x momentum', Nx, Ny);
+operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
+row_inds          = row_inds(2:end-1);
+
+j_u_TR = get_var_top_right_ind('u', Nx, Ny);
+j_u_BL = get_var_bottom_left_ind('u', Nx, Ny);
+column_inds = j_u_TR:j_u_BL;
+
+mat_A(row_inds,:) = 0;
+mat_B(row_inds,:) = 0;
+mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
+mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+
 % % d2v/dx2 = 0
 % operator_row_inds = get_opr_left_inds(Nx, Ny);
 % row_inds          = get_eqn_left_inds('y momentum', Nx, Ny);
@@ -286,107 +288,107 @@ mat_B(linear_inds)   = 1;
 % mat_B(row_inds,:) = 0;
 % mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
 % mat_B(row_inds,column_inds) = 1*D2x(operator_row_inds,:);
-% 
-% % d2w/dx2 = 0
-% operator_row_inds = get_opr_left_inds(Nx, Ny);
-% row_inds          = get_eqn_left_inds('z momentum', Nx, Ny);
-% operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
-% row_inds          = row_inds(2:end-1);
-% 
-% j_w_TR = get_var_top_right_ind('w', Nx, Ny);
-% j_w_BL = get_var_bottom_left_ind('w', Nx, Ny);
-% column_inds = j_w_TR:j_w_BL;
-% 
-% mat_A(row_inds,:) = 0;
-% mat_B(row_inds,:) = 0;
-% mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
-% mat_B(row_inds,column_inds) = 1*D2x(operator_row_inds,:);
-% 
-% % d2p/dx2 = 0 - replacing a continuity equation at the left boundary
-% operator_row_inds = get_opr_left_inds(Nx, Ny);
-% row_inds          = get_eqn_left_inds('continuity', Nx, Ny);
-% operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
-% row_inds          = row_inds(2:end-1);
-% 
-% j_p_TR = get_var_top_right_ind('p', Nx, Ny);
-% j_p_BL = get_var_bottom_left_ind('p', Nx, Ny);
-% column_inds = j_p_TR:j_p_BL;
-% 
-% mat_A(row_inds,:) = 0;
-% mat_B(row_inds,:) = 0;
-% mat_A(row_inds,column_inds) = linear_extrap_factor*Dx(operator_row_inds,:);
-% mat_B(row_inds,column_inds) = 1*Dx(operator_row_inds,:);
+
+% d2w/dx2 = 0
+operator_row_inds = get_opr_left_inds(Nx, Ny);
+row_inds          = get_eqn_left_inds('z momentum', Nx, Ny);
+operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
+row_inds          = row_inds(2:end-1);
+
+j_w_TR = get_var_top_right_ind('w', Nx, Ny);
+j_w_BL = get_var_bottom_left_ind('w', Nx, Ny);
+column_inds = j_w_TR:j_w_BL;
+
+mat_A(row_inds,:) = 0;
+mat_B(row_inds,:) = 0;
+mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
+mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+
+% d2p/dx2 = 0 - replacing a continuity equation at the left boundary
+operator_row_inds = get_opr_left_inds(Nx, Ny);
+row_inds          = get_eqn_left_inds('continuity', Nx, Ny);
+operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
+row_inds          = row_inds(2:end-1);
+
+j_p_TR = get_var_top_right_ind('p', Nx, Ny);
+j_p_BL = get_var_bottom_left_ind('p', Nx, Ny);
+column_inds = j_p_TR:j_p_BL;
+
+mat_A(row_inds,:) = 0;
+mat_B(row_inds,:) = 0;
+mat_A(row_inds,column_inds) = linear_extrap_factor*Dx(operator_row_inds,:);
+mat_B(row_inds,column_inds) = 1i*Dx(operator_row_inds,:);
 
 
-% Linear extrapolation - right boundary
-j_u_right_inds = get_var_right_inds('u', Nx, Ny);
-j_v_right_inds = get_var_right_inds('v', Nx, Ny);
-j_w_right_inds = get_var_right_inds('w', Nx, Ny);
-j_p_right_inds = get_var_right_inds('p', Nx, Ny);
-i_xmom_right_inds = get_eqn_right_inds('x momentum', Nx, Ny);
-i_ymom_right_inds = get_eqn_right_inds('y momentum', Nx, Ny);
-i_zmom_right_inds = get_eqn_right_inds('z momentum', Nx, Ny);
-i_cont_right_inds = get_eqn_right_inds('continuity', Nx, Ny);
-mat_A(i_xmom_right_inds(2:end-1),:) = 0;
-mat_B(i_xmom_right_inds(2:end-1),:) = 0;
-mat_A(i_ymom_right_inds(2:end-1),:) = 0;
-mat_B(i_ymom_right_inds(2:end-1),:) = 0;
-mat_A(i_zmom_right_inds(2:end-1),:) = 0;
-mat_B(i_zmom_right_inds(2:end-1),:) = 0;
-mat_A(i_cont_right_inds(2:end-1),:) = 0;
-mat_B(i_cont_right_inds(2:end-1),:) = 0;
-for i = 2:Ny-1
-    C = (mat_X(i,1)-mat_X(i,2))/(mat_X(i,3)-mat_X(i,2));
-    linear_extrap_opr = [1 C-1 -C];
-    ind_shift = Ny*[0 1 2];
-    % u
-    mat_A(i_xmom_right_inds(i),j_u_right_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
-    mat_B(i_xmom_right_inds(i),j_u_right_inds(i) + ind_shift) = linear_extrap_opr;
-    % v
-    mat_A(i_ymom_right_inds(i),j_v_right_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
-    mat_B(i_ymom_right_inds(i),j_v_right_inds(i) + ind_shift) = linear_extrap_opr;
-    % w
-    mat_A(i_zmom_right_inds(i),j_w_right_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
-    mat_B(i_zmom_right_inds(i),j_w_right_inds(i) + ind_shift) = linear_extrap_opr;
-    % p
-    mat_A(i_cont_right_inds(i),j_p_right_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
-    mat_B(i_cont_right_inds(i),j_p_right_inds(i) + ind_shift) = linear_extrap_opr;
-end
+% % Linear extrapolation - right boundary
+% j_u_right_inds = get_var_right_inds('u', Nx, Ny);
+% j_v_right_inds = get_var_right_inds('v', Nx, Ny);
+% j_w_right_inds = get_var_right_inds('w', Nx, Ny);
+% j_p_right_inds = get_var_right_inds('p', Nx, Ny);
+% i_xmom_right_inds = get_eqn_right_inds('x momentum', Nx, Ny);
+% i_ymom_right_inds = get_eqn_right_inds('y momentum', Nx, Ny);
+% i_zmom_right_inds = get_eqn_right_inds('z momentum', Nx, Ny);
+% i_cont_right_inds = get_eqn_right_inds('continuity', Nx, Ny);
+% mat_A(i_xmom_right_inds(2:end-1),:) = 0;
+% mat_B(i_xmom_right_inds(2:end-1),:) = 0;
+% mat_A(i_ymom_right_inds(2:end-1),:) = 0;
+% mat_B(i_ymom_right_inds(2:end-1),:) = 0;
+% mat_A(i_zmom_right_inds(2:end-1),:) = 0;
+% mat_B(i_zmom_right_inds(2:end-1),:) = 0;
+% mat_A(i_cont_right_inds(2:end-1),:) = 0;
+% mat_B(i_cont_right_inds(2:end-1),:) = 0;
+% for i = 2:Ny-1
+%     C = (mat_X(i,1)-mat_X(i,2))/(mat_X(i,3)-mat_X(i,2));
+%     linear_extrap_opr = [1 C-1 -C];
+%     ind_shift = Ny*[0 1 2];
+%     % u
+%     mat_A(i_xmom_right_inds(i),j_u_right_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
+%     mat_B(i_xmom_right_inds(i),j_u_right_inds(i) + ind_shift) = linear_extrap_opr;
+%     % v
+%     mat_A(i_ymom_right_inds(i),j_v_right_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
+%     mat_B(i_ymom_right_inds(i),j_v_right_inds(i) + ind_shift) = linear_extrap_opr;
+%     % w
+%     mat_A(i_zmom_right_inds(i),j_w_right_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
+%     mat_B(i_zmom_right_inds(i),j_w_right_inds(i) + ind_shift) = linear_extrap_opr;
+%     % p
+%     mat_A(i_cont_right_inds(i),j_p_right_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
+%     mat_B(i_cont_right_inds(i),j_p_right_inds(i) + ind_shift) = linear_extrap_opr;
+% end
 
-% Linear extrapolation - left boundary
-j_u_left_inds = get_var_left_inds('u', Nx, Ny);
-j_v_left_inds = get_var_left_inds('v', Nx, Ny);
-j_w_left_inds = get_var_left_inds('w', Nx, Ny);
-j_p_left_inds = get_var_left_inds('p', Nx, Ny);
-i_xmom_left_inds = get_eqn_left_inds('x momentum', Nx, Ny);
-i_ymom_left_inds = get_eqn_left_inds('y momentum', Nx, Ny);
-i_zmom_left_inds = get_eqn_left_inds('z momentum', Nx, Ny);
-i_cont_left_inds = get_eqn_left_inds('continuity', Nx, Ny);
-mat_A(i_xmom_left_inds(2:end-1),:) = 0;
-mat_B(i_xmom_left_inds(2:end-1),:) = 0;
-mat_A(i_ymom_left_inds(2:end-1),:) = 0;
-mat_B(i_ymom_left_inds(2:end-1),:) = 0;
-mat_A(i_zmom_left_inds(2:end-1),:) = 0;
-mat_B(i_zmom_left_inds(2:end-1),:) = 0;
-mat_A(i_cont_left_inds(2:end-1),:) = 0;
-mat_B(i_cont_left_inds(2:end-1),:) = 0;
-for i = 2:Ny-1
-    C = (mat_X(i,Nx)-mat_X(i,Nx-1))/(mat_X(i,Nx-2)-mat_X(i,Nx-1));
-    linear_extrap_opr = [1 C-1 -C];
-    ind_shift = -Ny*[0 1 2];
-    % u
-    mat_A(i_xmom_left_inds(i),j_u_left_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
-    mat_B(i_xmom_left_inds(i),j_u_left_inds(i) + ind_shift) = linear_extrap_opr;
-    % v
-    mat_A(i_ymom_left_inds(i),j_v_left_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
-    mat_B(i_ymom_left_inds(i),j_v_left_inds(i) + ind_shift) = linear_extrap_opr;
-    % w
-    mat_A(i_zmom_left_inds(i),j_w_left_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
-    mat_B(i_zmom_left_inds(i),j_w_left_inds(i) + ind_shift) = linear_extrap_opr;
-    % p
-    mat_A(i_cont_left_inds(i),j_p_left_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
-    mat_B(i_cont_left_inds(i),j_p_left_inds(i) + ind_shift) = linear_extrap_opr;
-end
+% % Linear extrapolation - left boundary
+% j_u_left_inds = get_var_left_inds('u', Nx, Ny);
+% j_v_left_inds = get_var_left_inds('v', Nx, Ny);
+% j_w_left_inds = get_var_left_inds('w', Nx, Ny);
+% j_p_left_inds = get_var_left_inds('p', Nx, Ny);
+% i_xmom_left_inds = get_eqn_left_inds('x momentum', Nx, Ny);
+% i_ymom_left_inds = get_eqn_left_inds('y momentum', Nx, Ny);
+% i_zmom_left_inds = get_eqn_left_inds('z momentum', Nx, Ny);
+% i_cont_left_inds = get_eqn_left_inds('continuity', Nx, Ny);
+% mat_A(i_xmom_left_inds(2:end-1),:) = 0;
+% mat_B(i_xmom_left_inds(2:end-1),:) = 0;
+% mat_A(i_ymom_left_inds(2:end-1),:) = 0;
+% mat_B(i_ymom_left_inds(2:end-1),:) = 0;
+% mat_A(i_zmom_left_inds(2:end-1),:) = 0;
+% mat_B(i_zmom_left_inds(2:end-1),:) = 0;
+% mat_A(i_cont_left_inds(2:end-1),:) = 0;
+% mat_B(i_cont_left_inds(2:end-1),:) = 0;
+% for i = 2:Ny-1
+%     C = (mat_X(i,Nx)-mat_X(i,Nx-1))/(mat_X(i,Nx-2)-mat_X(i,Nx-1));
+%     linear_extrap_opr = [1 C-1 -C];
+%     ind_shift = -Ny*[0 1 2];
+%     % u
+%     mat_A(i_xmom_left_inds(i),j_u_left_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
+%     mat_B(i_xmom_left_inds(i),j_u_left_inds(i) + ind_shift) = linear_extrap_opr;
+%     % v
+%     mat_A(i_ymom_left_inds(i),j_v_left_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
+%     mat_B(i_ymom_left_inds(i),j_v_left_inds(i) + ind_shift) = linear_extrap_opr;
+%     % w
+%     mat_A(i_zmom_left_inds(i),j_w_left_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
+%     mat_B(i_zmom_left_inds(i),j_w_left_inds(i) + ind_shift) = linear_extrap_opr;
+%     % p
+%     mat_A(i_cont_left_inds(i),j_p_left_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
+%     mat_B(i_cont_left_inds(i),j_p_left_inds(i) + ind_shift) = linear_extrap_opr;
+% end
 
 end
 
@@ -742,7 +744,7 @@ function i_opr_TR = get_opr_top_right_ind(~, ~)
 % INPUT:
 %   (~, ~)              two insignificant inputs (ment for compatibility of input method with other similar functions)
 % OUTPUT:
-%   i_opr_TR            row index of the operator matrix at the top-right corner of the domain      [scalar]
+%   i_opr_TR            row index of the operator matrix at the top-right corner of the domain      [vector]
 
 i_opr_TR = 1;
 
@@ -757,7 +759,7 @@ function i_opr_BL = get_opr_bottom_left_ind(Nx, Ny)
 %   Nx                  Number of points along the chordwise direction                              [scalar]
 %   Ny                  Number of points along the vertical direction                               [scalar]
 % OUTPUT:
-%   i_opr_BL            row index of the operator matrix at the bottom-left corner of the domain    [scalar]
+%   i_opr_BL            row index of the operator matrix at the bottom-left corner of the domain    [vector]
 
 i_opr_BL = Nx*Ny;
 
@@ -772,7 +774,7 @@ function i_opr_BR = get_opr_bottom_right_ind(Nx, Ny)
 %   Nx                  Number of points along the chordwise direction                              [scalar]
 %   Ny                  Number of points along the vertical direction                               [scalar]
 % OUTPUT:
-%   i_opr_BR            row index of the operator matrix at the bottom-right corner of the domain   [scalar]
+%   i_opr_BR            row index of the operator matrix at the bottom-right corner of the domain   [vector]
 
 i_opr_TR = get_opr_top_right_ind(Nx, Ny);
 i_opr_BR = i_opr_TR + (Ny-1);
@@ -788,7 +790,7 @@ function i_opr_TL = get_opr_top_left_ind(Nx, Ny)
 %   Nx                  Number of points along the chordwise direction                          [scalar]
 %   Ny                  Number of points along the vertical direction                           [scalar]
 % OUTPUT:
-%   i_opr_TL            row index of the operator matrix at the top-left corner of the domain   [scalar]
+%   i_opr_TL            row index of the operator matrix at the top-left corner of the domain   [vector]
 
 i_opr_BL = get_opr_bottom_left_ind(Nx, Ny);
 i_opr_TL = i_opr_BL - (Ny-1);
@@ -804,7 +806,7 @@ function i_opr_T = get_opr_top_inds(Nx, Ny)
 %   Nx                  Number of points along the chordwise direction                          [scalar]
 %   Ny                  Number of points along the vertical direction                           [scalar]
 % OUTPUT:
-%   i_opr_T             row indices of the operator matrix at the top boundary of the domain    [scalar]
+%   i_opr_T             row indices of the operator matrix at the top boundary of the domain    [vector]
 
 % nx = 1:Nx;
 % i_opr_TR = get_opr_top_right_ind(Nx, Ny);
@@ -825,7 +827,7 @@ function i_opr_B = get_opr_bottom_inds(Nx, Ny)
 %   Nx                  Number of points along the chordwise direction                              [scalar]
 %   Ny                  Number of points along the vertical direction                               [scalar]
 % OUTPUT:
-%   i_opr_B             row indices of the operator matrix at the bottom boundary of the domain     [scalar]
+%   i_opr_B             row indices of the operator matrix at the bottom boundary of the domain     [vector]
 
 % nx = 1:Nx;
 % i_opr_BR = get_opr_bottom_right_ind(Nx, Ny);
@@ -846,7 +848,7 @@ function i_opr_R = get_opr_right_inds(Nx, Ny)
 %   Nx                  Number of points along the chordwise direction                          [scalar]
 %   Ny                  Number of points along the vertical direction                           [scalar]
 % OUTPUT:
-%   i_opr_R             row indices of the operator matrix at the right boundary of the domain  [scalar]
+%   i_opr_R             row indices of the operator matrix at the right boundary of the domain  [vector]
 
 % ny = 1:Ny;
 % i_opr_TR = get_opr_top_right_ind(Nx, Ny);
@@ -867,7 +869,7 @@ function i_opr_L = get_opr_left_inds(Nx, Ny)
 %   Nx                  Number of points along the chordwise direction                          [scalar]
 %   Ny                  Number of points along the vertical direction                           [scalar]
 % OUTPUT:
-%   i_opr_L             row indices of the operator matrix at the left boundary of the domain   [scalar]
+%   i_opr_L             row indices of the operator matrix at the left boundary of the domain   [vector]
 
 % ny = 1:Ny;
 % i_opr_TL = get_opr_top_left_ind(Nx, Ny);
