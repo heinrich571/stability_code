@@ -18,7 +18,6 @@ ddphi = flip(Base_Flow.ddphi);
 mat_X = Domain.mat_X;
 Dx    = Domain.Dx;
 Dy    = Domain.Dy;
-D2x   = Domain.D2x;
 
 mat_phi   = repmat(phi  , [1,Nx]);
 mat_dphi  = repmat(dphi , [1,Nx]);
@@ -31,7 +30,7 @@ Uy = mat_X.*mat_ddphi;
 Uy = diag(Uy(:), 0);
 Vx = Z;
 Vy = diag(-mat_dphi(:), 0);
-L  = (U - Dx)*Dx - (-V - Dy)*Dy + beta^2;
+L  = (U - Dx)*Dx - (-V + Dy)*Dy + beta^2;
 
 
 % LHS matrix entries
@@ -258,7 +257,7 @@ mat_B(linear_inds)   = 1;
 
 
 % LEFT BOUNDARY
-% % d2u/dx2 = 0
+% d2u/dx2 = 0
 % operator_row_inds = get_opr_left_inds(Nx, Ny);
 % row_inds          = get_eqn_left_inds('x momentum', Nx, Ny);
 % operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
@@ -328,29 +327,30 @@ i_xmom_right_inds = get_eqn_right_inds('x momentum', Nx, Ny);
 i_ymom_right_inds = get_eqn_right_inds('y momentum', Nx, Ny);
 i_zmom_right_inds = get_eqn_right_inds('z momentum', Nx, Ny);
 i_cont_right_inds = get_eqn_right_inds('continuity', Nx, Ny);
-mat_A(i_xmom_right_inds,:) = 0;
-mat_B(i_xmom_right_inds,:) = 0;
-mat_A(i_ymom_right_inds,:) = 0;
-mat_B(i_ymom_right_inds,:) = 0;
-mat_A(i_zmom_right_inds,:) = 0;
-mat_B(i_zmom_right_inds,:) = 0;
-mat_A(i_cont_right_inds,:) = 0;
-mat_B(i_cont_right_inds,:) = 0;
+mat_A(i_xmom_right_inds(2:end-1),:) = 0;
+mat_B(i_xmom_right_inds(2:end-1),:) = 0;
+mat_A(i_ymom_right_inds(2:end-1),:) = 0;
+mat_B(i_ymom_right_inds(2:end-1),:) = 0;
+mat_A(i_zmom_right_inds(2:end-1),:) = 0;
+mat_B(i_zmom_right_inds(2:end-1),:) = 0;
+mat_A(i_cont_right_inds(2:end-1),:) = 0;
+mat_B(i_cont_right_inds(2:end-1),:) = 0;
 for i = 2:Ny-1
     C = (mat_X(i,1)-mat_X(i,2))/(mat_X(i,3)-mat_X(i,2));
     linear_extrap_opr = [1 C-1 -C];
+    ind_shift = Ny*[0 1 2];
     % u
-    mat_A(i_xmom_right_inds(i),j_u_right_inds(i) + (Ny+1)*[0 1 2]) = linear_extrap_factor*linear_extrap_opr;
-    mat_B(i_xmom_right_inds(i),j_u_right_inds(i) + (Ny+1)*[0 1 2]) = linear_extrap_opr;
+    mat_A(i_xmom_right_inds(i),j_u_right_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
+    mat_B(i_xmom_right_inds(i),j_u_right_inds(i) + ind_shift) = linear_extrap_opr;
     % v
-    mat_A(i_ymom_right_inds(i),j_v_right_inds(i) + (Ny+1)*[0 1 2]) = linear_extrap_factor*linear_extrap_opr;
-    mat_B(i_ymom_right_inds(i),j_v_right_inds(i) + (Ny+1)*[0 1 2]) = linear_extrap_opr;
+    mat_A(i_ymom_right_inds(i),j_v_right_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
+    mat_B(i_ymom_right_inds(i),j_v_right_inds(i) + ind_shift) = linear_extrap_opr;
     % w
-    mat_A(i_zmom_right_inds(i),j_w_right_inds(i) + (Ny+1)*[0 1 2]) = linear_extrap_factor*linear_extrap_opr;
-    mat_B(i_zmom_right_inds(i),j_w_right_inds(i) + (Ny+1)*[0 1 2]) = linear_extrap_opr;
+    mat_A(i_zmom_right_inds(i),j_w_right_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
+    mat_B(i_zmom_right_inds(i),j_w_right_inds(i) + ind_shift) = linear_extrap_opr;
     % p
-    mat_A(i_cont_right_inds(i),j_p_right_inds(i) + (Ny+1)*[0 1 2]) = linear_extrap_factor*linear_extrap_opr;
-    mat_B(i_cont_right_inds(i),j_p_right_inds(i) + (Ny+1)*[0 1 2]) = linear_extrap_opr;
+    mat_A(i_cont_right_inds(i),j_p_right_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
+    mat_B(i_cont_right_inds(i),j_p_right_inds(i) + ind_shift) = linear_extrap_opr;
 end
 
 % Linear extrapolation - left boundary
@@ -362,29 +362,30 @@ i_xmom_left_inds = get_eqn_left_inds('x momentum', Nx, Ny);
 i_ymom_left_inds = get_eqn_left_inds('y momentum', Nx, Ny);
 i_zmom_left_inds = get_eqn_left_inds('z momentum', Nx, Ny);
 i_cont_left_inds = get_eqn_left_inds('continuity', Nx, Ny);
-mat_A(i_xmom_left_inds,:) = 0;
-mat_B(i_xmom_left_inds,:) = 0;
-mat_A(i_ymom_left_inds,:) = 0;
-mat_B(i_ymom_left_inds,:) = 0;
-mat_A(i_zmom_left_inds,:) = 0;
-mat_B(i_zmom_left_inds,:) = 0;
-mat_A(i_cont_left_inds,:) = 0;
-mat_B(i_cont_left_inds,:) = 0;
+mat_A(i_xmom_left_inds(2:end-1),:) = 0;
+mat_B(i_xmom_left_inds(2:end-1),:) = 0;
+mat_A(i_ymom_left_inds(2:end-1),:) = 0;
+mat_B(i_ymom_left_inds(2:end-1),:) = 0;
+mat_A(i_zmom_left_inds(2:end-1),:) = 0;
+mat_B(i_zmom_left_inds(2:end-1),:) = 0;
+mat_A(i_cont_left_inds(2:end-1),:) = 0;
+mat_B(i_cont_left_inds(2:end-1),:) = 0;
 for i = 2:Ny-1
     C = (mat_X(i,Nx)-mat_X(i,Nx-1))/(mat_X(i,Nx-2)-mat_X(i,Nx-1));
     linear_extrap_opr = [1 C-1 -C];
+    ind_shift = -Ny*[0 1 2];
     % u
-    mat_A(i_xmom_left_inds(i),j_u_left_inds(i) - (Ny+1)*[0 1 2]) = linear_extrap_factor*linear_extrap_opr;
-    mat_B(i_xmom_left_inds(i),j_u_left_inds(i) - (Ny+1)*[0 1 2]) = linear_extrap_opr;
+    mat_A(i_xmom_left_inds(i),j_u_left_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
+    mat_B(i_xmom_left_inds(i),j_u_left_inds(i) + ind_shift) = linear_extrap_opr;
     % v
-    mat_A(i_ymom_left_inds(i),j_v_left_inds(i) - (Ny+1)*[0 1 2]) = linear_extrap_factor*linear_extrap_opr;
-    mat_B(i_ymom_left_inds(i),j_v_left_inds(i) - (Ny+1)*[0 1 2]) = linear_extrap_opr;
+    mat_A(i_ymom_left_inds(i),j_v_left_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
+    mat_B(i_ymom_left_inds(i),j_v_left_inds(i) + ind_shift) = linear_extrap_opr;
     % w
-    mat_A(i_zmom_left_inds(i),j_w_left_inds(i) - (Ny+1)*[0 1 2]) = linear_extrap_factor*linear_extrap_opr;
-    mat_B(i_zmom_left_inds(i),j_w_left_inds(i) - (Ny+1)*[0 1 2]) = linear_extrap_opr;
+    mat_A(i_zmom_left_inds(i),j_w_left_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
+    mat_B(i_zmom_left_inds(i),j_w_left_inds(i) + ind_shift) = linear_extrap_opr;
     % p
-    mat_A(i_cont_left_inds(i),j_p_left_inds(i) - (Ny+1)*[0 1 2]) = linear_extrap_factor*linear_extrap_opr;
-    mat_B(i_cont_left_inds(i),j_p_left_inds(i) - (Ny+1)*[0 1 2]) = linear_extrap_opr;
+    mat_A(i_cont_left_inds(i),j_p_left_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
+    mat_B(i_cont_left_inds(i),j_p_left_inds(i) + ind_shift) = linear_extrap_opr;
 end
 
 end

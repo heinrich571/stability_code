@@ -26,7 +26,7 @@ Y_normalized_Median = 2.4;
 Nx = 30;
 Ny = Nx/2;
 
-beta = 0.255;
+beta = 2;
 
 
 % Base flow parameters
@@ -88,7 +88,7 @@ dispstatus('EIGENVALUES CALCULATION')
 dispstatus('EIGENVALUES CALCULATION', 0)
 
 tic;
-Solution = biglobalsolver(mat_A, mat_B, Domain);
+[Solution_Filtered, Solution_Raw] = biglobalsolver(mat_A, mat_B, Domain);
 toc;
 
 dispstatus('EIGENVALUES CALCULATION', 1)
@@ -104,7 +104,7 @@ restults_dir = './results/';
 if ~isfolder(restults_dir)
     mkdir(restults_dir);
 end
-save([restults_dir 'results_test.mat'], 'Definitions', 'Flags', 'mat_A', 'mat_B', 'Base_Flow', 'Domain', 'Solution');
+save([restults_dir 'results_test.mat'], 'Definitions', 'Flags', 'mat_A', 'mat_B', 'Base_Flow', 'Domain', 'Solution_Filtered', 'Solution_Raw');
 
 dispstatus('SAVE RESULTS', 1)
 dispstatus()
@@ -112,9 +112,9 @@ dispstatus()
 
 %% Draw eigenfunctions
 
-omega_ind = 670;
+omega_ind = 1;
 
-% ploteigfun(Domain, Solution, 'u', omega_ind)
-ploteigfun(Domain, Solution, 'v', omega_ind)
-% ploteigfun(Domain, Solution, 'w', omega_ind)
-% ploteigfun(Domain, Solution, 'p', omega_ind)
+% ploteigfun(Domain, Solution_Filtered, 'u', omega_ind)
+ploteigfun(Domain, Solution_Filtered, 'v', omega_ind)
+% ploteigfun(Domain, Solution_Filtered, 'w', omega_ind)
+% ploteigfun(Domain, Solution_Filtered, 'p', omega_ind)

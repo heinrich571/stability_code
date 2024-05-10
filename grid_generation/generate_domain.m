@@ -11,15 +11,19 @@ function Domain = generate_domain(X_Limit, Y_Limit, Y_Median, Nx, Ny)
 a_y = Y_Median*Y_Limit/(Y_Limit-2*Y_Median);
 b_y = 1+2*a_y/Y_Limit;
 vec_Y   = (a_y*(1+yhat)./(b_y-yhat));
+% vec_Y = Y_Limit*(yhat + 1)/2;
 
 f = 0.01;
 e = 1-f;
 vec_X = X_Limit*(e*xhat.^3 + f*xhat);
+% vec_X = X_Limit*xhat;
 
 [mat_X, mat_Y] = meshgrid(vec_X, vec_Y);
 
 Dx_physical_domain = diag(1./(X_Limit*(3*e*xhat.^2+f)))*Dx_cheb;
+% Dx_physical_domain = X_Limit*Dx_cheb;
 Dy_physical_domain = diag(a_y*(1+b_y)./((vec_Y+a_y).^2))*Dy_cheb;
+% Dy_physical_domain = Y_Limit/2*Dy_cheb;
 D2x_physical_domain = Dx_physical_domain*Dx_physical_domain;
 D2y_physical_domain = Dy_physical_domain*Dy_physical_domain;
 Ix = eye(Nx+1);
