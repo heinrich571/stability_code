@@ -4,7 +4,7 @@ Nx = length(Domain.vec_X);
 Ny = length(Domain.vec_Y);
 
 % [eigenfunctions_matrix, eigenvalues_matrix] = eig(mat_A, mat_B);
-[eigenfunctions_matrix, eigenvalues_matrix] = eigs(sparse(mat_A), sparse(mat_B), 20, 'SM');
+[eigenfunctions_matrix, eigenvalues_matrix] = eigs(sparse(mat_A), sparse(mat_B), 40, 'SM');
 
 Solution_Raw.omega = diag(eigenvalues_matrix);
 

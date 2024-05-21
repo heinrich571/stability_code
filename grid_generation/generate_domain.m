@@ -13,7 +13,7 @@ b_y = 1+2*a_y/Y_Limit;
 vec_Y   = (a_y*(1+yhat)./(b_y-yhat));
 % vec_Y = Y_Limit*(yhat + 1)/2;
 
-f = 0.01;
+f = 0.5;
 e = 1-f;
 vec_X = X_Limit*(e*xhat.^3 + f*xhat);
 % vec_X = X_Limit*xhat;
