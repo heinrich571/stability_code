@@ -154,36 +154,36 @@ mat_A(linear_inds)   = dirichlet_factor;
 mat_B(linear_inds)   = 1;
 
 
-% Pressure compatibility condition
-row_inds    = get_eqn_bottom_inds('continuity', Nx, Ny);
-i_opr_B     = get_opr_bottom_inds(Nx, Ny);
-
-pressure_compatibility_opr = [-D2y(i_opr_B,:) , Z(i_opr_B,:) , Z(i_opr_B,:) , Dx(i_opr_B,:)];
-
-mat_A(row_inds(:),:) = 0;
-mat_B(row_inds(:),:) = 0;
-mat_A(row_inds(:),:) = pressure_compatibility_factor*pressure_compatibility_opr;
-mat_B(row_inds(:),:) = pressure_compatibility_opr;
-
-
-% % Linearized pressure poisson equation implementation at the boundaries
-% row_inds = get_eqn_bottom_inds('continuity', Nx, Ny);
-% i_opr_B  = get_opr_bottom_inds(Nx, Ny);
+% % Pressure compatibility condition
+% row_inds    = get_eqn_bottom_inds('continuity', Nx, Ny);
+% i_opr_B     = get_opr_bottom_inds(Nx, Ny);
 % 
-% lppe_u = Ux*Dx;
-% lppe_v = Uy*Dx + Vy*Dy;
-% lppe_w = Z;
-% lppe_p = D2x + D2y;
-% 
-% % lppe_opr = [Ux(i_opr_B,:).*Dx(i_opr_B,:) ,
-% % 2*(Uy(i_opr_B,:).*Dx(i_opr_B,:) + Vy(i_opr_B,:).*Dy(i_opr_B,:)) ,
-% % Z(i_opr_B,:) , D2x(i_opr_B,:) + D2y(i_opr_B,:) - beta^2*I(i_opr_B,:)]; % I'm not sure if this is correct
-% lppe_opr = [lppe_u(i_opr_B,:) , lppe_v(i_opr_B,:) , lppe_w(i_opr_B,:) , lppe_p(i_opr_B,:)];
+% pressure_compatibility_opr = [-D2y(i_opr_B,:) , Z(i_opr_B,:) , Z(i_opr_B,:) , Dx(i_opr_B,:)];
 % 
 % mat_A(row_inds(:),:) = 0;
 % mat_B(row_inds(:),:) = 0;
-% mat_A(row_inds(:),:) = lppe_factor*lppe_opr;
-% mat_B(row_inds(:),:) = lppe_opr;
+% mat_A(row_inds(:),:) = pressure_compatibility_factor*pressure_compatibility_opr;
+% mat_B(row_inds(:),:) = pressure_compatibility_opr;
+
+
+% Linearized pressure poisson equation implementation at the boundaries
+row_inds = get_eqn_bottom_inds('continuity', Nx, Ny);
+i_opr_B  = get_opr_bottom_inds(Nx, Ny);
+
+lppe_u = Ux*Dx;
+lppe_v = Uy*Dx + Vy*Dy;
+lppe_w = Z;
+lppe_p = D2x + D2y;
+
+% lppe_opr = [Ux(i_opr_B,:).*Dx(i_opr_B,:) ,
+% 2*(Uy(i_opr_B,:).*Dx(i_opr_B,:) + Vy(i_opr_B,:).*Dy(i_opr_B,:)) ,
+% Z(i_opr_B,:) , D2x(i_opr_B,:) + D2y(i_opr_B,:) - beta^2*I(i_opr_B,:)]; % I'm not sure if this is correct
+lppe_opr = [lppe_u(i_opr_B,:) , lppe_v(i_opr_B,:) , lppe_w(i_opr_B,:) , lppe_p(i_opr_B,:)];
+
+mat_A(row_inds(:),:) = 0;
+mat_B(row_inds(:),:) = 0;
+mat_A(row_inds(:),:) = lppe_factor*lppe_opr;
+mat_B(row_inds(:),:) = lppe_opr;
 
 
 %% Disturbances decay as y --> infinity
