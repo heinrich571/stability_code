@@ -1,7 +1,7 @@
 %% -------------------------- User toggles --------------------------- %%
-StartupSettings.FontName            = 'Arial';
+StartupSettings.FontName            = 'Times New Roman';
 StartupSettings.FontWeight          = 'Normal';
-StartupSettings.AxesFontSize        = 16;
+StartupSettings.AxesFontSize        = 20;
 StartupSettings.TitleTextMultiplier = 1.4;
 StartupSettings.LabelTextMultiplier = 1.2;
 StartupSettings.LineWidth           = 2;
@@ -29,6 +29,7 @@ StartupSettings.ColorOrder          = [ 000, 090, 255
 %% ---------------------- Default line settings ---------------------- %%
 set(groot, 'defaultLineLineWidth', StartupSettings.LineWidth)
 set(groot, 'defaultLineMarkerSize', StartupSettings.MarkerSize)
+set(groot, 'defaultLineMarkerFaceColor', ones(3, 1));
 set(groot, 'defaultErrorBarLineWidth', StartupSettings.LineWidth)
 % --------------------------------------------------------------------- %
 
@@ -85,6 +86,7 @@ set(groot, 'defaultAxesNextPlot', 'add')
 set(groot, 'defaultAxesBox', 'off')
 set(groot, 'defaultAxesUnits', 'Normalized')
 set(groot, 'defaultAxesColorOrder', StartupSettings.ColorOrder)
+set(groot, 'defaultTextInterpreter', 'latex')
 
 set(groot, 'defaultScatterLineWidth', 1.4)
 

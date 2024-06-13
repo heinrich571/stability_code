@@ -43,7 +43,7 @@ dispstatus()
 dispstatus('GENERALIZED EIGENVALUE MATRICES FORMULATION')
 dispstatus('GENERALIZED EIGENVALUE MATRICES FORMULATION', 0)
 
-[mat_A, mat_B] = create_eigenvalue_matrices(Domain, Base_Flow, Problem.Physics.Beta);
+[mat_A, mat_B] = create_eigenvalue_matrices(Domain, Base_Flow, Problem);
 
 dispstatus('GENERALIZED EIGENVALUE MATRICES FORMULATION', 1)
 dispstatus()
@@ -72,6 +72,7 @@ inds = find(sqrt(real(Solution_Raw.Eigenvalues).^2 + imag(Solution_Raw.Eigenvalu
 
 % Normalize the solution for consistency, and build output variable
 nrm = max(Solution_Raw.Eigenfunctions.p(:,inds), [], 1);
+% nrm = 1;
 
 Solution.Domain           = Domain;
 Solution.Eigenvalues      = Solution_Raw.Eigenvalues(inds);
@@ -79,6 +80,10 @@ Solution.Eigenfunctions.u = Solution_Raw.Eigenfunctions.u(:,inds)./nrm;
 Solution.Eigenfunctions.v = Solution_Raw.Eigenfunctions.v(:,inds)./nrm;
 Solution.Eigenfunctions.w = Solution_Raw.Eigenfunctions.w(:,inds)./nrm;
 Solution.Eigenfunctions.p = Solution_Raw.Eigenfunctions.p(:,inds)./nrm;
+
+% Generate a report on the validity of the results against the Navier-Stokes equations
+Report = validateNS(Domain, Base_Flow, Problem, Solution);
+Solution.Report = Report;
 
 end
 

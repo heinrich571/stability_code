@@ -12,8 +12,8 @@ startup
 Problem.Computation.N_Workers = 1;
 
 Problem.Domain.Nx       = 50;
-Problem.Domain.Ny       = 40;
-Problem.Domain.X_Limit  = 40;
+Problem.Domain.Ny       = 50;
+Problem.Domain.X_Limit  = 20;
 Problem.Domain.Y_Limit  = 20;
 Problem.Domain.Y_Median = 2.4;
 
@@ -24,7 +24,10 @@ Problem.Base_Flow_Settings.initguess            = [1.22 1.24];
 Problem.Base_Flow_Settings.maxIterations        = 1e2;
 Problem.Base_Flow_Settings.convergenceTolerance = 1e-6;
 
-Problem.Flags.Display_Domain    = 1;
+Problem.Boundary_Conditions.Wall.Pressure = 'LPPE';
+Problem.Boundary_Conditions.Sides         = '2nd_derivative_extrapolation';
+
+Problem.Flags.Display_Domain    = 0;
 Problem.Flags.Display_Base_Flow = 0;
 
 Case_ID        = 'test_new_solver';
