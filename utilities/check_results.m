@@ -10,7 +10,7 @@ load([Results_Folder Case_ID '.mat']);
 
 %% Plot results
 
-omega_ind = 10;
+omega_ind = 3;
 
 Nx = length(Solution.Domain.vec_X);
 Ny = length(Solution.Domain.vec_Y);

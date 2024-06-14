@@ -224,6 +224,22 @@ mat_B(row_inds(:),:) = 0;
 mat_A(linear_inds)   = dirichlet_factor;
 mat_B(linear_inds)   = 1;
 
+% % LPPE on the top of the domain
+% row_inds = get_eqn_top_inds('continuity', Nx, Ny);
+% i_opr_B  = get_opr_top_inds(Nx, Ny);
+% 
+% lppe_u = Z;
+% lppe_v = Z;
+% lppe_w = Z;
+% lppe_p = D2x + D2y - beta^2*I;
+% 
+% lppe_opr = [lppe_u(i_opr_B,:) , lppe_v(i_opr_B,:) , lppe_w(i_opr_B,:) , lppe_p(i_opr_B,:)];
+% 
+% mat_A(row_inds(:),:) = 0;
+% mat_B(row_inds(:),:) = 0;
+% mat_A(row_inds(:),:) = lppe_factor*lppe_opr;
+% mat_B(row_inds(:),:) = lppe_opr;
+
 
 %% Linear extrapolation of disturbances at the chordwise directions
 switch Problem.Boundary_Conditions.Sides
@@ -274,20 +290,35 @@ switch Problem.Boundary_Conditions.Sides
         mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
         mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
 
-        % d2p/dx2 = 0 - replacing a continuity equation at the right boundary
-        operator_row_inds = get_opr_right_inds(Nx, Ny);
-        row_inds          = get_eqn_right_inds('continuity', Nx, Ny);
-        operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
-        row_inds          = row_inds(2:end-1);
+        % % d2p/dx2 = 0 - replacing a continuity equation at the right boundary
+        % operator_row_inds = get_opr_right_inds(Nx, Ny);
+        % row_inds          = get_eqn_right_inds('continuity', Nx, Ny);
+        % operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
+        % row_inds          = row_inds(2:end-1);
+        % 
+        % j_p_TR = get_var_top_right_ind('p', Nx, Ny);
+        % j_p_BL = get_var_bottom_left_ind('p', Nx, Ny);
+        % column_inds = j_p_TR:j_p_BL;
+        % 
+        % mat_A(row_inds,:) = 0;
+        % mat_B(row_inds,:) = 0;
+        % mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
+        % mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
 
-        j_p_TR = get_var_top_right_ind('p', Nx, Ny);
-        j_p_BL = get_var_bottom_left_ind('p', Nx, Ny);
-        column_inds = j_p_TR:j_p_BL;
+        row_inds = get_eqn_right_inds('continuity', Nx, Ny);
+        i_opr_B  = get_opr_right_inds(Nx, Ny);
 
-        mat_A(row_inds,:) = 0;
-        mat_B(row_inds,:) = 0;
-        mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
-        mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+        lppe_u = 2*Ux*Dx;
+        lppe_v = 2*(Uy*Dx + Vy*Dy);
+        lppe_w = Z;
+        lppe_p = D2x + D2y - beta^2*I;
+
+        lppe_opr = [lppe_u(i_opr_B,:) , lppe_v(i_opr_B,:) , lppe_w(i_opr_B,:) , lppe_p(i_opr_B,:)];
+
+        mat_A(row_inds(:),:) = 0;
+        mat_B(row_inds(:),:) = 0;
+        mat_A(row_inds(:),:) = lppe_factor*lppe_opr;
+        mat_B(row_inds(:),:) = lppe_opr;
 
 
         % LEFT BOUNDARY
@@ -336,20 +367,35 @@ switch Problem.Boundary_Conditions.Sides
         mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
         mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
 
-        % d2p/dx2 = 0 - replacing a continuity equation at the left boundary
-        operator_row_inds = get_opr_left_inds(Nx, Ny);
-        row_inds          = get_eqn_left_inds('continuity', Nx, Ny);
-        operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
-        row_inds          = row_inds(2:end-1);
+        % % d2p/dx2 = 0 - replacing a continuity equation at the left boundary
+        % operator_row_inds = get_opr_left_inds(Nx, Ny);
+        % row_inds          = get_eqn_left_inds('continuity', Nx, Ny);
+        % operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
+        % row_inds          = row_inds(2:end-1);
+        % 
+        % j_p_TR = get_var_top_right_ind('p', Nx, Ny);
+        % j_p_BL = get_var_bottom_left_ind('p', Nx, Ny);
+        % column_inds = j_p_TR:j_p_BL;
+        % 
+        % mat_A(row_inds,:) = 0;
+        % mat_B(row_inds,:) = 0;
+        % mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
+        % mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
 
-        j_p_TR = get_var_top_right_ind('p', Nx, Ny);
-        j_p_BL = get_var_bottom_left_ind('p', Nx, Ny);
-        column_inds = j_p_TR:j_p_BL;
+        row_inds = get_eqn_left_inds('continuity', Nx, Ny);
+        i_opr_B  = get_opr_left_inds(Nx, Ny);
 
-        mat_A(row_inds,:) = 0;
-        mat_B(row_inds,:) = 0;
-        mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
-        mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+        lppe_u = 2*Ux*Dx;
+        lppe_v = 2*(Uy*Dx + Vy*Dy);
+        lppe_w = Z;
+        lppe_p = D2x + D2y - beta^2*I;
+
+        lppe_opr = [lppe_u(i_opr_B,:) , lppe_v(i_opr_B,:) , lppe_w(i_opr_B,:) , lppe_p(i_opr_B,:)];
+
+        mat_A(row_inds(:),:) = 0;
+        mat_B(row_inds(:),:) = 0;
+        mat_A(row_inds(:),:) = lppe_factor*lppe_opr;
+        mat_B(row_inds(:),:) = lppe_opr;
 
     case 'finite_differences_extrapolation'
         % Linear extrapolation - right boundary
@@ -525,9 +571,6 @@ function i_eqn_BL = get_eqn_bottom_left_ind(equation_name, Nx, Ny)
 % OUTPUT:
 %   i_eqn_BL            row index of specified equation at the bottom-left corner of the domain in the eigenvalue problem matrices  [scalar]
 
-% equation_number = eqn2num(equation_name);
-% i_eqn_BL = Nx*Ny*equation_number;
-
 i_eqn_TR = get_eqn_top_right_ind(equation_name, Nx, Ny);
 i_eqn_BL = i_eqn_TR + Nx*Ny - 1;
 
@@ -542,9 +585,6 @@ function j_var_BL = get_var_bottom_left_ind(variable_name, Nx, Ny)
 %   variable_name       name of the variable                                                                                            [char]
 % OUTPUT:
 %   i_eqn_BL            column index of specified variable at the bottom-left corner of the domain in the eigenvalue problem matrices   [scalar]
-
-% variable_number = var2num(variable_name);
-% j_var_BL = Nx*Ny*variable_number;
 
 j_var_TR = get_var_top_right_ind(variable_name, Nx, Ny);
 j_var_BL = j_var_TR + Nx*Ny - 1;
@@ -621,10 +661,6 @@ function i_eqn_T = get_eqn_top_inds(equation_name, Nx, Ny)
 % OUTPUT:
 %   i_eqn_T             row index of specified equation at the top boundary of the domain in the eigenvalue problem matrices    [scalar]
 
-% nx = 1:Nx;
-% i_eqn_TR = get_eqn_top_right_ind(equation_name, Nx, Ny);
-% i_eqn_T = i_eqn_TR + (nx-1)*Ny;
-
 i_eqn_TR = get_eqn_top_right_ind(equation_name, Nx, Ny);
 i_eqn_TL = get_eqn_top_left_ind(equation_name, Nx, Ny);
 i_eqn_T  = i_eqn_TR : Ny : i_eqn_TL;
@@ -640,10 +676,6 @@ function j_var_T = get_var_top_inds(variable_name, Nx, Ny)
 %   variable_name       name of the variable                                                                                        [char]
 % OUTPUT:
 %   j_var_T             column index of specified variable at the top boundary of the domain in the eigenvalue problem matrices     [scalar]
-
-% nx = 1:Nx;
-% j_var_TR = get_var_top_right_ind(variable_name, Nx, Ny);
-% j_var_T = i_var_TR + (nx-1)*Ny;
 
 j_var_TR = get_var_top_right_ind(variable_name, Nx, Ny);
 j_var_TL = get_var_top_left_ind(variable_name, Nx, Ny);
@@ -661,10 +693,6 @@ function i_eqn_B = get_eqn_bottom_inds(equation_name, Nx, Ny)
 % OUTPUT:
 %   i_eqn_B             row index of specified equation at the bottom boundary of the domain in the eigenvalue problem matrices     [scalar]
 
-% nx = 1:Nx;
-% i_eqn_BR = get_eqn_bottom_right_ind(equation_name, Nx, Ny);
-% i_eqn_B = i_eqn_BR + (nx-1)*Ny;
-
 i_eqn_BR = get_eqn_bottom_right_ind(equation_name, Nx, Ny);
 i_eqn_BL = get_eqn_bottom_left_ind(equation_name, Nx, Ny);
 i_eqn_B  = i_eqn_BR : Ny : i_eqn_BL;
@@ -680,10 +708,6 @@ function j_var_B = get_var_bottom_inds(variable_name, Nx, Ny)
 %   variable_name       name of the variable                                                                                        [char]
 % OUTPUT:
 %   j_var_B             column index of specified variable at the bottom boundary of the domain in the eigenvalue problem matrices  [scalar]
-
-% nx = 1:Nx;
-% j_var_BR = get_var_bottom_right_ind(variable_name, Nx, Ny);
-% j_var_B = j_var_BR + (nx-1)*Ny;
 
 j_var_BR = get_var_bottom_right_ind(variable_name, Nx, Ny);
 j_var_BL = get_var_bottom_left_ind(variable_name, Nx, Ny);
@@ -701,10 +725,6 @@ function i_eqn_R = get_eqn_right_inds(equation_name, Nx, Ny)
 % OUTPUT:
 %   i_eqn_R             row index of specified equation at the right boundary of the domain in the eigenvalue problem matrices      [scalar]
 
-% ny = 1:Ny;
-% i_eqn_TR = get_eqn_top_right_ind(equation_name, Nx, Ny);
-% i_eqn_R = i_eqn_TR + (ny-1);
-
 i_eqn_TR = get_eqn_top_right_ind(equation_name, Nx, Ny);
 i_eqn_BR = get_eqn_bottom_right_ind(equation_name, Nx, Ny);
 i_eqn_R  = i_eqn_TR : i_eqn_BR;
@@ -720,10 +740,6 @@ function j_var_R = get_var_right_inds(variable_name, Nx, Ny)
 %   variable_name       name of the variable                                                                                        [char]
 % OUTPUT:
 %   j_var_R             column index of specified variable at the right boundary of the domain in the eigenvalue problem matrices     [scalar]
-
-% ny = 1:Ny;
-% j_var_TR = get_var_top_right_ind(variable_name, Nx, Ny);
-% j_var_R = j_var_TR + (ny-1);
 
 j_var_TR = get_var_top_right_ind(variable_name, Nx, Ny);
 j_var_BR = get_var_bottom_right_ind(variable_name, Nx, Ny);
@@ -741,10 +757,6 @@ function i_eqn_L = get_eqn_left_inds(equation_name, Nx, Ny)
 % OUTPUT:
 %   i_eqn_L             row index of specified equation at the left boundary of the domain in the eigenvalue problem matrices   [scalar]
 
-% ny = 1:Ny;
-% i_eqn_TL = get_eqn_top_left_ind(equation_name, Nx, Ny);
-% i_eqn_L = i_eqn_TL + (ny-1);
-
 i_eqn_TL = get_eqn_top_left_ind(equation_name, Nx, Ny);
 i_eqn_BL = get_eqn_bottom_left_ind(equation_name, Nx, Ny);
 i_eqn_L  = i_eqn_TL : i_eqn_BL;
@@ -760,10 +772,6 @@ function j_var_L = get_var_left_inds(variable_name, Nx, Ny)
 %   variable_name       name of the variable                                                                                        [char]
 % OUTPUT:
 %   j_var_L             column index of specified variable at the left boundary of the domain in the eigenvalue problem matrices     [scalar]
-
-% ny = 1:Ny;
-% j_var_TL = get_var_top_left_ind(variable_name, Nx, Ny);
-% j_var_L = j_var_TL + (ny-1);
 
 j_var_TL = get_var_top_left_ind(variable_name, Nx, Ny);
 j_var_BL = get_var_bottom_left_ind(variable_name, Nx, Ny);
@@ -843,12 +851,8 @@ function i_opr_T = get_opr_top_inds(Nx, Ny)
 % OUTPUT:
 %   i_opr_T             row indices of the operator matrix at the top boundary of the domain    [vector]
 
-% nx = 1:Nx;
-% i_opr_TR = get_opr_top_right_ind(Nx, Ny);
-% i_opr_T = i_opr_TR + (nx-1)*Ny;
-
 i_opr_TR = get_opr_top_right_ind(Nx, Ny);
-i_opr_BR = get_opr_bottom_right_ind(Nx, Ny);
+i_opr_BR = get_opr_top_left_ind(Nx, Ny);
 i_opr_T  = i_opr_TR : Ny : i_opr_BR;
 
 end
@@ -863,10 +867,6 @@ function i_opr_B = get_opr_bottom_inds(Nx, Ny)
 %   Ny                  Number of points along the vertical direction                               [scalar]
 % OUTPUT:
 %   i_opr_B             row indices of the operator matrix at the bottom boundary of the domain     [vector]
-
-% nx = 1:Nx;
-% i_opr_BR = get_opr_bottom_right_ind(Nx, Ny);
-% i_opr_B = i_opr_TR + (nx-1)*Ny;
 
 i_opr_BR = get_opr_bottom_right_ind(Nx, Ny);
 i_opr_BL = get_opr_bottom_left_ind(Nx, Ny);
@@ -885,10 +885,6 @@ function i_opr_R = get_opr_right_inds(Nx, Ny)
 % OUTPUT:
 %   i_opr_R             row indices of the operator matrix at the right boundary of the domain  [vector]
 
-% ny = 1:Ny;
-% i_opr_TR = get_opr_top_right_ind(Nx, Ny);
-% i_opr_R  = i_opr_TR + (ny-1);
-
 i_opr_TR = get_opr_top_right_ind(Nx, Ny);
 i_opr_BR = get_opr_bottom_right_ind(Nx, Ny);
 i_opr_R  = i_opr_TR : i_opr_BR;
@@ -905,10 +901,6 @@ function i_opr_L = get_opr_left_inds(Nx, Ny)
 %   Ny                  Number of points along the vertical direction                           [scalar]
 % OUTPUT:
 %   i_opr_L             row indices of the operator matrix at the left boundary of the domain   [vector]
-
-% ny = 1:Ny;
-% i_opr_TL = get_opr_top_left_ind(Nx, Ny);
-% i_opr_L  = i_opr_TL + (ny-1);
 
 i_opr_TL = get_opr_top_left_ind(Nx, Ny);
 i_opr_BL = get_opr_bottom_left_ind(Nx, Ny);
