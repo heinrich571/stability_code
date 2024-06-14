@@ -75,6 +75,7 @@ nrm = max(Solution_Raw.Eigenfunctions.p(:,inds), [], 1);
 % nrm = 1;
 
 Solution.Domain           = Domain;
+Solution.Physics          = Problem.Physics;
 Solution.Eigenvalues      = Solution_Raw.Eigenvalues(inds);
 Solution.Eigenfunctions.u = Solution_Raw.Eigenfunctions.u(:,inds)./nrm;
 Solution.Eigenfunctions.v = Solution_Raw.Eigenfunctions.v(:,inds)./nrm;

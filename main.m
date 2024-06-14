@@ -26,6 +26,7 @@ Problem.Base_Flow_Settings.convergenceTolerance = 1e-6;
 
 Problem.Boundary_Conditions.Wall.Pressure = 'LPPE';
 Problem.Boundary_Conditions.Sides         = '2nd_derivative_extrapolation';
+% Problem.Boundary_Conditions.Sides         = 'finite_differences_extrapolation';
 
 Problem.Flags.Display_Domain    = 0;
 Problem.Flags.Display_Base_Flow = 0;
@@ -56,3 +57,4 @@ dispstatus()
 %% Draw eigenfunctions
 
 check_results
+errors_plots(Solution, 10)
