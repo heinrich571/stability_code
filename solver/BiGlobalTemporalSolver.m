@@ -1,4 +1,4 @@
-function Solution = BiGlobalTemporalSolver(Problem)
+function [Solution, Report] = BiGlobalTemporalSolver(Problem)
 
 % Expand problem parameters for convenient code
 Nx = Problem.Domain.Nx + 1;
@@ -72,19 +72,34 @@ inds = find(sqrt(real(Solution_Raw.Eigenvalues).^2 + imag(Solution_Raw.Eigenvalu
 
 % Normalize the solution for consistency, and build output variable
 nrm = max(Solution_Raw.Eigenfunctions.p(:,inds), [], 1);
+% [max_mag_u, ind_u] = max(abs(Solution_Raw.Eigenfunctions.u(:,inds)), [] ,1);
+% [max_mag_v, ind_v] = max(abs(Solution_Raw.Eigenfunctions.v(:,inds)), [] ,1);
+% [max_mag_w, ind_w] = max(abs(Solution_Raw.Eigenfunctions.w(:,inds)), [] ,1);
+% max_mag_vel_comp = max([max_mag_u ; max_mag_v ; max_mag_w], [] ,1);
+% nrm = 
 % nrm = 1;
 
 Solution.Domain           = Domain;
 Solution.Physics          = Problem.Physics;
+% Solution.EVP.Matrices.A   = mat_A;
+% Solution.EVP.Matrices.B   = mat_B;
 Solution.Eigenvalues      = Solution_Raw.Eigenvalues(inds);
 Solution.Eigenfunctions.u = Solution_Raw.Eigenfunctions.u(:,inds)./nrm;
 Solution.Eigenfunctions.v = Solution_Raw.Eigenfunctions.v(:,inds)./nrm;
 Solution.Eigenfunctions.w = Solution_Raw.Eigenfunctions.w(:,inds)./nrm;
 Solution.Eigenfunctions.p = Solution_Raw.Eigenfunctions.p(:,inds)./nrm;
 
-% Generate a report on the validity of the results against the Navier-Stokes equations
-Report = validateNS(Domain, Base_Flow, Problem, Solution);
-Solution.Report = Report;
+% Generate a report on the validity of the results against the
+% Navier-Stokes equations and satisfying the original problem
+Report = struct();
+if Problem.Flags.Generate_Report
+    Navier_Stokes_Check = validateNS(Domain, Base_Flow, Problem, Solution);
+    EVP_Check = verifyEVP(Domain, Base_Flow, Problem, Solution);
+    Report.Navier_Stokes_Check = Navier_Stokes_Check;
+    if isfield(Solution, 'EVP')
+        Report.EVP_Check = EVP_Check;
+    end
+end
 
 end
 

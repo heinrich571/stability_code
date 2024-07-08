@@ -46,9 +46,11 @@ err_p = initializer;
 for i = 1:N_cases
     Nx(i) = Problem(i).Domain.Nx + 1;
     Ny(i) = Problem(i).Domain.Ny + 1;
-    t(i)  = Monitor(i).Time;
     log_N(i) = log(Nx(i));
-    log_T(i) = log(t(i));
+    if exist('Monitor', 'var')
+        t(i)  = Monitor(i).Time;
+        log_T(i) = log(t(i));
+    end
 
     for j = 1:N_eigenvalues
         eigenvalue(i,j) = Solution(i).Eigenvalues(j);
@@ -70,16 +72,18 @@ end
 %% Plots
 
 % time vs. resolution
-figure('Name', 'Solution time vs. domain resolution', 'NumberTitle', 'off')
-plot(Nx, t, '-o')
-xlabel('$N$')
-ylabel('$t$')
-title('Solution time vs. domain resolution')
-grid minor
+if exist('Monitor', 'var')
+    figure('Name', 'Solution time vs. domain resolution', 'NumberTitle', 'off')
+    plot(Nx, t, '-o')
+    xlabel('$N$')
+    ylabel('$t$')
+    title('Solution time vs. domain resolution')
+    grid minor
+end
 
 
 % Convergence of eigenvalues
-eigenvalues_to_plot = [1 10];
+eigenvalues_to_plot = [1 2 3 4 5];
 for j = eigenvalues_to_plot
     figure('Name', ['Eigenvalue #' num2str(j) ' convergence'], 'NumberTitle', 'off')
     subplot(1,2,1)
@@ -92,7 +96,7 @@ for j = eigenvalues_to_plot
     ylabel(['$\mathrm{Im}\{\omega_' num2str(j) '\}$'])
 
     figure('Name', ['Eigenvalue #' num2str(j) ' convergence'], 'NumberTitle', 'off')
-    plot(Nx, err_eigenvalue(:,j)')
+    plot(Nx, err_eigenvalue(:,j)', '-^')
     xlabel('$N$')
     ylabel(['$\varepsilon_{\omega_' num2str(j) '}$'])
 end

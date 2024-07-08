@@ -9,10 +9,10 @@ clc
 
 x_limit  = 10;
 y_limit = 10;
-y_median = 2.4;
+y_median = 8;
 
 Nx = 50;
-Ny = Nx/2;
+Ny = 50;
 
 
 %% Generate the Chebyshev interval
@@ -29,7 +29,7 @@ a_y = y_median*y_limit/(y_limit-2*y_median);
 b_y = 1+2*a_y/y_limit;
 y = (a_y*(1+yhat)./(b_y-yhat));
 
-f = 0.01;
+f = 1;
 e = 1-f;
 x1 = x_limit*(e*xhat.^3 + f*xhat);
 ix_mid = Nx/2 + 1;

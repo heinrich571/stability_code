@@ -30,14 +30,15 @@ Problem.Boundary_Conditions.Sides         = '2nd_derivative_extrapolation';
 
 Problem.Flags.Display_Domain    = 0;
 Problem.Flags.Display_Base_Flow = 0;
+Problem.Flags.Generate_Report   = 0;
 
-Case_ID        = 'test_new_solver';
+Case_ID        = 'test';
 Results_Folder = '.\results\';
 
 
 %% Send to solver
 
-Solution = BiGlobalTemporalSolver(Problem);
+[Solution, Report] = BiGlobalTemporalSolver(Problem);
 
 
 %% Save results
@@ -48,7 +49,7 @@ dispstatus('SAVE RESULTS', 0)
 if ~isfolder(Results_Folder)
     mkdir(Results_Folder);
 end
-save([Results_Folder Case_ID '.mat'], 'Problem', 'Solution');
+save([Results_Folder Case_ID '.mat'], 'Problem', 'Solution', 'Report');
 
 dispstatus('SAVE RESULTS', 1)
 dispstatus()
@@ -57,4 +58,4 @@ dispstatus()
 %% Draw eigenfunctions
 
 check_results
-errors_plots(Solution, 10)
+errors_plots(Solution, Report, 1)

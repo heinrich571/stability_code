@@ -290,35 +290,35 @@ switch Problem.Boundary_Conditions.Sides
         mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
         mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
 
-        % % d2p/dx2 = 0 - replacing a continuity equation at the right boundary
-        % operator_row_inds = get_opr_right_inds(Nx, Ny);
-        % row_inds          = get_eqn_right_inds('continuity', Nx, Ny);
-        % operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
-        % row_inds          = row_inds(2:end-1);
+        % d2p/dx2 = 0 - replacing a continuity equation at the right boundary
+        operator_row_inds = get_opr_right_inds(Nx, Ny);
+        row_inds          = get_eqn_right_inds('continuity', Nx, Ny);
+        operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
+        row_inds          = row_inds(2:end-1);
+
+        j_p_TR = get_var_top_right_ind('p', Nx, Ny);
+        j_p_BL = get_var_bottom_left_ind('p', Nx, Ny);
+        column_inds = j_p_TR:j_p_BL;
+
+        mat_A(row_inds,:) = 0;
+        mat_B(row_inds,:) = 0;
+        mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
+        mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+
+        % row_inds = get_eqn_right_inds('continuity', Nx, Ny);
+        % i_opr_B  = get_opr_right_inds(Nx, Ny);
         % 
-        % j_p_TR = get_var_top_right_ind('p', Nx, Ny);
-        % j_p_BL = get_var_bottom_left_ind('p', Nx, Ny);
-        % column_inds = j_p_TR:j_p_BL;
+        % lppe_u = 2*Ux*Dx;
+        % lppe_v = 2*(Uy*Dx + Vy*Dy);
+        % lppe_w = Z;
+        % lppe_p = D2x + D2y - beta^2*I;
         % 
-        % mat_A(row_inds,:) = 0;
-        % mat_B(row_inds,:) = 0;
-        % mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
-        % mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
-
-        row_inds = get_eqn_right_inds('continuity', Nx, Ny);
-        i_opr_B  = get_opr_right_inds(Nx, Ny);
-
-        lppe_u = 2*Ux*Dx;
-        lppe_v = 2*(Uy*Dx + Vy*Dy);
-        lppe_w = Z;
-        lppe_p = D2x + D2y - beta^2*I;
-
-        lppe_opr = [lppe_u(i_opr_B,:) , lppe_v(i_opr_B,:) , lppe_w(i_opr_B,:) , lppe_p(i_opr_B,:)];
-
-        mat_A(row_inds(:),:) = 0;
-        mat_B(row_inds(:),:) = 0;
-        mat_A(row_inds(:),:) = lppe_factor*lppe_opr;
-        mat_B(row_inds(:),:) = lppe_opr;
+        % lppe_opr = [lppe_u(i_opr_B,:) , lppe_v(i_opr_B,:) , lppe_w(i_opr_B,:) , lppe_p(i_opr_B,:)];
+        % 
+        % mat_A(row_inds(:),:) = 0;
+        % mat_B(row_inds(:),:) = 0;
+        % mat_A(row_inds(:),:) = lppe_factor*lppe_opr;
+        % mat_B(row_inds(:),:) = lppe_opr;
 
 
         % LEFT BOUNDARY
@@ -367,35 +367,35 @@ switch Problem.Boundary_Conditions.Sides
         mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
         mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
 
-        % % d2p/dx2 = 0 - replacing a continuity equation at the left boundary
-        % operator_row_inds = get_opr_left_inds(Nx, Ny);
-        % row_inds          = get_eqn_left_inds('continuity', Nx, Ny);
-        % operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
-        % row_inds          = row_inds(2:end-1);
+        % d2p/dx2 = 0 - replacing a continuity equation at the left boundary
+        operator_row_inds = get_opr_left_inds(Nx, Ny);
+        row_inds          = get_eqn_left_inds('continuity', Nx, Ny);
+        operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
+        row_inds          = row_inds(2:end-1);
+
+        j_p_TR = get_var_top_right_ind('p', Nx, Ny);
+        j_p_BL = get_var_bottom_left_ind('p', Nx, Ny);
+        column_inds = j_p_TR:j_p_BL;
+
+        mat_A(row_inds,:) = 0;
+        mat_B(row_inds,:) = 0;
+        mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
+        mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+
+        % row_inds = get_eqn_left_inds('continuity', Nx, Ny);
+        % i_opr_B  = get_opr_left_inds(Nx, Ny);
         % 
-        % j_p_TR = get_var_top_right_ind('p', Nx, Ny);
-        % j_p_BL = get_var_bottom_left_ind('p', Nx, Ny);
-        % column_inds = j_p_TR:j_p_BL;
+        % lppe_u = 2*Ux*Dx;
+        % lppe_v = 2*(Uy*Dx + Vy*Dy);
+        % lppe_w = Z;
+        % lppe_p = D2x + D2y - beta^2*I;
         % 
-        % mat_A(row_inds,:) = 0;
-        % mat_B(row_inds,:) = 0;
-        % mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
-        % mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
-
-        row_inds = get_eqn_left_inds('continuity', Nx, Ny);
-        i_opr_B  = get_opr_left_inds(Nx, Ny);
-
-        lppe_u = 2*Ux*Dx;
-        lppe_v = 2*(Uy*Dx + Vy*Dy);
-        lppe_w = Z;
-        lppe_p = D2x + D2y - beta^2*I;
-
-        lppe_opr = [lppe_u(i_opr_B,:) , lppe_v(i_opr_B,:) , lppe_w(i_opr_B,:) , lppe_p(i_opr_B,:)];
-
-        mat_A(row_inds(:),:) = 0;
-        mat_B(row_inds(:),:) = 0;
-        mat_A(row_inds(:),:) = lppe_factor*lppe_opr;
-        mat_B(row_inds(:),:) = lppe_opr;
+        % lppe_opr = [lppe_u(i_opr_B,:) , lppe_v(i_opr_B,:) , lppe_w(i_opr_B,:) , lppe_p(i_opr_B,:)];
+        % 
+        % mat_A(row_inds(:),:) = 0;
+        % mat_B(row_inds(:),:) = 0;
+        % mat_A(row_inds(:),:) = lppe_factor*lppe_opr;
+        % mat_B(row_inds(:),:) = lppe_opr;
 
     case 'finite_differences_extrapolation'
         % Linear extrapolation - right boundary
