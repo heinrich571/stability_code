@@ -112,46 +112,63 @@ pressure_compatibility_factor = 500;
 
 lppe_factor = 500;
 
-%% No-slip on the wall:
-% u(y = 0) = 0 and a pressure compatibility condition on dp/dx
-row_inds    = get_eqn_bottom_inds('x momentum', Nx, Ny);
-column_inds = get_var_bottom_inds('u', Nx, Ny);
-linear_inds = get_linear_indices(mat_A, row_inds, column_inds);
 
-mat_A(row_inds(:),:) = 0;
-mat_B(row_inds(:),:) = 0;
-mat_A(linear_inds)   = dirichlet_factor;
-mat_B(linear_inds)   = 1;
+%% Wall boundary conditions
 
+Wall_Options.No_Slip        = {'Dirichlet' 'No_Slip' 'No-Slip' 'No Slip'};
+Wall_Options.No_Penetration = {'Dirichlet' 'No_Penetration' 'No-Penetration' 'No Penetration'};
+Wall_Options.PC             = {'PC' 'Pressure-Compatibility' 'Pressure Compatibility'};
+Wall_Options.LPPE           = {'LPPE' 'Linearized-Pressure-Poisson-Equation' 'Linearized Pressure Poisson Equation'};
 
-% w(y = 0) = 0
-row_inds    = get_eqn_bottom_inds('z momentum', Nx, Ny);
-column_inds = get_var_bottom_inds('w', Nx, Ny);
-linear_inds = get_linear_indices(mat_A, row_inds, column_inds);
+% u
+switch Problem.Boundary_Conditions.Wall.u
+    case Wall_Options.No_Slip % No-slip boundary condition
+        row_inds    = get_eqn_bottom_inds('x momentum', Nx, Ny);
+        column_inds = get_var_bottom_inds('u', Nx, Ny);
+        linear_inds = get_linear_indices(mat_A, row_inds, column_inds);
 
-mat_A(row_inds(:),:) = 0;
-mat_B(row_inds(:),:) = 0;
-mat_A(linear_inds)   = dirichlet_factor;
-mat_B(linear_inds)   = 1;
+        mat_A(row_inds(:),:) = 0;
+        mat_B(row_inds(:),:) = 0;
+        mat_A(linear_inds)   = dirichlet_factor;
+        mat_B(linear_inds)   = 1;
+    otherwise
+        error(['Boundary condition ' Problem.Boundary_Conditions.Wall.u ' for ''u'' at the wall is invalid or not supported'])
+end
 
+% v
+switch Problem.Boundary_Conditions.Wall.v
+    case Wall_Options.No_Penetration % No-penetration boundary condition
+        row_inds    = get_eqn_bottom_inds('y momentum', Nx, Ny);
+        column_inds = get_var_bottom_inds('v', Nx, Ny);
+        linear_inds = get_linear_indices(mat_A, row_inds, column_inds);
 
-% No-penetration on the wall
-% v(y = 0) = 0 and a pressure compatibility condition on dp/dy
-row_inds    = get_eqn_bottom_inds('y momentum', Nx, Ny);
-column_inds = get_var_bottom_inds('v', Nx, Ny);
-linear_inds = get_linear_indices(mat_A, row_inds, column_inds);
+        mat_A(row_inds(:),:) = 0;
+        mat_B(row_inds(:),:) = 0;
 
-mat_A(row_inds(:),:) = 0;
-mat_B(row_inds(:),:) = 0;
+        mat_A(linear_inds)   = dirichlet_factor;
+        mat_B(linear_inds)   = 1;
+    otherwise
+        error(['Boundary condition ' Problem.Boundary_Conditions.Wall.v ' for ''v'' at the wall is invalid or not supported'])
+end
 
-mat_A(linear_inds)   = dirichlet_factor;
-mat_B(linear_inds)   = 1;
+% w
+switch Problem.Boundary_Conditions.Wall.w
+    case Wall_Options.No_Slip % No-slip boundary condition
+        row_inds    = get_eqn_bottom_inds('z momentum', Nx, Ny);
+        column_inds = get_var_bottom_inds('w', Nx, Ny);
+        linear_inds = get_linear_indices(mat_A, row_inds, column_inds);
 
+        mat_A(row_inds(:),:) = 0;
+        mat_B(row_inds(:),:) = 0;
+        mat_A(linear_inds)   = dirichlet_factor;
+        mat_B(linear_inds)   = 1;
+    otherwise
+        error(['Boundary condition ' Problem.Boundary_Conditions.Wall.w ' for ''w'' at the wall is invalid or not supported'])
+end
 
-%% Pressure conditions on the wall
-% Pressure conditions on the wall
-switch Problem.Boundary_Conditions.Wall.Pressure
-    case 'PC' % Pressure compatibility condition
+% p
+switch Problem.Boundary_Conditions.Wall.p
+    case Wall_Options.PC % Pressure compatibility boundary condition
         row_inds = get_eqn_bottom_inds('continuity', Nx, Ny);
         i_opr_B  = get_opr_bottom_inds(Nx, Ny);
 
@@ -161,7 +178,7 @@ switch Problem.Boundary_Conditions.Wall.Pressure
         mat_B(row_inds(:),:) = 0;
         mat_A(row_inds(:),:) = pressure_compatibility_factor*pressure_compatibility_opr;
         mat_B(row_inds(:),:) = pressure_compatibility_opr;
-    case 'LPPE' % Linearized pressure poisson equation implementation at the boundaries
+    case Wall_Options.LPPE % LPPE boundary condition
         row_inds = get_eqn_bottom_inds('continuity', Nx, Ny);
         i_opr_B  = get_opr_bottom_inds(Nx, Ny);
 
@@ -177,75 +194,114 @@ switch Problem.Boundary_Conditions.Wall.Pressure
         mat_A(row_inds(:),:) = lppe_factor*lppe_opr;
         mat_B(row_inds(:),:) = lppe_opr;
     otherwise
-        error('Boundary condition on the wall pressure is invalid or unsupported.')
+        error(['Boundary condition ' Problem.Boundary_Conditions.Wall.p ' for ''p'' at the wall is invalid or not supported'])
 end
 
 
-%% Disturbances decay as y --> infinity
-% u(y --> inf) = 0
-row_inds    = get_eqn_top_inds('x momentum', Nx, Ny);
-column_inds = get_var_top_inds('u', Nx, Ny);
-linear_inds = get_linear_indices(mat_A, row_inds, column_inds);
+%% Top boundary conditions
 
-mat_A(row_inds(:),:) = 0;
-mat_B(row_inds(:),:) = 0;
-mat_A(linear_inds)   = dirichlet_factor;
-mat_B(linear_inds)   = 1;
+Top_Options.Decay = {'Dirichlet' 'Decay' 'decay'};
+Top_Options.LPPE  = {'LPPE' 'Linearized-Pressure-Poisson-Equation' 'Linearized Pressure Poisson Equation'};
 
-% v(y --> inf) = 0
-row_inds    = get_eqn_top_inds('y momentum', Nx, Ny);
-column_inds = get_var_top_inds('v', Nx, Ny);
-linear_inds = get_linear_indices(mat_A, row_inds, column_inds);
+% u
+switch Problem.Boundary_Conditions.Top.u
+    case Top_Options.Decay % u(y-->infinity) = 0
+        row_inds    = get_eqn_top_inds('x momentum', Nx, Ny);
+        column_inds = get_var_top_inds('u', Nx, Ny);
+        linear_inds = get_linear_indices(mat_A, row_inds, column_inds);
 
-mat_A(row_inds(:),:) = 0;
-mat_B(row_inds(:),:) = 0;
-mat_A(linear_inds)   = dirichlet_factor;
-mat_B(linear_inds)   = 1;
+        mat_A(row_inds(:),:) = 0;
+        mat_B(row_inds(:),:) = 0;
+        mat_A(linear_inds)   = dirichlet_factor;
+        mat_B(linear_inds)   = 1;
+    otherwise
+        error(['Boundary condition ' Problem.Boundary_Conditions.Wall.u ' for ''u'' at the top is invalid or not supported'])
+end
 
-% w(y --> inf) = 0
-row_inds    = get_eqn_top_inds('z momentum', Nx, Ny);
-column_inds = get_var_top_inds('w', Nx, Ny);
-linear_inds = get_linear_indices(mat_A, row_inds, column_inds);
+% v
+switch Problem.Boundary_Conditions.Top.v
+    case Top_Options.Decay % v(y-->infinity) = 0
+        row_inds    = get_eqn_top_inds('y momentum', Nx, Ny);
+        column_inds = get_var_top_inds('v', Nx, Ny);
+        linear_inds = get_linear_indices(mat_A, row_inds, column_inds);
 
-mat_A(row_inds(:),:) = 0;
-mat_B(row_inds(:),:) = 0;
-mat_A(linear_inds)   = dirichlet_factor;
-mat_B(linear_inds)   = 1;
+        mat_A(row_inds(:),:) = 0;
+        mat_B(row_inds(:),:) = 0;
+        mat_A(linear_inds)   = dirichlet_factor;
+        mat_B(linear_inds)   = 1;
+    otherwise
+        error(['Boundary condition ' Problem.Boundary_Conditions.Wall.v ' for ''v'' at the top is invalid or not supported'])
+end
+
+% w
+switch Problem.Boundary_Conditions.Top.w
+    case Top_Options.Decay % w(y-->infinity) = 0
+        row_inds    = get_eqn_top_inds('z momentum', Nx, Ny);
+        column_inds = get_var_top_inds('w', Nx, Ny);
+        linear_inds = get_linear_indices(mat_A, row_inds, column_inds);
+
+        mat_A(row_inds(:),:) = 0;
+        mat_B(row_inds(:),:) = 0;
+        mat_A(linear_inds)   = dirichlet_factor;
+        mat_B(linear_inds)   = 1;
+    otherwise
+        error(['Boundary condition ' Problem.Boundary_Conditions.Wall.w ' for ''w'' at the top is invalid or not supported'])
+end
+
+% p
+switch Problem.Boundary_Conditions.Top.p
+    case Top_Options.Decay % p(y-->infinity) = 0
+        row_inds    = get_eqn_top_inds('continuity', Nx, Ny);
+        column_inds = get_var_top_inds('p', Nx, Ny);
+        linear_inds = get_linear_indices(mat_A, row_inds, column_inds);
+
+        mat_A(row_inds(:),:) = 0;
+        mat_B(row_inds(:),:) = 0;
+        mat_A(linear_inds)   = dirichlet_factor;
+        mat_B(linear_inds)   = 1;
+    case Top_Options.LPPE % LPPE boundary condition
+        row_inds = get_eqn_top_inds('continuity', Nx, Ny);
+        i_opr_B  = get_opr_top_inds(Nx, Ny);
+
+        lppe_u = Z;
+        lppe_v = Z;
+        lppe_w = Z;
+        lppe_p = D2x + D2y - beta^2*I;
+
+        lppe_opr = [lppe_u(i_opr_B,:) , lppe_v(i_opr_B,:) , lppe_w(i_opr_B,:) , lppe_p(i_opr_B,:)];
+
+        mat_A(row_inds(:),:) = 0;
+        mat_B(row_inds(:),:) = 0;
+        mat_A(row_inds(:),:) = lppe_factor*lppe_opr;
+        mat_B(row_inds(:),:) = lppe_opr;
+    otherwise
+        error(['Boundary condition ' Problem.Boundary_Conditions.Wall.p ' for ''p'' at the top is invalid or not supported'])
+end
 
 
-% No vertical acceleration at the top of the domain
-% p(y --> inf) = 0
-row_inds    = get_eqn_top_inds('continuity', Nx, Ny);
-column_inds = get_var_top_inds('p', Nx, Ny);
-linear_inds = get_linear_indices(mat_A, row_inds, column_inds);
+%% Right side
 
-mat_A(row_inds(:),:) = 0;
-mat_B(row_inds(:),:) = 0;
-mat_A(linear_inds)   = dirichlet_factor;
-mat_B(linear_inds)   = 1;
+Right_Side_Options.FD_Extrapolation = {'Linear_Extrapolation' 'Linear-Extrapolation' 'Linear Extrapolation' 'FD_Extrapolation' 'FD Extrapolation' 'Finite Difference Extrapolation' 'finite_difference_extrapolation' 'finite difference extrapolation'};
+Right_Side_Options.Zero_2nd_Derivative_Extrapolation = {'zero_2nd_derivative' 'zero_2nd_derivative_extrapolation'};
+Right_Side_Options.LPPE = {'LPPE' 'Linearized-Pressure-Poisson-Equation' 'Linearized Pressure Poisson Equation'};
 
-% % LPPE on the top of the domain
-% row_inds = get_eqn_top_inds('continuity', Nx, Ny);
-% i_opr_B  = get_opr_top_inds(Nx, Ny);
-% 
-% lppe_u = Z;
-% lppe_v = Z;
-% lppe_w = Z;
-% lppe_p = D2x + D2y - beta^2*I;
-% 
-% lppe_opr = [lppe_u(i_opr_B,:) , lppe_v(i_opr_B,:) , lppe_w(i_opr_B,:) , lppe_p(i_opr_B,:)];
-% 
-% mat_A(row_inds(:),:) = 0;
-% mat_B(row_inds(:),:) = 0;
-% mat_A(row_inds(:),:) = lppe_factor*lppe_opr;
-% mat_B(row_inds(:),:) = lppe_opr;
+% u
+switch Problem.Boundary_Conditions.Right.u
+    case Right_Side_Options.FD_Extrapolation % Linear extrapolation
+        j_u_right_inds    = get_var_right_inds('u', Nx, Ny);
+        i_xmom_right_inds = get_eqn_right_inds('x momentum', Nx, Ny);
 
-
-%% Linear extrapolation of disturbances at the chordwise directions
-switch Problem.Boundary_Conditions.Sides
-    case '2nd_derivative_extrapolation'
-        % RIGHT BOUNDARY
-        % d2u/dx2 = 0
+        mat_A(i_xmom_right_inds(2:end-1),:) = 0;
+        mat_B(i_xmom_right_inds(2:end-1),:) = 0;
+        
+        for i = 2:Ny-1
+            C = (mat_X(i,1)-mat_X(i,2))/(mat_X(i,3)-mat_X(i,2));
+            linear_extrap_opr = [1 C-1 -C];
+            ind_shift = Ny*[0 1 2];
+            mat_A(i_xmom_right_inds(i),j_u_right_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
+            mat_B(i_xmom_right_inds(i),j_u_right_inds(i) + ind_shift) = linear_extrap_opr;
+        end
+    case Right_Side_Options.Zero_2nd_Derivative_Extrapolation % Zero 2nd derivative extrapolation
         operator_row_inds = get_opr_right_inds(Nx, Ny);
         row_inds          = get_eqn_right_inds('x momentum', Nx, Ny);
         operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
@@ -259,8 +315,27 @@ switch Problem.Boundary_Conditions.Sides
         mat_B(row_inds,:) = 0;
         mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
         mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+    otherwise
+        error(['Boundary condition ' Problem.Boundary_Conditions.Right.u ' for ''u'' at the right side is invalid or not supported'])
+end
 
-        % d2v/dx2 = 0
+% v
+switch Problem.Boundary_Conditions.Right.v
+    case Right_Side_Options.FD_Extrapolation % Linear extrapolation
+        j_v_right_inds    = get_var_right_inds('v', Nx, Ny);
+        i_ymom_right_inds = get_eqn_right_inds('y momentum', Nx, Ny);
+        
+        mat_A(i_ymom_right_inds(2:end-1),:) = 0;
+        mat_B(i_ymom_right_inds(2:end-1),:) = 0;
+        
+        for i = 2:Ny-1
+            C = (mat_X(i,1)-mat_X(i,2))/(mat_X(i,3)-mat_X(i,2));
+            linear_extrap_opr = [1 C-1 -C];
+            ind_shift = Ny*[0 1 2];
+            mat_A(i_ymom_right_inds(i),j_v_right_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
+            mat_B(i_ymom_right_inds(i),j_v_right_inds(i) + ind_shift) = linear_extrap_opr;
+        end
+    case Right_Side_Options.Zero_2nd_Derivative_Extrapolation % Zero 2nd derivative extrapolation
         operator_row_inds = get_opr_right_inds(Nx, Ny);
         row_inds          = get_eqn_right_inds('y momentum', Nx, Ny);
         operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
@@ -274,8 +349,28 @@ switch Problem.Boundary_Conditions.Sides
         mat_B(row_inds,:) = 0;
         mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
         mat_B(row_inds,column_inds) = 1*D2x(operator_row_inds,:);
+    otherwise
+        error(['Boundary condition ' Problem.Boundary_Conditions.Right.v ' for ''v'' at the right side is invalid or not supported'])
+end
 
-        % d2w/dx2 = 0
+% w
+switch Problem.Boundary_Conditions.Right.w
+    case Right_Side_Options.FD_Extrapolation % Linear extrapolation
+        j_w_right_inds    = get_var_right_inds('w', Nx, Ny);
+        i_zmom_right_inds = get_eqn_right_inds('z momentum', Nx, Ny);
+        
+        mat_A(i_zmom_right_inds(2:end-1),:) = 0;
+        mat_B(i_zmom_right_inds(2:end-1),:) = 0;
+        
+        for i = 2:Ny-1
+            C = (mat_X(i,1)-mat_X(i,2))/(mat_X(i,3)-mat_X(i,2));
+            linear_extrap_opr = [1 C-1 -C];
+            ind_shift = Ny*[0 1 2];
+            
+            mat_A(i_zmom_right_inds(i),j_w_right_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
+            mat_B(i_zmom_right_inds(i),j_w_right_inds(i) + ind_shift) = linear_extrap_opr;
+        end
+    case Right_Side_Options.Zero_2nd_Derivative_Extrapolation % Zero 2nd derivative extrapolation
         operator_row_inds = get_opr_right_inds(Nx, Ny);
         row_inds          = get_eqn_right_inds('z momentum', Nx, Ny);
         operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
@@ -289,8 +384,28 @@ switch Problem.Boundary_Conditions.Sides
         mat_B(row_inds,:) = 0;
         mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
         mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+    otherwise
+        error(['Boundary condition ' Problem.Boundary_Conditions.Right.w ' for ''w'' at the right side is invalid or not supported'])
+end
 
-        % d2p/dx2 = 0 - replacing a continuity equation at the right boundary
+% p
+switch Problem.Boundary_Conditions.Right.p
+    case Right_Side_Options.FD_Extrapolation % Linear extrapolation
+        j_p_right_inds    = get_var_right_inds('p', Nx, Ny);
+        i_cont_right_inds = get_eqn_right_inds('continuity', Nx, Ny);
+        
+        mat_A(i_cont_right_inds(2:end-1),:) = 0;
+        mat_B(i_cont_right_inds(2:end-1),:) = 0;
+
+        for i = 2:Ny-1
+            C = (mat_X(i,1)-mat_X(i,2))/(mat_X(i,3)-mat_X(i,2));
+            linear_extrap_opr = [1 C-1 -C];
+            ind_shift = Ny*[0 1 2];
+
+            mat_A(i_cont_right_inds(i),j_p_right_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
+            mat_B(i_cont_right_inds(i),j_p_right_inds(i) + ind_shift) = linear_extrap_opr;
+        end
+    case Right_Side_Options.Zero_2nd_Derivative_Extrapolation % Zero 2nd derivative extrapolation
         operator_row_inds = get_opr_right_inds(Nx, Ny);
         row_inds          = get_eqn_right_inds('continuity', Nx, Ny);
         operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
@@ -304,25 +419,50 @@ switch Problem.Boundary_Conditions.Sides
         mat_B(row_inds,:) = 0;
         mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
         mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+    case Right_Side_Options.LPPE % LPPE boundary condition
+        row_inds = get_eqn_right_inds('continuity', Nx, Ny);
+        i_opr_B  = get_opr_right_inds(Nx, Ny);
 
-        % row_inds = get_eqn_right_inds('continuity', Nx, Ny);
-        % i_opr_B  = get_opr_right_inds(Nx, Ny);
-        % 
-        % lppe_u = 2*Ux*Dx;
-        % lppe_v = 2*(Uy*Dx + Vy*Dy);
-        % lppe_w = Z;
-        % lppe_p = D2x + D2y - beta^2*I;
-        % 
-        % lppe_opr = [lppe_u(i_opr_B,:) , lppe_v(i_opr_B,:) , lppe_w(i_opr_B,:) , lppe_p(i_opr_B,:)];
-        % 
-        % mat_A(row_inds(:),:) = 0;
-        % mat_B(row_inds(:),:) = 0;
-        % mat_A(row_inds(:),:) = lppe_factor*lppe_opr;
-        % mat_B(row_inds(:),:) = lppe_opr;
+        lppe_u = 2*Ux*Dx;
+        lppe_v = 2*(Uy*Dx + Vy*Dy);
+        lppe_w = Z;
+        lppe_p = D2x + D2y - beta^2*I;
+
+        lppe_opr = [lppe_u(i_opr_B,:) , lppe_v(i_opr_B,:) , lppe_w(i_opr_B,:) , lppe_p(i_opr_B,:)];
+
+        mat_A(row_inds(:),:) = 0;
+        mat_B(row_inds(:),:) = 0;
+        mat_A(row_inds(:),:) = lppe_factor*lppe_opr;
+        mat_B(row_inds(:),:) = lppe_opr;
+    otherwise
+        error(['Boundary condition ' Problem.Boundary_Conditions.Right.p ' for ''p'' at the right side is invalid or not supported'])
+end
 
 
-        % LEFT BOUNDARY
-        % d2u/dx2 = 0
+%% Left side
+
+Left_Side_Options.FD_Extrapolation = {'Linear_Extrapolation' 'Linear-Extrapolation' 'Linear Extrapolation' 'FD_Extrapolation' 'FD Extrapolation' 'Finite Difference Extrapolation' 'finite_difference_extrapolation' 'finite difference extrapolation'};
+Left_Side_Options.Zero_2nd_Derivative_Extrapolation = {'zero_2nd_derivative' 'zero_2nd_derivative_extrapolation'};
+Left_Side_Options.LPPE = {'LPPE' 'Linearized-Pressure-Poisson-Equation' 'Linearized Pressure Poisson Equation'};
+
+% u
+switch Problem.Boundary_Conditions.Left.u
+    case Left_Side_Options.FD_Extrapolation % Linear extrapolation
+        j_u_left_inds    = get_var_left_inds('u', Nx, Ny);
+        i_xmom_left_inds = get_eqn_left_inds('x momentum', Nx, Ny);
+
+        mat_A(i_xmom_left_inds(2:end-1),:) = 0;
+        mat_B(i_xmom_left_inds(2:end-1),:) = 0;
+
+        for i = 2:Ny-1
+            C = (mat_X(i,Nx)-mat_X(i,Nx-1))/(mat_X(i,Nx-2)-mat_X(i,Nx-1));
+            linear_extrap_opr = [1 C-1 -C];
+            ind_shift = -Ny*[0 1 2];
+            
+            mat_A(i_xmom_left_inds(i),j_u_left_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
+            mat_B(i_xmom_left_inds(i),j_u_left_inds(i) + ind_shift) = linear_extrap_opr;
+        end
+    case Left_Side_Options.Zero_2nd_Derivative_Extrapolation % Zero 2nd derivative extrapolation
         operator_row_inds = get_opr_left_inds(Nx, Ny);
         row_inds          = get_eqn_left_inds('x momentum', Nx, Ny);
         operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
@@ -336,8 +476,27 @@ switch Problem.Boundary_Conditions.Sides
         mat_B(row_inds,:) = 0;
         mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
         mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+    otherwise
+        error(['Boundary condition ' Problem.Boundary_Conditions.Left.u ' for ''u'' at the left side is invalid or not supported'])
+end
 
-        % d2v/dx2 = 0
+% v
+switch Problem.Boundary_Conditions.Left.v
+    case Left_Side_Options.FD_Extrapolation % Linear extrapolation
+        j_v_left_inds    = get_var_left_inds('v', Nx, Ny);
+        i_ymom_left_inds = get_eqn_left_inds('y momentum', Nx, Ny);
+
+        mat_A(i_ymom_left_inds(2:end-1),:) = 0;
+        mat_B(i_ymom_left_inds(2:end-1),:) = 0;
+        for i = 2:Ny-1
+            C = (mat_X(i,Nx)-mat_X(i,Nx-1))/(mat_X(i,Nx-2)-mat_X(i,Nx-1));
+            linear_extrap_opr = [1 C-1 -C];
+            ind_shift = -Ny*[0 1 2];
+            
+            mat_A(i_ymom_left_inds(i),j_v_left_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
+            mat_B(i_ymom_left_inds(i),j_v_left_inds(i) + ind_shift) = linear_extrap_opr;
+        end
+    case Left_Side_Options.Zero_2nd_Derivative_Extrapolation % Zero 2nd derivative extrapolation
         operator_row_inds = get_opr_left_inds(Nx, Ny);
         row_inds          = get_eqn_left_inds('y momentum', Nx, Ny);
         operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
@@ -351,8 +510,28 @@ switch Problem.Boundary_Conditions.Sides
         mat_B(row_inds,:) = 0;
         mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
         mat_B(row_inds,column_inds) = 1*D2x(operator_row_inds,:);
+    otherwise
+        error(['Boundary condition ' Problem.Boundary_Conditions.Left.v ' for ''v'' at the left side is invalid or not supported'])
+end
 
-        % d2w/dx2 = 0
+% w
+switch Problem.Boundary_Conditions.Left.w
+    case Left_Side_Options.FD_Extrapolation % Linear extrapolation
+        j_w_left_inds    = get_var_left_inds('w', Nx, Ny);
+        i_zmom_left_inds = get_eqn_left_inds('z momentum', Nx, Ny);
+
+        mat_A(i_zmom_left_inds(2:end-1),:) = 0;
+        mat_B(i_zmom_left_inds(2:end-1),:) = 0;
+
+        for i = 2:Ny-1
+            C = (mat_X(i,Nx)-mat_X(i,Nx-1))/(mat_X(i,Nx-2)-mat_X(i,Nx-1));
+            linear_extrap_opr = [1 C-1 -C];
+            ind_shift = -Ny*[0 1 2];
+            
+            mat_A(i_zmom_left_inds(i),j_w_left_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
+            mat_B(i_zmom_left_inds(i),j_w_left_inds(i) + ind_shift) = linear_extrap_opr;
+        end
+    case Left_Side_Options.Zero_2nd_Derivative_Extrapolation % Zero 2nd derivative extrapolation
         operator_row_inds = get_opr_left_inds(Nx, Ny);
         row_inds          = get_eqn_left_inds('z momentum', Nx, Ny);
         operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
@@ -366,8 +545,28 @@ switch Problem.Boundary_Conditions.Sides
         mat_B(row_inds,:) = 0;
         mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
         mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+    otherwise
+        error(['Boundary condition ' Problem.Boundary_Conditions.Left.w ' for ''w'' at the left side is invalid or not supported'])
+end
 
-        % d2p/dx2 = 0 - replacing a continuity equation at the left boundary
+% p
+switch Problem.Boundary_Conditions.Left.p
+    case Left_Side_Options.FD_Extrapolation % Linear extrapolation
+        j_p_left_inds    = get_var_left_inds('p', Nx, Ny);
+        i_cont_left_inds = get_eqn_left_inds('continuity', Nx, Ny);
+
+        mat_A(i_cont_left_inds(2:end-1),:) = 0;
+        mat_B(i_cont_left_inds(2:end-1),:) = 0;
+
+        for i = 2:Ny-1
+            C = (mat_X(i,Nx)-mat_X(i,Nx-1))/(mat_X(i,Nx-2)-mat_X(i,Nx-1));
+            linear_extrap_opr = [1 C-1 -C];
+            ind_shift = -Ny*[0 1 2];
+            
+            mat_A(i_cont_left_inds(i),j_p_left_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
+            mat_B(i_cont_left_inds(i),j_p_left_inds(i) + ind_shift) = linear_extrap_opr;
+        end
+    case Left_Side_Options.Zero_2nd_Derivative_Extrapolation % Zero 2nd derivative extrapolation
         operator_row_inds = get_opr_left_inds(Nx, Ny);
         row_inds          = get_eqn_left_inds('continuity', Nx, Ny);
         operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
@@ -381,95 +580,25 @@ switch Problem.Boundary_Conditions.Sides
         mat_B(row_inds,:) = 0;
         mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
         mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+    case Left_Side_Options.LPPE % LPPE boundary condition
+        row_inds = get_eqn_left_inds('continuity', Nx, Ny);
+        i_opr_B  = get_opr_left_inds(Nx, Ny);
 
-        % row_inds = get_eqn_left_inds('continuity', Nx, Ny);
-        % i_opr_B  = get_opr_left_inds(Nx, Ny);
-        % 
-        % lppe_u = 2*Ux*Dx;
-        % lppe_v = 2*(Uy*Dx + Vy*Dy);
-        % lppe_w = Z;
-        % lppe_p = D2x + D2y - beta^2*I;
-        % 
-        % lppe_opr = [lppe_u(i_opr_B,:) , lppe_v(i_opr_B,:) , lppe_w(i_opr_B,:) , lppe_p(i_opr_B,:)];
-        % 
-        % mat_A(row_inds(:),:) = 0;
-        % mat_B(row_inds(:),:) = 0;
-        % mat_A(row_inds(:),:) = lppe_factor*lppe_opr;
-        % mat_B(row_inds(:),:) = lppe_opr;
+        lppe_u = 2*Ux*Dx;
+        lppe_v = 2*(Uy*Dx + Vy*Dy);
+        lppe_w = Z;
+        lppe_p = D2x + D2y - beta^2*I;
 
-    case 'finite_differences_extrapolation'
-        % Linear extrapolation - right boundary
-        j_u_right_inds = get_var_right_inds('u', Nx, Ny);
-        j_v_right_inds = get_var_right_inds('v', Nx, Ny);
-        j_w_right_inds = get_var_right_inds('w', Nx, Ny);
-        j_p_right_inds = get_var_right_inds('p', Nx, Ny);
-        i_xmom_right_inds = get_eqn_right_inds('x momentum', Nx, Ny);
-        i_ymom_right_inds = get_eqn_right_inds('y momentum', Nx, Ny);
-        i_zmom_right_inds = get_eqn_right_inds('z momentum', Nx, Ny);
-        i_cont_right_inds = get_eqn_right_inds('continuity', Nx, Ny);
-        mat_A(i_xmom_right_inds(2:end-1),:) = 0;
-        mat_B(i_xmom_right_inds(2:end-1),:) = 0;
-        mat_A(i_ymom_right_inds(2:end-1),:) = 0;
-        mat_B(i_ymom_right_inds(2:end-1),:) = 0;
-        mat_A(i_zmom_right_inds(2:end-1),:) = 0;
-        mat_B(i_zmom_right_inds(2:end-1),:) = 0;
-        mat_A(i_cont_right_inds(2:end-1),:) = 0;
-        mat_B(i_cont_right_inds(2:end-1),:) = 0;
-        for i = 2:Ny-1
-            C = (mat_X(i,1)-mat_X(i,2))/(mat_X(i,3)-mat_X(i,2));
-            linear_extrap_opr = [1 C-1 -C];
-            ind_shift = Ny*[0 1 2];
-            % u
-            mat_A(i_xmom_right_inds(i),j_u_right_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
-            mat_B(i_xmom_right_inds(i),j_u_right_inds(i) + ind_shift) = linear_extrap_opr;
-            % v
-            mat_A(i_ymom_right_inds(i),j_v_right_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
-            mat_B(i_ymom_right_inds(i),j_v_right_inds(i) + ind_shift) = linear_extrap_opr;
-            % w
-            mat_A(i_zmom_right_inds(i),j_w_right_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
-            mat_B(i_zmom_right_inds(i),j_w_right_inds(i) + ind_shift) = linear_extrap_opr;
-            % p
-            mat_A(i_cont_right_inds(i),j_p_right_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
-            mat_B(i_cont_right_inds(i),j_p_right_inds(i) + ind_shift) = linear_extrap_opr;
-        end
+        lppe_opr = [lppe_u(i_opr_B,:) , lppe_v(i_opr_B,:) , lppe_w(i_opr_B,:) , lppe_p(i_opr_B,:)];
 
-        % Linear extrapolation - left boundary
-        j_u_left_inds = get_var_left_inds('u', Nx, Ny);
-        j_v_left_inds = get_var_left_inds('v', Nx, Ny);
-        j_w_left_inds = get_var_left_inds('w', Nx, Ny);
-        j_p_left_inds = get_var_left_inds('p', Nx, Ny);
-        i_xmom_left_inds = get_eqn_left_inds('x momentum', Nx, Ny);
-        i_ymom_left_inds = get_eqn_left_inds('y momentum', Nx, Ny);
-        i_zmom_left_inds = get_eqn_left_inds('z momentum', Nx, Ny);
-        i_cont_left_inds = get_eqn_left_inds('continuity', Nx, Ny);
-        mat_A(i_xmom_left_inds(2:end-1),:) = 0;
-        mat_B(i_xmom_left_inds(2:end-1),:) = 0;
-        mat_A(i_ymom_left_inds(2:end-1),:) = 0;
-        mat_B(i_ymom_left_inds(2:end-1),:) = 0;
-        mat_A(i_zmom_left_inds(2:end-1),:) = 0;
-        mat_B(i_zmom_left_inds(2:end-1),:) = 0;
-        mat_A(i_cont_left_inds(2:end-1),:) = 0;
-        mat_B(i_cont_left_inds(2:end-1),:) = 0;
-        for i = 2:Ny-1
-            C = (mat_X(i,Nx)-mat_X(i,Nx-1))/(mat_X(i,Nx-2)-mat_X(i,Nx-1));
-            linear_extrap_opr = [1 C-1 -C];
-            ind_shift = -Ny*[0 1 2];
-            % u
-            mat_A(i_xmom_left_inds(i),j_u_left_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
-            mat_B(i_xmom_left_inds(i),j_u_left_inds(i) + ind_shift) = linear_extrap_opr;
-            % v
-            mat_A(i_ymom_left_inds(i),j_v_left_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
-            mat_B(i_ymom_left_inds(i),j_v_left_inds(i) + ind_shift) = linear_extrap_opr;
-            % w
-            mat_A(i_zmom_left_inds(i),j_w_left_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
-            mat_B(i_zmom_left_inds(i),j_w_left_inds(i) + ind_shift) = linear_extrap_opr;
-            % p
-            mat_A(i_cont_left_inds(i),j_p_left_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
-            mat_B(i_cont_left_inds(i),j_p_left_inds(i) + ind_shift) = linear_extrap_opr;
-        end
+        mat_A(row_inds(:),:) = 0;
+        mat_B(row_inds(:),:) = 0;
+        mat_A(row_inds(:),:) = lppe_factor*lppe_opr;
+        mat_B(row_inds(:),:) = lppe_opr;
     otherwise
-        error('Boundary condition on the sides is invalid or unsupported.')
+        error(['Boundary condition ' Problem.Boundary_Conditions.Left.p ' for ''p'' at the left side is invalid or not supported'])
 end
+
 
 end
 
@@ -907,6 +1036,3 @@ i_opr_BL = get_opr_bottom_left_ind(Nx, Ny);
 i_opr_L  = i_opr_TL : i_opr_BL;
 
 end
-
-
-

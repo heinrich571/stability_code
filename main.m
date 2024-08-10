@@ -24,9 +24,32 @@ Problem.Base_Flow_Settings.initguess            = 1.232587656820289 + [-1 1]*1e-
 Problem.Base_Flow_Settings.maxIterations        = 1e2;
 Problem.Base_Flow_Settings.convergenceTolerance = 1e-6;
 
-Problem.Boundary_Conditions.Wall.Pressure = 'LPPE';
-Problem.Boundary_Conditions.Sides         = '2nd_derivative_extrapolation';
-% Problem.Boundary_Conditions.Sides         = 'finite_differences_extrapolation';
+% Problem.Boundary_Conditions.Wall.Pressure = 'LPPE';
+% Problem.Boundary_Conditions.Sides         = '2nd_derivative_extrapolation';
+% % Problem.Boundary_Conditions.Sides         = 'finite_differences_extrapolation';
+
+Sides_Boundary_Condition = 'zero_2nd_derivative_extrapolation';
+
+Problem.Boundary_Conditions.Top.u   = 'Dirichlet';
+Problem.Boundary_Conditions.Top.v   = 'Dirichlet';
+Problem.Boundary_Conditions.Top.w   = 'Dirichlet';
+Problem.Boundary_Conditions.Top.p   = 'Dirichlet';
+
+Problem.Boundary_Conditions.Right.u = Sides_Boundary_Condition;
+Problem.Boundary_Conditions.Right.v = Sides_Boundary_Condition;
+Problem.Boundary_Conditions.Right.w = Sides_Boundary_Condition;
+Problem.Boundary_Conditions.Right.p = Sides_Boundary_Condition;
+
+Problem.Boundary_Conditions.Left.u  = Sides_Boundary_Condition;
+Problem.Boundary_Conditions.Left.v  = Sides_Boundary_Condition;
+Problem.Boundary_Conditions.Left.w  = Sides_Boundary_Condition;
+Problem.Boundary_Conditions.Left.p  = Sides_Boundary_Condition;
+
+Problem.Boundary_Conditions.Wall.u  = 'Dirichlet';
+Problem.Boundary_Conditions.Wall.v  = 'Dirichlet';
+Problem.Boundary_Conditions.Wall.w  = 'Dirichlet';
+Problem.Boundary_Conditions.Wall.p  = 'LPPE';
+
 
 Problem.Flags.Display_Domain    = 1;
 Problem.Flags.Display_Base_Flow = 1;
