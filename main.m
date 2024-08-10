@@ -4,23 +4,23 @@
 clearvars
 clc
 path_manager('add')
-startup
+% startup
 
 
 %% Define problem parameters
 
 Problem.Computation.N_Workers = 1;
 
-Problem.Domain.Nx       = 50;
-Problem.Domain.Ny       = 50;
-Problem.Domain.X_Limit  = 20;
-Problem.Domain.Y_Limit  = 20;
+Problem.Domain.Nx       = 60;
+Problem.Domain.Ny       = 60;
+Problem.Domain.X_Limit  = 200;
+Problem.Domain.Y_Limit  = 150;
 Problem.Domain.Y_Median = 2.4;
 
 Problem.Physics.Beta                  = 2;
-Problem.Physics.Number_Of_Eigenvalues = 40;
+Problem.Physics.Number_Of_Eigenvalues = 20;
 
-Problem.Base_Flow_Settings.initguess            = [1.22 1.24];
+Problem.Base_Flow_Settings.initguess            = 1.232587656820289 + [-1 1]*1e-4;
 Problem.Base_Flow_Settings.maxIterations        = 1e2;
 Problem.Base_Flow_Settings.convergenceTolerance = 1e-6;
 
@@ -28,8 +28,8 @@ Problem.Boundary_Conditions.Wall.Pressure = 'LPPE';
 Problem.Boundary_Conditions.Sides         = '2nd_derivative_extrapolation';
 % Problem.Boundary_Conditions.Sides         = 'finite_differences_extrapolation';
 
-Problem.Flags.Display_Domain    = 0;
-Problem.Flags.Display_Base_Flow = 0;
+Problem.Flags.Display_Domain    = 1;
+Problem.Flags.Display_Base_Flow = 1;
 Problem.Flags.Generate_Report   = 0;
 
 Case_ID        = 'test';

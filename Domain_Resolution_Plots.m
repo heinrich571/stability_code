@@ -10,7 +10,8 @@ path_manager('add')
 
 %% Load results
 
-Results_Folder = '.\results\tests\';
+% Results_Folder = '.\results\tests\';
+Results_Folder = '.\results\';
 Results_File   = 'Domain_Resolution_Test.mat';
 
 load([Results_Folder Results_File]);

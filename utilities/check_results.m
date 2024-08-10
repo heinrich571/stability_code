@@ -10,7 +10,7 @@ load([Results_Folder Case_ID '.mat']);
 
 %% Plot results
 
-omega_ind = 3;
+omega_ind = 1;
 
 Nx = length(Solution.Domain.vec_X);
 Ny = length(Solution.Domain.vec_Y);
@@ -29,8 +29,8 @@ Re_p = real(p) ; Im_p = imag(p) ;
 
 figure('Name', 'Eigenspectra', 'NumberTitle', 'off')
 plot(real(Solution.Eigenvalues), imag(Solution.Eigenvalues), 'o')
-xlabel('$\mathrm{Re}\{\omega\}$')
-ylabel('$\mathrm{Im}\{\omega\}$')
+xlabel('$\omega_r$')
+ylabel('$\omega_i$')
 
 figure('Name', 'Velocity Components', 'NumberTitle', 'off')
 subplot(2,3,1)

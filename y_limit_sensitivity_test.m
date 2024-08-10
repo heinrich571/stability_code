@@ -14,14 +14,14 @@ Basic_Problem.Computation.N_Workers = 1;
 
 Basic_Problem.Domain.Nx       = 50;
 Basic_Problem.Domain.Ny       = 50;
-Basic_Problem.Domain.X_Limit  = 20;
+Basic_Problem.Domain.X_Limit  = 150;
 Basic_Problem.Domain.Y_Limit  = 20;
 Basic_Problem.Domain.Y_Median = 2.4;
 
 Basic_Problem.Physics.Beta                  = 2;
 Basic_Problem.Physics.Number_Of_Eigenvalues = 40;
 
-Basic_Problem.Base_Flow_Settings.initguess            = [1.22 1.24];
+Basic_Problem.Base_Flow_Settings.initguess            = 1.232587656820289 + [-1 1]*1e-4;
 Basic_Problem.Base_Flow_Settings.maxIterations        = 1e2;
 Basic_Problem.Base_Flow_Settings.convergenceTolerance = 1e-6;
 
@@ -38,7 +38,7 @@ Results_Folder = '.\results\';
 
 %% Define domain resolutions for convergence test
 
-Y_Limit_vec = [10:2:24];
+Y_Limit_vec = [15:15:150];
 
 
 %% Solve problems
@@ -58,7 +58,7 @@ Report   = repmat(Report, [N 1]);
 parfor i = 2:N
     Problem(i).Domain.Y_Limit = Y_Limit_vec(i);
     
-    Current_Case = ['Y_Limit_Sensitivity_X_Limit_' num2str(Problem(i).Domain.Y_Limit)];
+    Current_Case = ['Y_Limit_Sensitivity_Y_Limit_' num2str(Problem(i).Domain.Y_Limit)];
     disp(['Now solving for: ' Current_Case])
     disp('')
     

@@ -1,9 +1,9 @@
 function [fig_baseflow_simple, fig_baseflow_with_streamlines] = show_baseflow(Domain, Base_Flow)
 
 fig_baseflow_simple = figure('Name', 'Base flow solution', 'NumberTitle', 'off');
-plot(Base_Flow.phi, Base_Flow.eta  , 'DisplayName', '$\phi(\eta)$')
-plot(Base_Flow.dphi, Base_Flow.eta , 'DisplayName', '$\phi''(\eta)$')
-plot(Base_Flow.ddphi, Base_Flow.eta, 'DisplayName', '$\phi''''(\eta)$')
+plot(Base_Flow.phi, Base_Flow.eta  , '-o', 'DisplayName', '$\phi(\eta)$')
+plot(Base_Flow.dphi, Base_Flow.eta , '-s', 'DisplayName', '$\phi''(\eta)$')
+plot(Base_Flow.ddphi, Base_Flow.eta, '-d', 'DisplayName', '$\phi''''(\eta)$')
 ylabel('$\eta = \sqrt{\frac{a}{\nu}} \cdot y$', 'Interpreter', 'LaTeX')
 ylim([min(Domain.vec_Y) max(Domain.vec_Y)])
 legend('Interpreter', 'LaTeX', 'Location', 'southeast')
