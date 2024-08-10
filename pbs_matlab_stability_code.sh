@@ -1,5 +1,5 @@
 #!/bin/sh
-#PBS -N hiemenz_stability_analysis
+#PBS -N stagnation_point_flow_stability_tests_batch_run
 #PBS -q karp_q
 #PBS -M dan.heinrich@campus.technion.ac.il
 #PBS -mbea
@@ -9,5 +9,5 @@
 # working directory:
 cd $PBS_O_WORKDIR
 
-/dan/local/bin/matlab -nodesktop  < main.m  > output
+/usr/local/bin/matlab -nodesktop  < main.m  > output
  

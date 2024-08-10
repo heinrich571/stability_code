@@ -4,6 +4,7 @@ if nargin < 2, additional_paths = {}; end
 path_list = {'./baseflow_definition'
              './grid_generation'
              './solver'
+             './BatchX'
              './utilities'
              './plots'};
 
