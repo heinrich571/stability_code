@@ -12,7 +12,7 @@ Problem.Computation.N_Workers = 1;
 Problem.Domain.Nx       = [];
 Problem.Domain.Ny       = [];
 Problem.Domain.X_Limit  = [];
-Problem.Domain.Y_Limit  = 200;
+Problem.Domain.Y_Limit  = 150;
 Problem.Domain.Y_Median = 2.4;
 
 Problem.Physics.Beta                  = 2;
@@ -42,7 +42,7 @@ Problem.Boundary_Conditions.Left.p  = Sides_Boundary_Condition;
 Problem.Boundary_Conditions.Wall.u  = 'Dirichlet';
 Problem.Boundary_Conditions.Wall.v  = 'Dirichlet';
 Problem.Boundary_Conditions.Wall.w  = 'Dirichlet';
-Problem.Boundary_Conditions.Wall.p  = 'LPPE';
+Problem.Boundary_Conditions.Wall.p  = 'PC';
 
 Problem.Flags.Display_Domain    = 0;
 Problem.Flags.Display_Base_Flow = 0;
@@ -54,7 +54,7 @@ Case_Name = 'X_Limit_Sensitivity_Test';
 %% Generate Problems (huehue)
 
 Nx_max = 80;
-X_Limit_max = 150;
+X_Limit_max = 200;
 
 Average_Cell_Size = X_Limit_max/Nx_max;
 

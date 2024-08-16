@@ -12,7 +12,8 @@ path_manager('add')
 
 % Results_Folder = '.\results\tests\';
 Results_Folder = '.\results\';
-Results_File   = 'Domain_Resolution_Test.mat';
+% Results_File   = 'Domain_Resolution_Test.mat';
+Results_File = 'Domain_Resolution_Sensitivity_Test.mat';
 
 load([Results_Folder Results_File]);
 

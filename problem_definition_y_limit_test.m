@@ -42,7 +42,7 @@ Problem.Boundary_Conditions.Left.p  = Sides_Boundary_Condition;
 Problem.Boundary_Conditions.Wall.u  = 'Dirichlet';
 Problem.Boundary_Conditions.Wall.v  = 'Dirichlet';
 Problem.Boundary_Conditions.Wall.w  = 'Dirichlet';
-Problem.Boundary_Conditions.Wall.p  = 'LPPE';
+Problem.Boundary_Conditions.Wall.p  = 'PC';
 
 Problem.Flags.Display_Domain    = 0;
 Problem.Flags.Display_Base_Flow = 0;

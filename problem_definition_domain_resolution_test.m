@@ -42,7 +42,7 @@ Problem.Boundary_Conditions.Left.p  = Sides_Boundary_Condition;
 Problem.Boundary_Conditions.Wall.u  = 'Dirichlet';
 Problem.Boundary_Conditions.Wall.v  = 'Dirichlet';
 Problem.Boundary_Conditions.Wall.w  = 'Dirichlet';
-Problem.Boundary_Conditions.Wall.p  = 'LPPE';
+Problem.Boundary_Conditions.Wall.p  = 'PC';
 
 Problem.Flags.Display_Domain    = 0;
 Problem.Flags.Display_Base_Flow = 0;
@@ -53,8 +53,8 @@ Case_Name = 'Domain_Resolution_Sensitivity_Test';
 
 %% Generate Problems (huehue)
 
-Nx_vec = 10:5:20;
-Ny_vec = 10:5:20;
+Nx_vec = 10:10:80;
+Ny_vec = 10:10:80;
 
 Problem = repmat(Problem, [length(Nx_vec) 1]);
 

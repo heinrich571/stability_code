@@ -23,9 +23,9 @@ D2y   = Domain.D2y;
 
 beta = Problem.Physics.Beta;
 
-mat_phi   = repmat(phi  , [1,Nx]);
-mat_dphi  = repmat(dphi , [1,Nx]);
-mat_ddphi = repmat(ddphi, [1,Nx]);
+mat_phi   = repmat(phi  , [1 Nx]);
+mat_dphi  = repmat(dphi , [1 Nx]);
+mat_ddphi = repmat(ddphi, [1 Nx]);
 U  = mat_X.*mat_dphi;
 U  = diag(U(:), 0);
 V  = diag(-mat_phi(:), 0);
@@ -115,10 +115,11 @@ lppe_factor = 500;
 
 %% Wall boundary conditions
 
-Wall_Options.No_Slip        = {'Dirichlet' 'No_Slip' 'No-Slip' 'No Slip'};
-Wall_Options.No_Penetration = {'Dirichlet' 'No_Penetration' 'No-Penetration' 'No Penetration'};
-Wall_Options.PC             = {'PC' 'Pressure-Compatibility' 'Pressure Compatibility'};
-Wall_Options.LPPE           = {'LPPE' 'Linearized-Pressure-Poisson-Equation' 'Linearized Pressure Poisson Equation'};
+% Multiple entry options allow for flexible user interaction with the code
+Wall_Options.No_Slip        = {'Dirichlet' 'No_Slip' 'No-Slip' 'No Slip'}; % Meant for 'u' and 'w'
+Wall_Options.No_Penetration = {'Dirichlet' 'No_Penetration' 'No-Penetration' 'No Penetration'}; % Meant for 'v'
+Wall_Options.PC             = {'PC' 'Pressure-Compatibility' 'Pressure Compatibility' 'Pressure_Compatibility'}; % Meant for 'p'
+Wall_Options.LPPE           = {'LPPE' 'Linearized-Pressure-Poisson-Equation' 'Linearized Pressure Poisson Equation' 'Linearized_Pressure_Poisson_Equation'}; % Meant for 'p'
 
 % u
 switch Problem.Boundary_Conditions.Wall.u
@@ -130,7 +131,7 @@ switch Problem.Boundary_Conditions.Wall.u
         mat_A(row_inds(:),:) = 0;
         mat_B(row_inds(:),:) = 0;
         mat_A(linear_inds)   = dirichlet_factor;
-        mat_B(linear_inds)   = 1;
+        mat_B(linear_inds)   = 1i;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Wall.u ' for ''u'' at the wall is invalid or not supported'])
 end
@@ -146,7 +147,7 @@ switch Problem.Boundary_Conditions.Wall.v
         mat_B(row_inds(:),:) = 0;
 
         mat_A(linear_inds)   = dirichlet_factor;
-        mat_B(linear_inds)   = 1;
+        mat_B(linear_inds)   = 1i;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Wall.v ' for ''v'' at the wall is invalid or not supported'])
 end
@@ -161,7 +162,7 @@ switch Problem.Boundary_Conditions.Wall.w
         mat_A(row_inds(:),:) = 0;
         mat_B(row_inds(:),:) = 0;
         mat_A(linear_inds)   = dirichlet_factor;
-        mat_B(linear_inds)   = 1;
+        mat_B(linear_inds)   = 1i;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Wall.w ' for ''w'' at the wall is invalid or not supported'])
 end
@@ -213,7 +214,7 @@ switch Problem.Boundary_Conditions.Top.u
         mat_A(row_inds(:),:) = 0;
         mat_B(row_inds(:),:) = 0;
         mat_A(linear_inds)   = dirichlet_factor;
-        mat_B(linear_inds)   = 1;
+        mat_B(linear_inds)   = 1i;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Wall.u ' for ''u'' at the top is invalid or not supported'])
 end
@@ -228,7 +229,7 @@ switch Problem.Boundary_Conditions.Top.v
         mat_A(row_inds(:),:) = 0;
         mat_B(row_inds(:),:) = 0;
         mat_A(linear_inds)   = dirichlet_factor;
-        mat_B(linear_inds)   = 1;
+        mat_B(linear_inds)   = 1i;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Wall.v ' for ''v'' at the top is invalid or not supported'])
 end
@@ -243,7 +244,7 @@ switch Problem.Boundary_Conditions.Top.w
         mat_A(row_inds(:),:) = 0;
         mat_B(row_inds(:),:) = 0;
         mat_A(linear_inds)   = dirichlet_factor;
-        mat_B(linear_inds)   = 1;
+        mat_B(linear_inds)   = 1i;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Wall.w ' for ''w'' at the top is invalid or not supported'])
 end
@@ -258,7 +259,7 @@ switch Problem.Boundary_Conditions.Top.p
         mat_A(row_inds(:),:) = 0;
         mat_B(row_inds(:),:) = 0;
         mat_A(linear_inds)   = dirichlet_factor;
-        mat_B(linear_inds)   = 1;
+        mat_B(linear_inds)   = 1i;
     case Top_Options.LPPE % LPPE boundary condition
         row_inds = get_eqn_top_inds('continuity', Nx, Ny);
         i_opr_B  = get_opr_top_inds(Nx, Ny);

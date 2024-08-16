@@ -20,8 +20,8 @@ if ~isfolder(Output_Folder)
     mkdir(Output_Folder)
 end
 
-% Create a "parpool"
-parpool(N_Workers)
+% % Create a "parpool"
+% parpool(N_Workers)
 
 % Batch execution of runs
 for i = 1:length(Paths)
@@ -47,7 +47,7 @@ for i = 1:length(Paths)
         mkdir(output_folder)
     end
     output_path = [output_folder '/' Case_Name '.mat'];
-    save(output_path, 'Problem', 'Solution', 'Report')
+    save(output_path, 'Problem', 'Solution', 'Report', '-v7.3')
     
     dispstatus(['CASE: ' Case_Name], 1)
     dispstatus()
@@ -56,6 +56,6 @@ for i = 1:length(Paths)
     clearvars Problem Solution Report
 end
 
-dispstatus(['Batch execution finished' Case_Name], -2)
+dispstatus('Batch execution finished!', -2)
 
 end
