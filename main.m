@@ -24,7 +24,8 @@ Problem.Base_Flow_Settings.initguess            = 1.232587656820289 + [-1 1]*1e-
 Problem.Base_Flow_Settings.maxIterations        = 1e2;
 Problem.Base_Flow_Settings.convergenceTolerance = 1e-6;
 
-Sides_Boundary_Condition = 'zero_2nd_derivative_extrapolation';
+Sides_Boundary_Condition = 'zero_2nd_derivative';
+% Sides_Boundary_Condition = 'Linear_Extrapolation';
 
 Problem.Boundary_Conditions.Top.u   = 'Dirichlet';
 Problem.Boundary_Conditions.Top.v   = 'Dirichlet';

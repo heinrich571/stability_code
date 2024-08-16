@@ -38,55 +38,55 @@ L  = U*Dx + V*Dy - (D2x + D2y - beta^2*I);
 
 
 %% LHS matrix entries
-% continuity
-a11 = Dx;
-a12 = Dy;
-a13 = 1i*beta*I;
-a14 = Z;
-
 % x-momentum
-a21 = L + Ux;
-a22 = Uy;
-a23 = Z;
-a24 = Dx;
+a11 = L + Ux;
+a12 = Uy;
+a13 = Z;
+a14 = Dx;
 
 % y-momentum
-a31 = Vx;
-a32 = L + Vy;
-a33 = Z;
-a34 = Dy;
+a21 = Vx;
+a22 = L + Vy;
+a23 = Z;
+a24 = Dy;
 
 % z-momentum
-a41 = Z;
-a42 = Z;
-a43 = L;
-a44 = 1i*beta*I;
+a31 = Z;
+a32 = Z;
+a33 = L;
+a34 = 1i*beta*I;
+
+% continuity
+a41 = Dx;
+a42 = Dy;
+a43 = 1i*beta*I;
+a44 = Z;
 
 
 %% RHS matrix entries
-% continuity
-b11 = Z;
+% x-momentum
+b11 = 1i*I;
 b12 = Z;
 b13 = Z;
 b14 = Z;
 
-% x-momentum
-b21 = 1i*I;
-b22 = Z;
+% y-momentum
+
+b21 = Z;
+b22 = 1i*I;
 b23 = Z;
 b24 = Z;
 
-% y-momentum
-
+% z-momentum
 b31 = Z;
-b32 = 1i*I;
-b33 = Z;
+b32 = Z;
+b33 = 1i*I;
 b34 = Z;
 
-% z-momentum
+% continuity
 b41 = Z;
 b42 = Z;
-b43 = 1i*I;
+b43 = Z;
 b44 = Z;
 
 
@@ -109,7 +109,6 @@ dirichlet_factor     = 200;
 neumann_factor       = 300;
 linear_extrap_factor = 400;
 pressure_compatibility_factor = 500;
-
 lppe_factor = 500;
 
 
@@ -423,6 +422,8 @@ switch Problem.Boundary_Conditions.Right.p
     case Right_Side_Options.LPPE % LPPE boundary condition
         row_inds = get_eqn_right_inds('continuity', Nx, Ny);
         i_opr_B  = get_opr_right_inds(Nx, Ny);
+        row_inds = row_inds(2:end-1);
+        i_opr_B  = i_opr_B(2:end-1);
 
         lppe_u = 2*Ux*Dx;
         lppe_v = 2*(Uy*Dx + Vy*Dy);
@@ -584,6 +585,8 @@ switch Problem.Boundary_Conditions.Left.p
     case Left_Side_Options.LPPE % LPPE boundary condition
         row_inds = get_eqn_left_inds('continuity', Nx, Ny);
         i_opr_B  = get_opr_left_inds(Nx, Ny);
+        row_inds = row_inds(2:end-1);
+        i_opr_B  = i_opr_B(2:end-1);
 
         lppe_u = 2*Ux*Dx;
         lppe_v = 2*(Uy*Dx + Vy*Dy);
@@ -633,7 +636,7 @@ function equation_number = eqn2num(equation_name)
 % OUTPUT
 %   equation_number     number of the equation according to its position in the eigenvalue problem formulation  [scalar]
 
-equation_names  = {'continuity' , 'x momentum' , 'y momentum' , 'z momentum'};
+equation_names  = {'x momentum' , 'y momentum' , 'z momentum' , 'continuity'};
 equation_number = find(strcmp(equation_names, equation_name));
 
 if isempty(equation_number)

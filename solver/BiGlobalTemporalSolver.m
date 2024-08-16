@@ -71,23 +71,22 @@ eigenvalue_max_magnitude = 100;
 inds = find(sqrt(real(Solution_Raw.Eigenvalues).^2 + imag(Solution_Raw.Eigenvalues).^2) <= eigenvalue_max_magnitude);
 
 % Normalize the solution for consistency, and build output variable
-nrm = max(abs(Solution_Raw.Eigenfunctions.p(:,inds)), [], 1);
+% nrm = max(abs(Solution_Raw.Eigenfunctions.p(:,inds)), [], 1);
 % [max_mag_u, ind_u] = max(abs(Solution_Raw.Eigenfunctions.u(:,inds)), [] ,1);
 % [max_mag_v, ind_v] = max(abs(Solution_Raw.Eigenfunctions.v(:,inds)), [] ,1);
 % [max_mag_w, ind_w] = max(abs(Solution_Raw.Eigenfunctions.w(:,inds)), [] ,1);
 % max_mag_vel_comp = max([max_mag_u ; max_mag_v ; max_mag_w], [] ,1);
-% nrm = 
-% nrm = 1;
+nrm = Solution_Raw.Eigenfunctions.p(Ny,:);
 
 Solution.Domain           = Domain;
 Solution.Physics          = Problem.Physics;
 Solution.EVP.Matrices.A   = sparse(mat_A);
 Solution.EVP.Matrices.B   = sparse(mat_B);
-Solution.Eigenvalues      = Solution_Raw.Eigenvalues(inds);
-Solution.Eigenfunctions.u = Solution_Raw.Eigenfunctions.u(:,inds)./nrm;
-Solution.Eigenfunctions.v = Solution_Raw.Eigenfunctions.v(:,inds)./nrm;
-Solution.Eigenfunctions.w = Solution_Raw.Eigenfunctions.w(:,inds)./nrm;
-Solution.Eigenfunctions.p = Solution_Raw.Eigenfunctions.p(:,inds)./nrm;
+Solution.Eigenvalues      = Solution_Raw.Eigenvalues;
+Solution.Eigenfunctions.u = Solution_Raw.Eigenfunctions.u./nrm;
+Solution.Eigenfunctions.v = Solution_Raw.Eigenfunctions.v./nrm;
+Solution.Eigenfunctions.w = Solution_Raw.Eigenfunctions.w./nrm;
+Solution.Eigenfunctions.p = Solution_Raw.Eigenfunctions.p./nrm;
 
 % Generate a report on the validity of the results against the
 % Navier-Stokes equations and satisfying the original problem
