@@ -18,7 +18,7 @@ default_view = [-45 45];
 for i = eigenvalues_inds
     figure('Name', ['Error Map - Continuity, eigenvalue #' num2str(i)], 'NumberTitle', 'off')
     surf(mat_X, mat_Y, Report.Navier_Stokes_Check.Errors.Continuity.Absolute.Map(:,:,i))
-    title(['Continuity absolute error, $\beta = ' num2str(beta) '$, $\omega = ' num2str(omega(i)) '$'])
+    title(['Continuity absolute error, $\beta = ' num2str(beta) '$, $\omega_' num2str(i) ' = ' num2str(omega(i)) '$'])
     xlabel('$x$')
     ylabel('$y$')
     zlabel('Absolute Error')
@@ -26,21 +26,21 @@ for i = eigenvalues_inds
 
     figure('Name', ['Error Map - X Momentum, eigenvalue #' num2str(i)], 'NumberTitle', 'off')
     surf(mat_X, mat_Y, Report.Navier_Stokes_Check.Errors.X_Momentum.Absolute.Map(:,:,i))
-    title(['X-Momentum absolute error, $\beta = ' num2str(beta) '$, $\omega = ' num2str(omega(i)) '$'])
+    title(['X-Momentum absolute error, $\beta = ' num2str(beta) '$, $\omega_' num2str(i) ' = ' num2str(omega(i)) '$'])
     xlabel('$x$')
     ylabel('$y$')
     view(default_view)
 
     figure('Name', ['Error Map - Y Momentum, eigenvalue #' num2str(i)], 'NumberTitle', 'off')
     surf(mat_X, mat_Y, Report.Navier_Stokes_Check.Errors.Y_Momentum.Absolute.Map(:,:,i))
-    title(['Y-Momentum absolute error, $\beta = ' num2str(beta) '$, $\omega = ' num2str(omega(i)) '$'])
+    title(['Y-Momentum absolute error, $\beta = ' num2str(beta) '$, $\omega_' num2str(i) ' = ' num2str(omega(i)) '$'])
     xlabel('$x$')
     ylabel('$y$')
     view(default_view)
 
     figure('Name', ['Error Map - Z Momentum, eigenvalue #' num2str(i)], 'NumberTitle', 'off')
     surf(mat_X, mat_Y, Report.Navier_Stokes_Check.Errors.Z_Momentum.Absolute.Map(:,:,i))
-    title(['Z-Momentum absolute error, $\beta = ' num2str(beta) '$, $\omega = ' num2str(omega(i)) '$'])
+    title(['Z-Momentum absolute error, $\beta = ' num2str(beta) '$, $\omega_' num2str(i) ' = ' num2str(omega(i)) '$'])
     xlabel('$x$')
     ylabel('$y$')
     view(default_view)

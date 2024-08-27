@@ -2,13 +2,13 @@ function EVP_Check = verifyEVP(Domain, Base_Flow, Problem, Solution)
 
 %% Check the validity of the solution
 
-mat_A = Solution.EVP.Matrices.A;
-mat_B = Solution.EVP.Matrices.B;
+mat_A = full(Solution.EVP.Matrices.A);
+mat_B = full(Solution.EVP.Matrices.B);
 
-Ny  = size(Domain.mat_X, 1);
-Nx  = size(Domain.mat_X, 2);
+Ny = size(Domain.mat_X, 1);
+Nx = size(Domain.mat_X, 2);
 
-N_eigenvalues  = length(Solution.Eigenvalues);
+N_eigenvalues = length(Solution.Eigenvalues);
 
 % Initializations
 Absolute_Error = zeros([size(mat_A, 1) N_eigenvalues]);
@@ -39,15 +39,15 @@ Maximum_Z_Momentum_Absolute_Error_Y = zeros([1 N_eigenvalues]);
 
 for i = 1:N_eigenvalues
     omega = Solution.Eigenvalues(i);
-    q = [Solution.Eigenfunctions.u(:,i) ; Solution.Eigenfunctions.v(:,i) ; Solution.Eigenfunctions.w(:,i) ; Solution.Eigenfunctions.p(:,i)];
+    q = [Solution.Eigenfunctions.u(:,i) ; Solution.Eigenfunctions.v(:,i) ; Solution.Eigenfunctions.w(:,i) ; Solution.Eigenfunctions.p(:,i)]*Solution.Normalizers(i);
     LHS_matrix = mat_A*q;
     RHS_matrix = omega*mat_B*q;
     Absolute_Error(:,i) = abs(LHS_matrix - RHS_matrix);
     
-    Continuity_Absolute_Error(:,:,i) = reshape(Absolute_Error(0*Nx*Ny+1:1*Nx*Ny,i), Ny, Nx);
-    X_Momentum_Absolute_Error(:,:,i) = reshape(Absolute_Error(1*Nx*Ny+1:2*Nx*Ny,i), Ny, Nx);
-    Y_Momentum_Absolute_Error(:,:,i) = reshape(Absolute_Error(2*Nx*Ny+1:3*Nx*Ny,i), Ny, Nx);
-    Z_Momentum_Absolute_Error(:,:,i) = reshape(Absolute_Error(3*Nx*Ny+1:4*Nx*Ny,i), Ny, Nx);
+    X_Momentum_Absolute_Error(:,:,i) = reshape(Absolute_Error(0*Nx*Ny+1:1*Nx*Ny,i), Ny, Nx);
+    Y_Momentum_Absolute_Error(:,:,i) = reshape(Absolute_Error(1*Nx*Ny+1:2*Nx*Ny,i), Ny, Nx);
+    Z_Momentum_Absolute_Error(:,:,i) = reshape(Absolute_Error(2*Nx*Ny+1:3*Nx*Ny,i), Ny, Nx);
+    Continuity_Absolute_Error(:,:,i) = reshape(Absolute_Error(3*Nx*Ny+1:4*Nx*Ny,i), Ny, Nx); 
     
     [Maximum_Continuity_Absolute_Error(i), ind_Maximum_Continuity_Absolute_Error(i)] = max(Continuity_Absolute_Error(:,:,i), [], 'all');
     [Maximum_X_Momentum_Absolute_Error(i), ind_Maximum_X_Momentum_Absolute_Error(i)] = max(X_Momentum_Absolute_Error(:,:,i), [], 'all');

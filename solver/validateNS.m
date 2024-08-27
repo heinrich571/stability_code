@@ -10,7 +10,6 @@ I   = eye(Ny*Nx);
 
 
 % Compute matrix terms
-
 phi   = flip(Base_Flow.phi);
 dphi  = flip(Base_Flow.dphi);
 ddphi = flip(Base_Flow.ddphi);
@@ -38,57 +37,55 @@ L  = U*Dx + V*Dy - (D2x + D2y - beta^2*I);
 
 
 %% LHS matrix entries
-
-% continuity
-a11 = Dx;
-a12 = Dy;
-a13 = 1i*beta*I;
-a14 = Z;
-
 % x-momentum
-a21 = L + Ux;
-a22 = Uy;
-a23 = Z;
-a24 = Dx;
+a11 = L + Ux;
+a12 = Uy;
+a13 = Z;
+a14 = Dx;
 
 % y-momentum
-a31 = Vx;
-a32 = L + Vy;
-a33 = Z;
-a34 = Dy;
+a21 = Vx;
+a22 = L + Vy;
+a23 = Z;
+a24 = Dy;
 
 % z-momentum
-a41 = Z;
-a42 = Z;
-a43 = L;
-a44 = 1i*beta*I;
+a31 = Z;
+a32 = Z;
+a33 = L;
+a34 = 1i*beta*I;
+
+% continuity
+a41 = Dx;
+a42 = Dy;
+a43 = 1i*beta*I;
+a44 = Z;
 
 
 %% RHS matrix entries
-
-% continuity
-b11 = Z;
+% x-momentum
+b11 = 1i*I;
 b12 = Z;
 b13 = Z;
 b14 = Z;
 
-% x-momentum
-b21 = 1i*I;
-b22 = Z;
+% y-momentum
+
+b21 = Z;
+b22 = 1i*I;
 b23 = Z;
 b24 = Z;
 
-% y-momentum
-
+% z-momentum
 b31 = Z;
-b32 = 1i*I;
-b33 = Z;
+b32 = Z;
+b33 = 1i*I;
 b34 = Z;
 
-% z-momentum
+% continuity
 b41 = Z;
 b42 = Z;
-b43 = 1i*I;
+b43 = Z;
 b44 = Z;
 
 
@@ -138,15 +135,15 @@ Maximum_Z_Momentum_Absolute_Error_Y = zeros([1 N_eigenvalues]);
 
 for i = 1:N_eigenvalues
     omega = Solution.Eigenvalues(i);
-    q = [Solution.Eigenfunctions.u(:,i) ; Solution.Eigenfunctions.v(:,i) ; Solution.Eigenfunctions.w(:,i) ; Solution.Eigenfunctions.p(:,i)];
+    q = [Solution.Eigenfunctions.u(:,i) ; Solution.Eigenfunctions.v(:,i) ; Solution.Eigenfunctions.w(:,i) ; Solution.Eigenfunctions.p(:,i)]*Solution.Normalizers(i);
     LHS_matrix = mat_A*q;
     RHS_matrix = omega*mat_B*q;
-    Absolute_Error(:,i) = abs(LHS_matrix - RHS_matrix);
+    Absolute_Error(:,i) = abs((LHS_matrix - RHS_matrix)./LHS_matrix);
     
-    Continuity_Absolute_Error(:,:,i) = reshape(Absolute_Error(0*Nx*Ny+1:1*Nx*Ny,i), Ny, Nx);
-    X_Momentum_Absolute_Error(:,:,i) = reshape(Absolute_Error(1*Nx*Ny+1:2*Nx*Ny,i), Ny, Nx);
-    Y_Momentum_Absolute_Error(:,:,i) = reshape(Absolute_Error(2*Nx*Ny+1:3*Nx*Ny,i), Ny, Nx);
-    Z_Momentum_Absolute_Error(:,:,i) = reshape(Absolute_Error(3*Nx*Ny+1:4*Nx*Ny,i), Ny, Nx);
+    X_Momentum_Absolute_Error(:,:,i) = reshape(Absolute_Error(0*Nx*Ny+1:1*Nx*Ny,i), Ny, Nx);
+    Y_Momentum_Absolute_Error(:,:,i) = reshape(Absolute_Error(1*Nx*Ny+1:2*Nx*Ny,i), Ny, Nx);
+    Z_Momentum_Absolute_Error(:,:,i) = reshape(Absolute_Error(2*Nx*Ny+1:3*Nx*Ny,i), Ny, Nx);
+    Continuity_Absolute_Error(:,:,i) = reshape(Absolute_Error(3*Nx*Ny+1:4*Nx*Ny,i), Ny, Nx);
     
     [Maximum_Continuity_Absolute_Error(i), ind_Maximum_Continuity_Absolute_Error(i)] = max(Continuity_Absolute_Error(:,:,i), [], 'all');
     [Maximum_X_Momentum_Absolute_Error(i), ind_Maximum_X_Momentum_Absolute_Error(i)] = max(X_Momentum_Absolute_Error(:,:,i), [], 'all');

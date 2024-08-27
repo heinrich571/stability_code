@@ -7,9 +7,9 @@ clc
 
 %% Define the computational domain
 
-x_limit  = 10;
-y_limit = 10;
-y_median = 8;
+x_limit  = 20;
+y_limit = 20;
+y_median = 2.4;
 
 Nx = 50;
 Ny = 50;

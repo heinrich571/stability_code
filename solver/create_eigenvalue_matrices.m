@@ -129,8 +129,8 @@ switch Problem.Boundary_Conditions.Wall.u
 
         mat_A(row_inds(:),:) = 0;
         mat_B(row_inds(:),:) = 0;
-        mat_A(linear_inds)   = dirichlet_factor;
-        mat_B(linear_inds)   = 1i;
+        mat_A(linear_inds)   = 1;
+        mat_B(linear_inds)   = 0;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Wall.u ' for ''u'' at the wall is invalid or not supported'])
 end
@@ -145,8 +145,19 @@ switch Problem.Boundary_Conditions.Wall.v
         mat_A(row_inds(:),:) = 0;
         mat_B(row_inds(:),:) = 0;
 
-        mat_A(linear_inds)   = dirichlet_factor;
-        mat_B(linear_inds)   = 1i;
+        mat_A(linear_inds)   = 1;
+        mat_B(linear_inds)   = 0;
+
+        % Enforcing dv/dy = 0 for the continuity equation
+        row_inds = get_eqn_bottom_inds('continuity', Nx, Ny);
+        i_opr_B  = get_opr_bottom_inds(Nx, Ny);
+
+        continuity_zero_dvdy_opr = [Z(i_opr_B,:) , Dy(i_opr_B,:) , Z(i_opr_B,:) , Z(i_opr_B,:)];
+
+        mat_A(row_inds(:),:) = 0;
+        mat_B(row_inds(:),:) = 0;
+        mat_A(row_inds(:),:) = continuity_zero_dvdy_opr;
+        mat_B(row_inds(:),:) = 0;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Wall.v ' for ''v'' at the wall is invalid or not supported'])
 end
@@ -160,8 +171,8 @@ switch Problem.Boundary_Conditions.Wall.w
 
         mat_A(row_inds(:),:) = 0;
         mat_B(row_inds(:),:) = 0;
-        mat_A(linear_inds)   = dirichlet_factor;
-        mat_B(linear_inds)   = 1i;
+        mat_A(linear_inds)   = 1;
+        mat_B(linear_inds)   = 0;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Wall.w ' for ''w'' at the wall is invalid or not supported'])
 end
@@ -176,8 +187,8 @@ switch Problem.Boundary_Conditions.Wall.p
 
         mat_A(row_inds(:),:) = 0;
         mat_B(row_inds(:),:) = 0;
-        mat_A(row_inds(:),:) = pressure_compatibility_factor*pressure_compatibility_opr;
-        mat_B(row_inds(:),:) = pressure_compatibility_opr;
+        mat_A(row_inds(:),:) = pressure_compatibility_opr;
+        mat_B(row_inds(:),:) = 0;
     case Wall_Options.LPPE % LPPE boundary condition
         row_inds = get_eqn_bottom_inds('continuity', Nx, Ny);
         i_opr_B  = get_opr_bottom_inds(Nx, Ny);
@@ -191,10 +202,10 @@ switch Problem.Boundary_Conditions.Wall.p
 
         mat_A(row_inds(:),:) = 0;
         mat_B(row_inds(:),:) = 0;
-        mat_A(row_inds(:),:) = lppe_factor*lppe_opr;
-        mat_B(row_inds(:),:) = lppe_opr;
+        mat_A(row_inds(:),:) = lppe_opr;
+        mat_B(row_inds(:),:) = 0;
     otherwise
-        error(['Boundary condition ' Problem.Boundary_Conditions.Wall.p ' for ''p'' at the wall is invalid or not supported'])
+        warning('No boundary condition applied for the pressure on the wall')
 end
 
 
@@ -212,8 +223,8 @@ switch Problem.Boundary_Conditions.Top.u
 
         mat_A(row_inds(:),:) = 0;
         mat_B(row_inds(:),:) = 0;
-        mat_A(linear_inds)   = dirichlet_factor;
-        mat_B(linear_inds)   = 1i;
+        mat_A(linear_inds)   = 1;
+        mat_B(linear_inds)   = 0;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Wall.u ' for ''u'' at the top is invalid or not supported'])
 end
@@ -227,8 +238,8 @@ switch Problem.Boundary_Conditions.Top.v
 
         mat_A(row_inds(:),:) = 0;
         mat_B(row_inds(:),:) = 0;
-        mat_A(linear_inds)   = dirichlet_factor;
-        mat_B(linear_inds)   = 1i;
+        mat_A(linear_inds)   = 1;
+        mat_B(linear_inds)   = 0;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Wall.v ' for ''v'' at the top is invalid or not supported'])
 end
@@ -242,8 +253,8 @@ switch Problem.Boundary_Conditions.Top.w
 
         mat_A(row_inds(:),:) = 0;
         mat_B(row_inds(:),:) = 0;
-        mat_A(linear_inds)   = dirichlet_factor;
-        mat_B(linear_inds)   = 1i;
+        mat_A(linear_inds)   = 1;
+        mat_B(linear_inds)   = 0;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Wall.w ' for ''w'' at the top is invalid or not supported'])
 end
@@ -257,8 +268,8 @@ switch Problem.Boundary_Conditions.Top.p
 
         mat_A(row_inds(:),:) = 0;
         mat_B(row_inds(:),:) = 0;
-        mat_A(linear_inds)   = dirichlet_factor;
-        mat_B(linear_inds)   = 1i;
+        mat_A(linear_inds)   = 1;
+        mat_B(linear_inds)   = 0;
     case Top_Options.LPPE % LPPE boundary condition
         row_inds = get_eqn_top_inds('continuity', Nx, Ny);
         i_opr_B  = get_opr_top_inds(Nx, Ny);
@@ -298,8 +309,8 @@ switch Problem.Boundary_Conditions.Right.u
             C = (mat_X(i,1)-mat_X(i,2))/(mat_X(i,3)-mat_X(i,2));
             linear_extrap_opr = [1 C-1 -C];
             ind_shift = Ny*[0 1 2];
-            mat_A(i_xmom_right_inds(i),j_u_right_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
-            mat_B(i_xmom_right_inds(i),j_u_right_inds(i) + ind_shift) = linear_extrap_opr;
+            mat_A(i_xmom_right_inds(i),j_u_right_inds(i) + ind_shift) = linear_extrap_opr;
+            mat_B(i_xmom_right_inds(i),j_u_right_inds(i) + ind_shift) = 0;
         end
     case Right_Side_Options.Zero_2nd_Derivative_Extrapolation % Zero 2nd derivative extrapolation
         operator_row_inds = get_opr_right_inds(Nx, Ny);
@@ -313,8 +324,8 @@ switch Problem.Boundary_Conditions.Right.u
 
         mat_A(row_inds,:) = 0;
         mat_B(row_inds,:) = 0;
-        mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
-        mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+        mat_A(row_inds,column_inds) = D2x(operator_row_inds,:);
+        mat_B(row_inds,column_inds) = 0;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Right.u ' for ''u'' at the right side is invalid or not supported'])
 end
@@ -332,8 +343,8 @@ switch Problem.Boundary_Conditions.Right.v
             C = (mat_X(i,1)-mat_X(i,2))/(mat_X(i,3)-mat_X(i,2));
             linear_extrap_opr = [1 C-1 -C];
             ind_shift = Ny*[0 1 2];
-            mat_A(i_ymom_right_inds(i),j_v_right_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
-            mat_B(i_ymom_right_inds(i),j_v_right_inds(i) + ind_shift) = linear_extrap_opr;
+            mat_A(i_ymom_right_inds(i),j_v_right_inds(i) + ind_shift) = linear_extrap_opr;
+            mat_B(i_ymom_right_inds(i),j_v_right_inds(i) + ind_shift) = 0;
         end
     case Right_Side_Options.Zero_2nd_Derivative_Extrapolation % Zero 2nd derivative extrapolation
         operator_row_inds = get_opr_right_inds(Nx, Ny);
@@ -347,8 +358,8 @@ switch Problem.Boundary_Conditions.Right.v
 
         mat_A(row_inds,:) = 0;
         mat_B(row_inds,:) = 0;
-        mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
-        mat_B(row_inds,column_inds) = 1*D2x(operator_row_inds,:);
+        mat_A(row_inds,column_inds) = D2x(operator_row_inds,:);
+        mat_B(row_inds,column_inds) = 0;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Right.v ' for ''v'' at the right side is invalid or not supported'])
 end
@@ -367,8 +378,8 @@ switch Problem.Boundary_Conditions.Right.w
             linear_extrap_opr = [1 C-1 -C];
             ind_shift = Ny*[0 1 2];
             
-            mat_A(i_zmom_right_inds(i),j_w_right_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
-            mat_B(i_zmom_right_inds(i),j_w_right_inds(i) + ind_shift) = linear_extrap_opr;
+            mat_A(i_zmom_right_inds(i),j_w_right_inds(i) + ind_shift) = linear_extrap_opr;
+            mat_B(i_zmom_right_inds(i),j_w_right_inds(i) + ind_shift) = 0;
         end
     case Right_Side_Options.Zero_2nd_Derivative_Extrapolation % Zero 2nd derivative extrapolation
         operator_row_inds = get_opr_right_inds(Nx, Ny);
@@ -382,8 +393,8 @@ switch Problem.Boundary_Conditions.Right.w
 
         mat_A(row_inds,:) = 0;
         mat_B(row_inds,:) = 0;
-        mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
-        mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+        mat_A(row_inds,column_inds) = D2x(operator_row_inds,:);
+        mat_B(row_inds,column_inds) = 0;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Right.w ' for ''w'' at the right side is invalid or not supported'])
 end
@@ -402,8 +413,8 @@ switch Problem.Boundary_Conditions.Right.p
             linear_extrap_opr = [1 C-1 -C];
             ind_shift = Ny*[0 1 2];
 
-            mat_A(i_cont_right_inds(i),j_p_right_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
-            mat_B(i_cont_right_inds(i),j_p_right_inds(i) + ind_shift) = linear_extrap_opr;
+            mat_A(i_cont_right_inds(i),j_p_right_inds(i) + ind_shift) = linear_extrap_opr;
+            mat_B(i_cont_right_inds(i),j_p_right_inds(i) + ind_shift) = 0;
         end
     case Right_Side_Options.Zero_2nd_Derivative_Extrapolation % Zero 2nd derivative extrapolation
         operator_row_inds = get_opr_right_inds(Nx, Ny);
@@ -417,8 +428,8 @@ switch Problem.Boundary_Conditions.Right.p
 
         mat_A(row_inds,:) = 0;
         mat_B(row_inds,:) = 0;
-        mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
-        mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+        mat_A(row_inds,column_inds) = D2x(operator_row_inds,:);
+        mat_B(row_inds,column_inds) = 0;
     case Right_Side_Options.LPPE % LPPE boundary condition
         row_inds = get_eqn_right_inds('continuity', Nx, Ny);
         i_opr_B  = get_opr_right_inds(Nx, Ny);
@@ -461,8 +472,8 @@ switch Problem.Boundary_Conditions.Left.u
             linear_extrap_opr = [1 C-1 -C];
             ind_shift = -Ny*[0 1 2];
             
-            mat_A(i_xmom_left_inds(i),j_u_left_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
-            mat_B(i_xmom_left_inds(i),j_u_left_inds(i) + ind_shift) = linear_extrap_opr;
+            mat_A(i_xmom_left_inds(i),j_u_left_inds(i) + ind_shift) = linear_extrap_opr;
+            mat_B(i_xmom_left_inds(i),j_u_left_inds(i) + ind_shift) = 0;
         end
     case Left_Side_Options.Zero_2nd_Derivative_Extrapolation % Zero 2nd derivative extrapolation
         operator_row_inds = get_opr_left_inds(Nx, Ny);
@@ -476,8 +487,8 @@ switch Problem.Boundary_Conditions.Left.u
 
         mat_A(row_inds,:) = 0;
         mat_B(row_inds,:) = 0;
-        mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
-        mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+        mat_A(row_inds,column_inds) = D2x(operator_row_inds,:);
+        mat_B(row_inds,column_inds) = 0;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Left.u ' for ''u'' at the left side is invalid or not supported'])
 end
@@ -495,8 +506,8 @@ switch Problem.Boundary_Conditions.Left.v
             linear_extrap_opr = [1 C-1 -C];
             ind_shift = -Ny*[0 1 2];
             
-            mat_A(i_ymom_left_inds(i),j_v_left_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
-            mat_B(i_ymom_left_inds(i),j_v_left_inds(i) + ind_shift) = linear_extrap_opr;
+            mat_A(i_ymom_left_inds(i),j_v_left_inds(i) + ind_shift) = linear_extrap_opr;
+            mat_B(i_ymom_left_inds(i),j_v_left_inds(i) + ind_shift) = 0;
         end
     case Left_Side_Options.Zero_2nd_Derivative_Extrapolation % Zero 2nd derivative extrapolation
         operator_row_inds = get_opr_left_inds(Nx, Ny);
@@ -510,8 +521,8 @@ switch Problem.Boundary_Conditions.Left.v
 
         mat_A(row_inds,:) = 0;
         mat_B(row_inds,:) = 0;
-        mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
-        mat_B(row_inds,column_inds) = 1*D2x(operator_row_inds,:);
+        mat_A(row_inds,column_inds) = D2x(operator_row_inds,:);
+        mat_B(row_inds,column_inds) = 0;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Left.v ' for ''v'' at the left side is invalid or not supported'])
 end
@@ -530,8 +541,8 @@ switch Problem.Boundary_Conditions.Left.w
             linear_extrap_opr = [1 C-1 -C];
             ind_shift = -Ny*[0 1 2];
             
-            mat_A(i_zmom_left_inds(i),j_w_left_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
-            mat_B(i_zmom_left_inds(i),j_w_left_inds(i) + ind_shift) = linear_extrap_opr;
+            mat_A(i_zmom_left_inds(i),j_w_left_inds(i) + ind_shift) = linear_extrap_opr;
+            mat_B(i_zmom_left_inds(i),j_w_left_inds(i) + ind_shift) = 0;
         end
     case Left_Side_Options.Zero_2nd_Derivative_Extrapolation % Zero 2nd derivative extrapolation
         operator_row_inds = get_opr_left_inds(Nx, Ny);
@@ -545,8 +556,8 @@ switch Problem.Boundary_Conditions.Left.w
 
         mat_A(row_inds,:) = 0;
         mat_B(row_inds,:) = 0;
-        mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
-        mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+        mat_A(row_inds,column_inds) = D2x(operator_row_inds,:);
+        mat_B(row_inds,column_inds) = 0;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Left.w ' for ''w'' at the left side is invalid or not supported'])
 end
@@ -565,8 +576,8 @@ switch Problem.Boundary_Conditions.Left.p
             linear_extrap_opr = [1 C-1 -C];
             ind_shift = -Ny*[0 1 2];
             
-            mat_A(i_cont_left_inds(i),j_p_left_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
-            mat_B(i_cont_left_inds(i),j_p_left_inds(i) + ind_shift) = linear_extrap_opr;
+            mat_A(i_cont_left_inds(i),j_p_left_inds(i) + ind_shift) = linear_extrap_opr;
+            mat_B(i_cont_left_inds(i),j_p_left_inds(i) + ind_shift) = 0;
         end
     case Left_Side_Options.Zero_2nd_Derivative_Extrapolation % Zero 2nd derivative extrapolation
         operator_row_inds = get_opr_left_inds(Nx, Ny);
@@ -580,8 +591,8 @@ switch Problem.Boundary_Conditions.Left.p
 
         mat_A(row_inds,:) = 0;
         mat_B(row_inds,:) = 0;
-        mat_A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
-        mat_B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+        mat_A(row_inds,column_inds) = D2x(operator_row_inds,:);
+        mat_B(row_inds,column_inds) = 0;
     case Left_Side_Options.LPPE % LPPE boundary condition
         row_inds = get_eqn_left_inds('continuity', Nx, Ny);
         i_opr_B  = get_opr_left_inds(Nx, Ny);

@@ -11,11 +11,11 @@ Problem.Computation.N_Workers = 1;
 
 Problem.Domain.Nx       = [];
 Problem.Domain.Ny       = [];
-Problem.Domain.X_Limit  = 200;
-Problem.Domain.Y_Limit  = 150;
+Problem.Domain.X_Limit  = 150;
+Problem.Domain.Y_Limit  = 100;
 Problem.Domain.Y_Median = 2.4;
 
-Problem.Physics.Beta                  = 2;
+Problem.Physics.Beta                  = 0.25;
 Problem.Physics.Number_Of_Eigenvalues = 20;
 
 Problem.Base_Flow_Settings.initguess            = 1.232587656820289 + [-1 1]*1e-4;
@@ -42,7 +42,7 @@ Problem.Boundary_Conditions.Left.p  = Sides_Boundary_Condition;
 Problem.Boundary_Conditions.Wall.u  = 'Dirichlet';
 Problem.Boundary_Conditions.Wall.v  = 'Dirichlet';
 Problem.Boundary_Conditions.Wall.w  = 'Dirichlet';
-Problem.Boundary_Conditions.Wall.p  = 'PC';
+Problem.Boundary_Conditions.Wall.p  = 'LPPE';
 
 Problem.Flags.Display_Domain    = 0;
 Problem.Flags.Display_Base_Flow = 0;
@@ -53,8 +53,8 @@ Case_Name = 'Domain_Resolution_Sensitivity_Test';
 
 %% Generate Problems (huehue)
 
-Nx_vec = 10:10:80;
-Ny_vec = 10:10:80;
+Nx_vec = 20:20:120;
+Ny_vec = 20:20:120;
 
 Problem = repmat(Problem, [length(Nx_vec) 1]);
 

@@ -11,7 +11,7 @@ path_manager('add')
 %% Load results
 
 % Results_Folder = '.\results\tests\';
-Results_Folder = '.\results\';
+Results_Folder = '.\batch_results\Domain_Resolution_Sensitivity_Test\';
 % Results_File   = 'Domain_Resolution_Test.mat';
 Results_File = 'Domain_Resolution_Sensitivity_Test.mat';
 
@@ -72,6 +72,15 @@ end
 
 
 %% Plots
+
+% Eigenspectra
+figure('Name', 'Eigenspectra', 'NumberTitle', 'off')
+symbol_list = {'o' 's' 'd' '+' 'x' '*'};
+for i = 1:length(Solution)
+    scatter(real(Solution(i).Eigenvalues), imag(Solution(i).Eigenvalues), symbol_list{i})
+end
+xlabel('\omega_r')
+ylabel('\omega_i')
 
 % time vs. resolution
 if exist('Monitor', 'var')

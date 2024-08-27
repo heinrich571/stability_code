@@ -11,13 +11,13 @@ startup
 
 Problem.Computation.N_Workers = 1;
 
-Problem.Domain.Nx       = 50;
-Problem.Domain.Ny       = 50;
-Problem.Domain.X_Limit  = 200;
-Problem.Domain.Y_Limit  = 150;
-Problem.Domain.Y_Median = 2.4;
+Problem.Domain.Nx       = 60;
+Problem.Domain.Ny       = 60;
+Problem.Domain.X_Limit  = 150;
+Problem.Domain.Y_Limit  = 100;
+Problem.Domain.Y_Median = 4*2.4;
 
-Problem.Physics.Beta                  = 2;
+Problem.Physics.Beta                  = 0.25;
 Problem.Physics.Number_Of_Eigenvalues = 20;
 
 Problem.Base_Flow_Settings.initguess            = 1.232587656820289 + [-1 1]*1e-4;
@@ -77,5 +77,5 @@ dispstatus()
 
 %% Draw eigenfunctions
 
-check_results
-errors_plots(Solution, Report, 1)
+view_results(Case_ID, Results_Folder, 1)
+% errors_plots(Solution, Report, 1)

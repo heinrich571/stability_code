@@ -10,9 +10,11 @@ path_manager('add')
 
 Folders = {'./batch_runs/'};
 
-Filenames(1) = {'X_Limit_Sensitivity_Test.mat'};
-Filenames(2) = {'Y_Limit_Sensitivity_Test.mat'};
-Filenames(3) = {'Domain_Resolution_Sensitivity_Test.mat'};
+% Filenames(1) = {'X_Limit_Sensitivity_Test.mat'};
+% Filenames(2) = {'Y_Limit_Sensitivity_Test.mat'};
+% Filenames(3) = {'Domain_Resolution_Sensitivity_Test.mat'};
+
+Filenames(1) = {'Domain_Resolution_Sensitivity_Test.mat'};
 
 Output_Folder = './batch_results/';
 
