@@ -1,9 +1,11 @@
 function EVP_Check = verifyEVP(Domain, Base_Flow, Problem, Solution)
 
-%% Check the validity of the solution
+%% Build EVP matrices
 
-mat_A = full(Solution.EVP.Matrices.A);
-mat_B = full(Solution.EVP.Matrices.B);
+[A, B] = evpmatrices(Domain, Base_Flow, Problem);
+
+
+%% Check the validity of the solution
 
 Ny = size(Domain.mat_X, 1);
 Nx = size(Domain.mat_X, 2);
@@ -11,7 +13,7 @@ Nx = size(Domain.mat_X, 2);
 N_eigenvalues = length(Solution.Eigenvalues);
 
 % Initializations
-Absolute_Error = zeros([size(mat_A, 1) N_eigenvalues]);
+Absolute_Error = zeros([size(A, 1) N_eigenvalues]);
 
 Continuity_Absolute_Error = zeros([Ny Nx N_eigenvalues]);
 X_Momentum_Absolute_Error = zeros([Ny Nx N_eigenvalues]);
@@ -40,8 +42,8 @@ Maximum_Z_Momentum_Absolute_Error_Y = zeros([1 N_eigenvalues]);
 for i = 1:N_eigenvalues
     omega = Solution.Eigenvalues(i);
     q = [Solution.Eigenfunctions.u(:,i) ; Solution.Eigenfunctions.v(:,i) ; Solution.Eigenfunctions.w(:,i) ; Solution.Eigenfunctions.p(:,i)]*Solution.Normalizers(i);
-    LHS_matrix = mat_A*q;
-    RHS_matrix = omega*mat_B*q;
+    LHS_matrix = A*q;
+    RHS_matrix = omega*B*q;
     Absolute_Error(:,i) = abs(LHS_matrix - RHS_matrix);
     
     X_Momentum_Absolute_Error(:,:,i) = reshape(Absolute_Error(0*Nx*Ny+1:1*Nx*Ny,i), Ny, Nx);
@@ -64,8 +66,8 @@ for i = 1:N_eigenvalues
     Maximum_Z_Momentum_Absolute_Error_Y(i) = Domain.mat_Y(ind_Maximum_Z_Momentum_Absolute_Error(i));
 end
 
-EVP_Check.mat_A = mat_A;
-EVP_Check.mat_B = mat_B;
+EVP_Check.A = sparse(A);
+EVP_Check.B = sparse(B);
 
 EVP_Check.Errors.Continuity.Absolute.Map = Continuity_Absolute_Error;
 EVP_Check.Errors.X_Momentum.Absolute.Map = X_Momentum_Absolute_Error;

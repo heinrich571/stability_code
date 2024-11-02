@@ -9,5 +9,5 @@
 # working directory:
 cd $PBS_O_WORKDIR
 
-/usr/local/bin/matlab -nodesktop  < main.m  > output
+matlab -nodesktop  < batch_run.m  > output
  

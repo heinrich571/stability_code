@@ -1,4 +1,4 @@
-function [Solution, Report] = BiGlobalTemporalSolver(Problem)
+function [Domain, Base_Flow, Solution] = BiGlobalTemporalSolver(Problem)
 
 % Expand problem parameters for convenient code
 Nx = Problem.Domain.Nx + 1;
@@ -43,7 +43,7 @@ dispstatus()
 dispstatus('GENERALIZED EIGENVALUE MATRICES FORMULATION')
 dispstatus('GENERALIZED EIGENVALUE MATRICES FORMULATION', 0)
 
-[mat_A, mat_B] = create_eigenvalue_matrices(Domain, Base_Flow, Problem);
+[mat_A, mat_B] = evpmatrices(Domain, Base_Flow, Problem);
 
 dispstatus('GENERALIZED EIGENVALUE MATRICES FORMULATION', 1)
 dispstatus()
@@ -78,8 +78,6 @@ nrm = Solution_Raw.Eigenfunctions.p(Ny,:);
 
 Solution.Domain           = Domain;
 Solution.Physics          = Problem.Physics;
-Solution.EVP.Matrices.A   = sparse(mat_A);
-Solution.EVP.Matrices.B   = sparse(mat_B);
 Solution.Eigenvalues      = Solution_Raw.Eigenvalues;
 Solution.Eigenfunctions.u = Solution_Raw.Eigenfunctions.u./nrm;
 Solution.Eigenfunctions.v = Solution_Raw.Eigenfunctions.v./nrm;
@@ -87,18 +85,6 @@ Solution.Eigenfunctions.w = Solution_Raw.Eigenfunctions.w./nrm;
 Solution.Eigenfunctions.p = Solution_Raw.Eigenfunctions.p./nrm;
 Solution.Normalizers      = nrm;
 Solution.Convergence_Flag = convergence_flag;
-
-% Generate a report on the validity of the results against the
-% Navier-Stokes equations and satisfying the original problem
-Report = struct();
-if Problem.Flags.Generate_Report
-    Navier_Stokes_Check = validateNS(Domain, Base_Flow, Problem, Solution);
-    EVP_Check = verifyEVP(Domain, Base_Flow, Problem, Solution);
-    Report.Navier_Stokes_Check = Navier_Stokes_Check;
-    if isfield(Solution, 'EVP')
-        Report.EVP_Check = EVP_Check;
-    end
-end
 
 end
 
