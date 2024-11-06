@@ -15,9 +15,9 @@ Problem.Domain.Nx       = 60;
 Problem.Domain.Ny       = 60;
 Problem.Domain.X_Limit  = 150;
 Problem.Domain.Y_Limit  = 100;
-Problem.Domain.Y_Median = 4*2.4;
+Problem.Domain.Y_Median = 2.4;
 
-Problem.Physics.Beta                  = 0.25;
+Problem.Physics.Beta                  = 2;
 Problem.Physics.Number_Of_Eigenvalues = 20;
 
 Problem.Base_Flow_Settings.initguess            = 1.232587656820289 + [-1 1]*1e-4;
@@ -48,9 +48,9 @@ Problem.Boundary_Conditions.Wall.w  = 'Dirichlet';
 Problem.Boundary_Conditions.Wall.p  = 'PC';
 
 
-Problem.Flags.Display_Domain    = 1;
-Problem.Flags.Display_Base_Flow = 1;
-Problem.Flags.Generate_Report   = 1;
+Problem.Flags.Display_Domain    = 0;
+Problem.Flags.Display_Base_Flow = 0;
+Problem.Flags.Generate_Report   = 0;
 
 Case_ID        = 'test';
 Results_Folder = '.\results\';
@@ -85,7 +85,7 @@ if Problem.Flags.Generate_Report
     Report.EVP_Check = verifyEVP(Domain, Base_Flow, Problem, Solution);
 end
 
-Eigenvalue_Indices = 5;
+Eigenvalue_Indices = 3;
 Options.Solution_Index = 1;
 Options.X_Limit = Problem.Domain.X_Limit;
 Options.Y_Limit = Problem.Domain.Y_Limit;
