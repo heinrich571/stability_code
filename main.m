@@ -24,8 +24,8 @@ Problem.Base_Flow_Settings.initguess            = 1.23258765682022 + [-1 1]*1e-5
 Problem.Base_Flow_Settings.maxIterations        = 1e2;
 Problem.Base_Flow_Settings.convergenceTolerance = 1e-6;
 
-Sides_Boundary_Condition = 'zero_2nd_derivative';
-% Sides_Boundary_Condition = 'Linear_Extrapolation';
+% Sides_Boundary_Condition = 'zero_2nd_derivative';
+Sides_Boundary_Condition = 'Linear_Extrapolation';
 
 Problem.Boundary_Conditions.Top.u   = 'Dirichlet';
 Problem.Boundary_Conditions.Top.v   = 'Dirichlet';
@@ -48,7 +48,7 @@ Problem.Boundary_Conditions.Wall.w  = 'Dirichlet';
 Problem.Boundary_Conditions.Wall.p  = 'LPPE';
 
 
-Problem.Flags.Display_Domain    = 1;
+Problem.Flags.Display_Domain    = 0;
 Problem.Flags.Display_Base_Flow = 0;
 Problem.Flags.Generate_Report   = 0;
 

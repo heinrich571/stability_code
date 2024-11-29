@@ -233,10 +233,11 @@ switch Problem.Boundary_Conditions.Right.u
         A(i_xmom_right_inds(2:end-1),:) = 0;
         B(i_xmom_right_inds(2:end-1),:) = 0;
         
+        ind_shift = Ny*[0 1 2];
         for i = 2:Ny-1
             C = (mat_X(i,1)-mat_X(i,2))/(mat_X(i,3)-mat_X(i,2));
             linear_extrap_opr = [1 C-1 -C];
-            ind_shift = Ny*[0 1 2];
+            
             A(i_xmom_right_inds(i),j_u_right_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
             B(i_xmom_right_inds(i),j_u_right_inds(i) + ind_shift) = 1i*linear_extrap_opr;
         end
@@ -265,10 +266,11 @@ switch Problem.Boundary_Conditions.Right.v
         A(i_ymom_right_inds(2:end-1),:) = 0;
         B(i_ymom_right_inds(2:end-1),:) = 0;
         
+        ind_shift = Ny*[0 1 2];
         for i = 2:Ny-1
             C = (mat_X(i,1)-mat_X(i,2))/(mat_X(i,3)-mat_X(i,2));
             linear_extrap_opr = [1 C-1 -C];
-            ind_shift = Ny*[0 1 2];
+            
             A(i_ymom_right_inds(i),j_v_right_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
             B(i_ymom_right_inds(i),j_v_right_inds(i) + ind_shift) = 1i*linear_extrap_opr;
         end
@@ -297,10 +299,10 @@ switch Problem.Boundary_Conditions.Right.w
         A(i_zmom_right_inds(2:end-1),:) = 0;
         B(i_zmom_right_inds(2:end-1),:) = 0;
         
+        ind_shift = Ny*[0 1 2];
         for i = 2:Ny-1
             C = (mat_X(i,1)-mat_X(i,2))/(mat_X(i,3)-mat_X(i,2));
             linear_extrap_opr = [1 C-1 -C];
-            ind_shift = Ny*[0 1 2];
             
             A(i_zmom_right_inds(i),j_w_right_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
             B(i_zmom_right_inds(i),j_w_right_inds(i) + ind_shift) = 1i*linear_extrap_opr;
@@ -330,10 +332,10 @@ switch Problem.Boundary_Conditions.Right.p
         A(i_cont_right_inds(2:end-1),:) = 0;
         B(i_cont_right_inds(2:end-1),:) = 0;
 
+        ind_shift = Ny*[0 1 2];
         for i = 2:Ny-1
             C = (mat_X(i,1)-mat_X(i,2))/(mat_X(i,3)-mat_X(i,2));
             linear_extrap_opr = [1 C-1 -C];
-            ind_shift = Ny*[0 1 2];
 
             A(i_cont_right_inds(i),j_p_right_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
             B(i_cont_right_inds(i),j_p_right_inds(i) + ind_shift) = 1i*linear_extrap_opr;
@@ -387,10 +389,10 @@ switch Problem.Boundary_Conditions.Left.u
         A(i_xmom_left_inds(2:end-1),:) = 0;
         B(i_xmom_left_inds(2:end-1),:) = 0;
 
+        ind_shift = -Ny*[0 1 2];
         for i = 2:Ny-1
             C = (mat_X(i,Nx)-mat_X(i,Nx-1))/(mat_X(i,Nx-2)-mat_X(i,Nx-1));
             linear_extrap_opr = [1 C-1 -C];
-            ind_shift = -Ny*[0 1 2];
             
             A(i_xmom_left_inds(i),j_u_left_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
             B(i_xmom_left_inds(i),j_u_left_inds(i) + ind_shift) = 1i*linear_extrap_opr;
@@ -419,10 +421,11 @@ switch Problem.Boundary_Conditions.Left.v
 
         A(i_ymom_left_inds(2:end-1),:) = 0;
         B(i_ymom_left_inds(2:end-1),:) = 0;
+
+        ind_shift = -Ny*[0 1 2];
         for i = 2:Ny-1
             C = (mat_X(i,Nx)-mat_X(i,Nx-1))/(mat_X(i,Nx-2)-mat_X(i,Nx-1));
             linear_extrap_opr = [1 C-1 -C];
-            ind_shift = -Ny*[0 1 2];
             
             A(i_ymom_left_inds(i),j_v_left_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
             B(i_ymom_left_inds(i),j_v_left_inds(i) + ind_shift) = 1i*linear_extrap_opr;
@@ -452,10 +455,10 @@ switch Problem.Boundary_Conditions.Left.w
         A(i_zmom_left_inds(2:end-1),:) = 0;
         B(i_zmom_left_inds(2:end-1),:) = 0;
 
+        ind_shift = -Ny*[0 1 2];
         for i = 2:Ny-1
             C = (mat_X(i,Nx)-mat_X(i,Nx-1))/(mat_X(i,Nx-2)-mat_X(i,Nx-1));
             linear_extrap_opr = [1 C-1 -C];
-            ind_shift = -Ny*[0 1 2];
             
             A(i_zmom_left_inds(i),j_w_left_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
             B(i_zmom_left_inds(i),j_w_left_inds(i) + ind_shift) = 1i*linear_extrap_opr;
@@ -485,10 +488,10 @@ switch Problem.Boundary_Conditions.Left.p
         A(i_cont_left_inds(2:end-1),:) = 0;
         B(i_cont_left_inds(2:end-1),:) = 0;
 
+        ind_shift = -Ny*[0 1 2];
         for i = 2:Ny-1
             C = (mat_X(i,Nx)-mat_X(i,Nx-1))/(mat_X(i,Nx-2)-mat_X(i,Nx-1));
             linear_extrap_opr = [1 C-1 -C];
-            ind_shift = -Ny*[0 1 2];
             
             A(i_cont_left_inds(i),j_p_left_inds(i) + ind_shift) = linear_extrap_factor*linear_extrap_opr;
             B(i_cont_left_inds(i),j_p_left_inds(i) + ind_shift) = 1i*linear_extrap_opr;
