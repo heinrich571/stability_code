@@ -43,7 +43,9 @@ dispstatus()
 dispstatus('GENERALIZED EIGENVALUE MATRICES FORMULATION')
 dispstatus('GENERALIZED EIGENVALUE MATRICES FORMULATION', 0)
 
-[mat_A, mat_B] = evpmatrices(Domain, Base_Flow, Problem);
+[A, B] = evpmatrices(Domain, Base_Flow, Problem);
+
+% B(1:3844,1:4*Nx*Ny) = 
 
 dispstatus('GENERALIZED EIGENVALUE MATRICES FORMULATION', 1)
 dispstatus()
@@ -53,8 +55,8 @@ dispstatus('EIGENVALUES CALCULATION')
 dispstatus('EIGENVALUES CALCULATION', 0)
 
 tic;
-[eigenfunctions_matrix, eigenvalues_matrix, convergence_flag] = eigs(sparse(mat_A),...
-                                                                     sparse(mat_B),...
+[eigenfunctions_matrix, eigenvalues_matrix, convergence_flag] = eigs(sparse(A),...
+                                                                     sparse(B),...
                                                                      Problem.Physics.Number_Of_Eigenvalues,...
                                                                      "smallestabs", 'MaxIterations', 400, 'Display', true);
 toc;

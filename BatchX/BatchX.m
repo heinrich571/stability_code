@@ -31,14 +31,13 @@ for i = 1:length(Paths)
     dispstatus(['CASE: ' Case_Name], 0)
 
     % Perform 1st run for initialization
-    [Solution, Report] = BiGlobalTemporalSolver(Problem(1));
+    [Domain, Base_Flow, Solution] = BiGlobalTemporalSolver(Problem(1));
 
     Solution = repmat(Solution, [length(Problem) 1]);
-    Report   = repmat(Report,   [length(Problem) 1]);
 
     % Parallel execution
     parfor j = 2:length(Problem)
-        [Solution(j), Report(j)] = BiGlobalTemporalSolver(Problem(j));
+        [Domain(j), Base_Flow(j), Solution(j)] = BiGlobalTemporalSolver(Problem(j));
     end
 
     % Save results
@@ -47,7 +46,7 @@ for i = 1:length(Paths)
         mkdir(output_folder)
     end
     output_path = [output_folder '/' Case_Name '.mat'];
-    save(output_path, 'Problem', 'Solution', 'Report', '-v7.3')
+    save(output_path, 'Problem', 'Solution', '-v7.3')
     
     dispstatus(['CASE: ' Case_Name], 1)
     dispstatus()

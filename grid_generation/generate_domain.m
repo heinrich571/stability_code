@@ -18,7 +18,7 @@ b_y = 1+2*a_y/Y_Limit;
 vec_Y   = (a_y*(1+yhat)./(b_y-yhat));
 % vec_Y = (yhat + 1)*Y_Limit;
 
-f = 0.5;
+f = 1;
 e = 1-f;
 vec_X = X_Limit*(e*xhat.^3 + f*xhat);
 

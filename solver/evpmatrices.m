@@ -18,6 +18,15 @@ Dy    = Domain.Dy;
 D2x   = Domain.D2x;
 D2y   = Domain.D2y;
 
+dphi  = flip(Base_Flow.dphi);
+ddphi = flip(Base_Flow.ddphi);
+mat_dphi  = repmat(dphi , [1 Nx]);
+mat_ddphi = repmat(ddphi, [1 Nx]);
+Ux = diag(mat_dphi(:), 0);
+Uy = mat_X.*mat_ddphi;
+Uy = diag(Uy(:), 0);
+Vy = diag(-mat_dphi(:), 0);
+
 beta = Problem.Physics.Beta;
 
 dirichlet_factor     = 200;
@@ -98,7 +107,11 @@ switch Problem.Boundary_Conditions.Wall.p
         row_inds = get_eqn_bottom_inds('continuity', Nx, Ny);
         i_opr_B  = get_opr_bottom_inds(Nx, Ny);
 
-        pressure_compatibility_opr = [Z(i_opr_B,:) , -D2y(i_opr_B,:) , Z(i_opr_B,:) , Dy(i_opr_B,:)];
+        % pressure_compatibility_opr = [Z(i_opr_B,:) , -D2y(i_opr_B,:) , Z(i_opr_B,:) , Dy(i_opr_B,:)];
+        % pressure_compatibility_opr = [-D2y(i_opr_B,:) , -D2y(i_opr_B,:) , Z(i_opr_B,:) , Dx(i_opr_B,:) + Dy(i_opr_B,:)];
+        DxDy = Dx*Dy;
+        ibIDy = (1i*beta*I)*Dy;
+        pressure_compatibility_opr = [DxDy(i_opr_B,:) , Z(i_opr_B,:) , ibIDy(i_opr_B,:) , Dy(i_opr_B,:)];
 
         A(row_inds(:),:) = 0;
         B(row_inds(:),:) = 0;
@@ -233,14 +246,12 @@ switch Problem.Boundary_Conditions.Right.u
         operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
         row_inds          = row_inds(2:end-1);
 
-        j_u_TR = get_var_top_right_ind('u', Nx, Ny);
-        j_u_BL = get_var_bottom_left_ind('u', Nx, Ny);
-        column_inds = j_u_TR:j_u_BL;
+        z_2nd_der_opr = [D2x(operator_row_inds,:) Z(operator_row_inds,:) Z(operator_row_inds,:) Z(operator_row_inds,:)];
 
         A(row_inds,:) = 0;
         B(row_inds,:) = 0;
-        A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
-        B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+        A(row_inds,:) = linear_extrap_factor*z_2nd_der_opr;
+        B(row_inds,:) = 1i*z_2nd_der_opr;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Right.u ' for ''u'' at the right side is invalid or not supported'])
 end
@@ -267,14 +278,12 @@ switch Problem.Boundary_Conditions.Right.v
         operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
         row_inds          = row_inds(2:end-1);
 
-        j_v_TR = get_var_top_right_ind('v', Nx, Ny);
-        j_v_BL = get_var_bottom_left_ind('v', Nx, Ny);
-        column_inds = j_v_TR:j_v_BL;
+        z_2nd_der_opr = [Z(operator_row_inds,:) D2x(operator_row_inds,:) Z(operator_row_inds,:) Z(operator_row_inds,:)];
 
         A(row_inds,:) = 0;
         B(row_inds,:) = 0;
-        A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
-        B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+        A(row_inds,:) = linear_extrap_factor*z_2nd_der_opr;
+        B(row_inds,:) = 1i*z_2nd_der_opr;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Right.v ' for ''v'' at the right side is invalid or not supported'])
 end
@@ -302,14 +311,12 @@ switch Problem.Boundary_Conditions.Right.w
         operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
         row_inds          = row_inds(2:end-1);
 
-        j_w_TR = get_var_top_right_ind('w', Nx, Ny);
-        j_w_BL = get_var_bottom_left_ind('w', Nx, Ny);
-        column_inds = j_w_TR:j_w_BL;
+        z_2nd_der_opr = [Z(operator_row_inds,:) Z(operator_row_inds,:) D2x(operator_row_inds,:) Z(operator_row_inds,:)];
 
         A(row_inds,:) = 0;
         B(row_inds,:) = 0;
-        A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
-        B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+        A(row_inds,:) = linear_extrap_factor*z_2nd_der_opr;
+        B(row_inds,:) = 1i*z_2nd_der_opr;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Right.w ' for ''w'' at the right side is invalid or not supported'])
 end
@@ -337,14 +344,12 @@ switch Problem.Boundary_Conditions.Right.p
         operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
         row_inds          = row_inds(2:end-1);
 
-        j_p_TR = get_var_top_right_ind('p', Nx, Ny);
-        j_p_BL = get_var_bottom_left_ind('p', Nx, Ny);
-        column_inds = j_p_TR:j_p_BL;
+        z_2nd_der_opr = [Z(operator_row_inds,:) Z(operator_row_inds,:) Z(operator_row_inds,:) D2x(operator_row_inds,:)];
 
         A(row_inds,:) = 0;
         B(row_inds,:) = 0;
-        A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
-        B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+        A(row_inds,:) = linear_extrap_factor*z_2nd_der_opr;
+        B(row_inds,:) = 1i*z_2nd_der_opr;
     case Right_Side_Options.LPPE % LPPE boundary condition
         row_inds = get_eqn_right_inds('continuity', Nx, Ny);
         i_opr_B  = get_opr_right_inds(Nx, Ny);
@@ -396,14 +401,12 @@ switch Problem.Boundary_Conditions.Left.u
         operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
         row_inds          = row_inds(2:end-1);
 
-        j_u_TR = get_var_top_right_ind('u', Nx, Ny);
-        j_u_BL = get_var_bottom_left_ind('u', Nx, Ny);
-        column_inds = j_u_TR:j_u_BL;
+        z_2nd_der_opr = [D2x(operator_row_inds,:) Z(operator_row_inds,:) Z(operator_row_inds,:) Z(operator_row_inds,:)];
 
         A(row_inds,:) = 0;
         B(row_inds,:) = 0;
-        A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
-        B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+        A(row_inds,:) = linear_extrap_factor*z_2nd_der_opr;
+        B(row_inds,:) = 1i*z_2nd_der_opr;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Left.u ' for ''u'' at the left side is invalid or not supported'])
 end
@@ -430,14 +433,12 @@ switch Problem.Boundary_Conditions.Left.v
         operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
         row_inds          = row_inds(2:end-1);
 
-        j_v_TR = get_var_top_right_ind('v', Nx, Ny);
-        j_v_BL = get_var_bottom_left_ind('v', Nx, Ny);
-        column_inds = j_v_TR:j_v_BL;
+        z_2nd_der_opr = [Z(operator_row_inds,:) D2x(operator_row_inds,:) Z(operator_row_inds,:) Z(operator_row_inds,:)];
 
         A(row_inds,:) = 0;
         B(row_inds,:) = 0;
-        A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
-        B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+        A(row_inds,:) = linear_extrap_factor*z_2nd_der_opr;
+        B(row_inds,:) = 1i*z_2nd_der_opr;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Left.v ' for ''v'' at the left side is invalid or not supported'])
 end
@@ -465,14 +466,12 @@ switch Problem.Boundary_Conditions.Left.w
         operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
         row_inds          = row_inds(2:end-1);
 
-        j_w_TR = get_var_top_right_ind('w', Nx, Ny);
-        j_w_BL = get_var_bottom_left_ind('w', Nx, Ny);
-        column_inds = j_w_TR:j_w_BL;
+        z_2nd_der_opr = [Z(operator_row_inds,:) Z(operator_row_inds,:) D2x(operator_row_inds,:) Z(operator_row_inds,:)];
 
         A(row_inds,:) = 0;
         B(row_inds,:) = 0;
-        A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
-        B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+        A(row_inds,:) = linear_extrap_factor*z_2nd_der_opr;
+        B(row_inds,:) = 1i*z_2nd_der_opr;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Left.w ' for ''w'' at the left side is invalid or not supported'])
 end
@@ -500,14 +499,12 @@ switch Problem.Boundary_Conditions.Left.p
         operator_row_inds = operator_row_inds(2:end-1); % exclude top and bottom parts of the domain, as boundary conditions there were already applied
         row_inds          = row_inds(2:end-1);
 
-        j_p_TR = get_var_top_right_ind('p', Nx, Ny);
-        j_p_BL = get_var_bottom_left_ind('p', Nx, Ny);
-        column_inds = j_p_TR:j_p_BL;
+        z_2nd_der_opr = [Z(operator_row_inds,:) Z(operator_row_inds,:) Z(operator_row_inds,:) D2x(operator_row_inds,:)];
 
         A(row_inds,:) = 0;
         B(row_inds,:) = 0;
-        A(row_inds,column_inds) = linear_extrap_factor*D2x(operator_row_inds,:);
-        B(row_inds,column_inds) = 1i*D2x(operator_row_inds,:);
+        A(row_inds,:) = linear_extrap_factor*z_2nd_der_opr;
+        B(row_inds,:) = 1i*z_2nd_der_opr;
     case Left_Side_Options.LPPE % LPPE boundary condition
         row_inds = get_eqn_left_inds('continuity', Nx, Ny);
         i_opr_B  = get_opr_left_inds(Nx, Ny);

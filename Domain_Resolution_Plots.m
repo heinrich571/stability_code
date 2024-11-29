@@ -77,7 +77,8 @@ end
 figure('Name', 'Eigenspectra', 'NumberTitle', 'off')
 symbol_list = {'o' 's' 'd' '+' 'x' '*'};
 for i = 1:length(Solution)
-    scatter(real(Solution(i).Eigenvalues), imag(Solution(i).Eigenvalues), symbol_list{i})
+    current_symbol_ind = mod(i, length(symbol_list))+1;
+    scatter(real(Solution(i).Eigenvalues), imag(Solution(i).Eigenvalues), symbol_list{current_symbol_ind})
 end
 xlabel('\omega_r')
 ylabel('\omega_i')
@@ -107,6 +108,7 @@ for j = eigenvalues_to_plot
     ylabel(['$\mathrm{Im}\{\omega_' num2str(j) '\}$'])
 
     figure('Name', ['Eigenvalue #' num2str(j) ' convergence'], 'NumberTitle', 'off')
+    title(['$\omega = ' num2str(real(eigenvalue(end,j))) ' + ' num2str(imag(eigenvalue(end,j))) 'i$'])
     plot(Nx, err_eigenvalue(:,j)', '-^')
     xlabel('$N$')
     ylabel(['$\varepsilon_{\omega_' num2str(j) '}$'])

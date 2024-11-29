@@ -11,16 +11,16 @@ startup
 
 Problem.Computation.N_Workers = 1;
 
-Problem.Domain.Nx       = 60;
-Problem.Domain.Ny       = 60;
-Problem.Domain.X_Limit  = 150;
-Problem.Domain.Y_Limit  = 100;
-Problem.Domain.Y_Median = 2.4;
+Problem.Domain.Nx       = 40;
+Problem.Domain.Ny       = 40;
+Problem.Domain.X_Limit  = 200;
+Problem.Domain.Y_Limit  = 300;
+Problem.Domain.Y_Median = 1*2.4;
 
-Problem.Physics.Beta                  = 2;
+Problem.Physics.Beta                  = 0.2;
 Problem.Physics.Number_Of_Eigenvalues = 20;
 
-Problem.Base_Flow_Settings.initguess            = 1.232587656820289 + [-1 1]*1e-4;
+Problem.Base_Flow_Settings.initguess            = 1.23258765682022 + [-1 1]*1e-5;
 Problem.Base_Flow_Settings.maxIterations        = 1e2;
 Problem.Base_Flow_Settings.convergenceTolerance = 1e-6;
 
@@ -45,14 +45,14 @@ Problem.Boundary_Conditions.Left.p  = Sides_Boundary_Condition;
 Problem.Boundary_Conditions.Wall.u  = 'Dirichlet';
 Problem.Boundary_Conditions.Wall.v  = 'Dirichlet';
 Problem.Boundary_Conditions.Wall.w  = 'Dirichlet';
-Problem.Boundary_Conditions.Wall.p  = 'PC';
+Problem.Boundary_Conditions.Wall.p  = 'LPPE';
 
 
-Problem.Flags.Display_Domain    = 0;
+Problem.Flags.Display_Domain    = 1;
 Problem.Flags.Display_Base_Flow = 0;
 Problem.Flags.Generate_Report   = 0;
 
-Case_ID        = 'test';
+Case_ID        = 'test_lppe_linextrap';
 Results_Folder = '.\results\';
 
 
@@ -85,7 +85,7 @@ if Problem.Flags.Generate_Report
     Report.EVP_Check = verifyEVP(Domain, Base_Flow, Problem, Solution);
 end
 
-Eigenvalue_Indices = 3;
+Eigenvalue_Indices = 1;
 Options.Solution_Index = 1;
 Options.X_Limit = Problem.Domain.X_Limit;
 Options.Y_Limit = Problem.Domain.Y_Limit;

@@ -47,6 +47,7 @@ a31 = Z; a32 = Z; a33 = L; a34 = 1i*beta*I;
 % continuity
 a41 = Dx; a42 = Dy; a43 = 1i*beta*I; a44 = Z;
 
+% a44 = a44 + 1e-8*eye(Nx*Ny);
 
 % RHS matrix entries
 % x-momentum

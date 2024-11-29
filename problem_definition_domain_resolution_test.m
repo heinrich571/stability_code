@@ -53,8 +53,8 @@ Case_Name = 'Domain_Resolution_Sensitivity_Test';
 
 %% Generate Problems (huehue)
 
-Nx_vec = 20:20:120;
-Ny_vec = 20:20:120;
+Nx_vec = 20:10:120;
+Ny_vec = 20:10:120;
 
 Problem = repmat(Problem, [length(Nx_vec) 1]);
 
