@@ -31,18 +31,18 @@ Uy = mat_X.*mat_ddphi;
 Uy = diag(Uy(:), 0);
 Vx = Z;
 Vy = diag(-mat_dphi(:), 0);
-L  = U*Dx + V*Dy - (D2x + D2y - beta^2*I);
+L  = (D2x + D2y - beta^2*I) - U*Dx - V*Dy;
 
 
 % LHS matrix entries
 % x-momentum
-a11 = L + Ux; a12 = Uy; a13 = Z; a14 = Dx;
+a11 = L - Ux; a12 = -Uy; a13 = Z; a14 = -Dx;
 
 % y-momentum
-a21 = Vx; a22 = L + Vy; a23 = Z; a24 = Dy;
+a21 = -Vx; a22 = L - Vy; a23 = Z; a24 = -Dy;
 
 % z-momentum
-a31 = Z; a32 = Z; a33 = L; a34 = 1i*beta*I;
+a31 = Z; a32 = Z; a33 = L; a34 = -1i*beta*I;
 
 % continuity
 a41 = Dx; a42 = Dy; a43 = 1i*beta*I; a44 = Z;
@@ -51,13 +51,13 @@ a41 = Dx; a42 = Dy; a43 = 1i*beta*I; a44 = Z;
 
 % RHS matrix entries
 % x-momentum
-b11 = 1i*I; b12 = Z; b13 = Z; b14 = Z;
+b11 = -1i*I; b12 = Z; b13 = Z; b14 = Z;
 
 % y-momentum
-b21 = Z; b22 = 1i*I; b23 = Z; b24 = Z;
+b21 = Z; b22 = -1i*I; b23 = Z; b24 = Z;
 
 % z-momentum
-b31 = Z; b32 = Z; b33 = 1i*I; b34 = Z;
+b31 = Z; b32 = Z; b33 = -1i*I; b34 = Z;
 
 % continuity
 b41 = Z; b42 = Z;  b43 = Z; b44 = Z;

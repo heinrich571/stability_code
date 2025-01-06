@@ -11,6 +11,8 @@ Y_Median = Problem.Domain.Y_Median;
 [Dx_cheb, xhat] = cheb(Nx);
 [Dy_cheb, yhat] = cheb(Ny);
 
+xhat(abs(xhat) < 1e-10) = 0;
+yhat(abs(yhat) < 1e-10) = 0;
 
 % Define the mapping
 a_y = Y_Median*Y_Limit/(Y_Limit-2*Y_Median);

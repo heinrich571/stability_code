@@ -44,7 +44,8 @@ for i = 1:N_eigenvalues
     q = [Solution.Eigenfunctions.u(:,i) ; Solution.Eigenfunctions.v(:,i) ; Solution.Eigenfunctions.w(:,i) ; Solution.Eigenfunctions.p(:,i)]*Solution.Normalizers(i);
     LHS_matrix = A*q;
     RHS_matrix = omega*B*q;
-    Absolute_Error(:,i) = abs((LHS_matrix - RHS_matrix)./LHS_matrix);
+    % Absolute_Error(:,i) = abs((LHS_matrix - RHS_matrix)./LHS_matrix);
+    Absolute_Error(:,i) = abs(LHS_matrix - RHS_matrix);
     
     X_Momentum_Absolute_Error(:,:,i) = reshape(Absolute_Error(0*Nx*Ny+1:1*Nx*Ny,i), Ny, Nx);
     Y_Momentum_Absolute_Error(:,:,i) = reshape(Absolute_Error(1*Nx*Ny+1:2*Nx*Ny,i), Ny, Nx);

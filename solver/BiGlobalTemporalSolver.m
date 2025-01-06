@@ -45,8 +45,6 @@ dispstatus('GENERALIZED EIGENVALUE MATRICES FORMULATION', 0)
 
 [A, B] = evpmatrices(Domain, Base_Flow, Problem);
 
-% B(1:3844,1:4*Nx*Ny) = 
-
 dispstatus('GENERALIZED EIGENVALUE MATRICES FORMULATION', 1)
 dispstatus()
 
@@ -58,7 +56,8 @@ tic;
 [eigenfunctions_matrix, eigenvalues_matrix, convergence_flag] = eigs(sparse(A),...
                                                                      sparse(B),...
                                                                      Problem.Physics.Number_Of_Eigenvalues,...
-                                                                     "smallestabs", 'MaxIterations', 400, 'Display', true);
+                                                                     "smallestabs", 'MaxIterations', 400, 'Display', true, ...
+                                                                     'Tolerance', 1e-8);
 toc;
 
 dispstatus('EIGENVALUES CALCULATION', 1)
@@ -71,12 +70,14 @@ Solution_Raw.Eigenfunctions.v = get_eigenfunction_of(eigenfunctions_matrix, 'v',
 Solution_Raw.Eigenfunctions.w = get_eigenfunction_of(eigenfunctions_matrix, 'w', Nx, Ny);
 Solution_Raw.Eigenfunctions.p = get_eigenfunction_of(eigenfunctions_matrix, 'p', Nx, Ny);
 
-% Get eigenvalues within the specified limitations
-eigenvalue_max_magnitude = 100;
-inds = find(sqrt(real(Solution_Raw.Eigenvalues).^2 + imag(Solution_Raw.Eigenvalues).^2) <= eigenvalue_max_magnitude);
-
 % Normalize the solution for consistency, and build output variable
-nrm = Solution_Raw.Eigenfunctions.p(Ny,:);
+% nrm = Solution_Raw.Eigenfunctions.p(Ny,:);
+nrm = zeros([1 length(Solution_Raw.Eigenvalues)]);
+for i = 1:length(Solution_Raw.Eigenvalues)
+    abs_p = abs(Solution_Raw.Eigenfunctions.p(:,i));
+    ind_max = find(abs_p == max(abs_p), 1, 'first');
+    nrm(i) = Solution_Raw.Eigenfunctions.p(ind_max,i);
+end
 
 Solution.Domain           = Domain;
 Solution.Physics          = Problem.Physics;

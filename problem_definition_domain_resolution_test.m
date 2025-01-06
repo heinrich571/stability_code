@@ -11,18 +11,18 @@ Problem.Computation.N_Workers = 1;
 
 Problem.Domain.Nx       = [];
 Problem.Domain.Ny       = [];
-Problem.Domain.X_Limit  = 150;
-Problem.Domain.Y_Limit  = 100;
+Problem.Domain.X_Limit  = 200;
+Problem.Domain.Y_Limit  = 300;
 Problem.Domain.Y_Median = 2.4;
 
 Problem.Physics.Beta                  = 0.25;
 Problem.Physics.Number_Of_Eigenvalues = 20;
 
-Problem.Base_Flow_Settings.initguess            = 1.232587656820289 + [-1 1]*1e-4;
+Problem.Base_Flow_Settings.initguess            = 1.23258765682022 + [-1 1]*1e-5;
 Problem.Base_Flow_Settings.maxIterations        = 1e2;
 Problem.Base_Flow_Settings.convergenceTolerance = 1e-6;
 
-Sides_Boundary_Condition = 'zero_2nd_derivative_extrapolation';
+Sides_Boundary_Condition = 'zero_2nd_derivative';
 
 Problem.Boundary_Conditions.Top.u   = 'Dirichlet';
 Problem.Boundary_Conditions.Top.v   = 'Dirichlet';
@@ -53,14 +53,20 @@ Case_Name = 'Domain_Resolution_Sensitivity_Test';
 
 %% Generate Problems (huehue)
 
-Nx_vec = 20:10:120;
-Ny_vec = 20:10:120;
+Nx_vec = 20:10:40;
+Ny_vec = 20:20:200;
 
-Problem = repmat(Problem, [length(Nx_vec) 1]);
+Problem = repmat(Problem, [length(Nx_vec)*length(Ny_vec) 1]);
 
+k = 1;
 for i = 1:length(Nx_vec)
-    Problem(i).Domain.Nx = Nx_vec(i);
-    Problem(i).Domain.Ny = Ny_vec(i);
+    Nx = Nx_vec(i);
+    for j = 1:length(Ny_vec)
+        Ny = Ny_vec(j);
+        Problem(k).Domain.Nx = Nx;
+        Problem(k).Domain.Ny = Ny;
+        k = k + 1;
+    end
 end
 
 

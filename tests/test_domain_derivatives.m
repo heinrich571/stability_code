@@ -9,13 +9,13 @@ addpath('../grid_generation/')
 
 %% Domain Generation
 % Define domain
-Nx = 100;
-Ny = 100;
+Nx = 40;
+Ny = 120;
 Problem.Domain.Nx       = Nx;
 Problem.Domain.Ny       = Ny;
 Problem.Domain.X_Limit  = 200;
-Problem.Domain.Y_Limit  = 150;
-Problem.Domain.Y_Median = 1*2.4;
+Problem.Domain.Y_Limit  = 300;
+Problem.Domain.Y_Median = 6*2.4;
 
 % Generate domain
 Domain = generate_domain(Problem);
@@ -38,7 +38,7 @@ mat_Y = Domain.mat_Y;
 % analytical.d2fdydx = analytical.d2fdxdy;
 
 a = 1;
-b = -1;
+b = -0.5;
 c = 0.02;
 f = a*exp(b*mat_Y.^2).*cos(c*mat_X);
 

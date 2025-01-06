@@ -1,87 +1,75 @@
-%% Fresh start
+%% Fresh Start
 
 close all
-clear all
+clearvars -except Problem Solution
 clc
 startup
 
 path_manager('add')
 
 
-%% Load results
+%% Input
 
-% Results_Folder = '.\results\tests\';
+% Results file settings
 Results_Folder = '.\batch_results\Domain_Resolution_Sensitivity_Test\';
-% Results_File   = 'Domain_Resolution_Test.mat';
-Results_File = 'Domain_Resolution_Sensitivity_Test.mat';
+Results_File   = 'Domain_Resolution_Sensitivity_Test_2nd_zero_deriv.mat';
 
-load([Results_Folder Results_File]);
+% Eigenvalues to plot
+Eigenvalues_To_Plot = [1 2 3 4 5];
 
 
-%% Calculate graph variables
+%% Load Results
 
+if ~exist('Solution', 'var')
+    load([Results_Folder '\' Results_File]);
+end
+
+
+%% Calculate Graph Variables
+
+% Find the number of eigenvalues
 N_eigenvalues = length(Solution(1).Eigenvalues);
-Nx_ref = Problem(end).Domain.Nx + 1;
-Ny_ref = Problem(end).Domain.Ny + 1;
-eigenvalue_ref = zeros([N_eigenvalues 1]);
-for j = 1:N_eigenvalues
-    eigenvalue_ref(j) = Solution(end).Eigenvalues(j);
-    mat_X_ref  = Solution(end).Domain.mat_X;
-    mat_Y_ref  = Solution(end).Domain.mat_Y;
-    u_ref(:,:,j) = reshape(Solution(end).Eigenfunctions.u(:,j), Ny_ref, Nx_ref);
-    v_ref(:,:,j) = reshape(Solution(end).Eigenfunctions.v(:,j), Ny_ref, Nx_ref);
-    w_ref(:,:,j) = reshape(Solution(end).Eigenfunctions.w(:,j), Ny_ref, Nx_ref);
-    p_ref(:,:,j) = reshape(Solution(end).Eigenfunctions.p(:,j), Ny_ref, Nx_ref);
-end
 
-N_cases = length(Solution);
-initializer = zeros([N_cases 1]);
-log_N = initializer;
-log_T = initializer;
-Nx    = initializer;
-t     = initializer;
-initializer = zeros([N_cases N_eigenvalues]);
-err_u = initializer;
-err_v = initializer;
-err_w = initializer;
-err_p = initializer;
-for i = 1:N_cases
-    Nx(i) = Problem(i).Domain.Nx + 1;
-    Ny(i) = Problem(i).Domain.Ny + 1;
-    log_N(i) = log(Nx(i));
-    if exist('Monitor', 'var')
-        t(i)  = Monitor(i).Time;
-        log_T(i) = log(t(i));
+% Find the number of nodes in the x & y directions
+Nx_vec = 0;
+Ny_vec = 0;
+for i = 1:length(Solution)
+    Nx = length(Solution(i).Domain.vec_X);
+    Ny = length(Solution(i).Domain.vec_Y);
+    if ~sum(Nx_vec == Nx)
+        Nx_vec(end+1) = Nx;
     end
-
-    for j = 1:N_eigenvalues
-        eigenvalue(i,j) = Solution(i).Eigenvalues(j);
-        err_eigenvalue(i,j) = abs(eigenvalue(i,j) - eigenvalue_ref(j));
-        mat_X = Solution(i).Domain.mat_X;
-        mat_Y = Solution(i).Domain.mat_Y;
-        u = reshape(Solution(i).Eigenfunctions.u(:,j), Ny(i), Nx(i));
-        v = reshape(Solution(i).Eigenfunctions.v(:,j), Ny(i), Nx(i));
-        w = reshape(Solution(i).Eigenfunctions.w(:,j), Ny(i), Nx(i));
-        p = reshape(Solution(i).Eigenfunctions.p(:,j), Ny(i), Nx(i));
-        err_u(i,j) = max(abs(interp2(mat_X, mat_Y, u, mat_X_ref, mat_Y_ref)-u_ref(:,:,j)), [], 'all');
-        err_v(i,j) = max(abs(interp2(mat_X, mat_Y, v, mat_X_ref, mat_Y_ref)-v_ref(:,:,j)), [], 'all');
-        err_w(i,j) = max(abs(interp2(mat_X, mat_Y, w, mat_X_ref, mat_Y_ref)-w_ref(:,:,j)), [], 'all');
-        err_p(i,j) = max(abs(interp2(mat_X, mat_Y, p, mat_X_ref, mat_Y_ref)-p_ref(:,:,j)), [], 'all');
+    if ~sum(Ny_vec == Ny)
+        Ny_vec(end+1) = Ny;
     end
 end
+Nx_vec = Nx_vec(2:end) - 1;
+Ny_vec = Ny_vec(2:end) - 1;
 
 
 %% Plots
 
 % Eigenspectra
+symbol_list = {'o' 's' 'd' '^' 'x' '*'};
 figure('Name', 'Eigenspectra', 'NumberTitle', 'off')
-symbol_list = {'o' 's' 'd' '+' 'x' '*'};
-for i = 1:length(Solution)
-    current_symbol_ind = mod(i, length(symbol_list))+1;
-    scatter(real(Solution(i).Eigenvalues), imag(Solution(i).Eigenvalues), symbol_list{current_symbol_ind})
+k = 1;
+for i = 1:length(Nx_vec)
+    figure('Name', ['Eigenspectra for Nx = ' num2str(Nx_vec(i))], 'NumberTitle', 'off')
+    for j = 1:length(Ny_vec)
+        current_symbol_ind = mod(j, length(symbol_list))+1;
+        plot(real(Solution(k).Eigenvalues), imag(Solution(k).Eigenvalues), ...
+            symbol_list{current_symbol_ind}, 'DisplayName', ['N_y = ' num2str(Ny_vec(j))], ...
+            'LineWidth', 0.5, 'MarkerSize', 10)
+        title(['Eigenspectra for $N_x = ' num2str(Nx_vec(i)) '$'])
+        xlabel('$\omega_r$')
+        ylabel('$\omega_i$')
+        xlim([-5 5])
+        ylim([-4 0])
+        grid off
+
+        k = k + 1;
+    end
 end
-xlabel('\omega_r')
-ylabel('\omega_i')
 
 % time vs. resolution
 if exist('Monitor', 'var')
@@ -95,32 +83,26 @@ end
 
 
 % Convergence of eigenvalues
-eigenvalues_to_plot = [1 2 3 4 5];
-for j = eigenvalues_to_plot
-    figure('Name', ['Eigenvalue #' num2str(j) ' convergence'], 'NumberTitle', 'off')
-    subplot(1,2,1)
-    plot(Nx, real(eigenvalue(:,j)'))
-    xlabel('$N$')
-    ylabel(['$\mathrm{Re}\{\omega_' num2str(j) '\}$'])
-    subplot(1,2,2)
-    plot(Nx, imag(eigenvalue(:,j)'))
-    xlabel('$N$')
-    ylabel(['$\mathrm{Im}\{\omega_' num2str(j) '\}$'])
+for i = 1:length(Nx_vec)
+    Nx = Nx_vec(i);
+    for j = Eigenvalues_To_Plot
+        for n = 1:length(Ny_vec)
+            omega(n) = Solution(n).Eigenvalues(j);
+        end
+        figure('Name', ['Eigenvalue #' num2str(j) ' convergence, Nx = ' num2str(Nx)], 'NumberTitle', 'off')
+        subplot(1,2,1)
+        plot(Ny_vec, real(omega'), '-o', 'LineWidth', 0.5)
+        xlabel('$N_y$')
+        ylabel(['$\mathrm{Re}\{\omega_' num2str(j) '\}$'])
+        subplot(1,2,2)
+        plot(Ny_vec, imag(omega'), '-o', 'LineWidth', 0.5)
+        xlabel('$N_y$')
+        ylabel(['$\mathrm{Im}\{\omega_' num2str(j) '\}$'])
 
-    figure('Name', ['Eigenvalue #' num2str(j) ' convergence'], 'NumberTitle', 'off')
-    title(['$\omega = ' num2str(real(eigenvalue(end,j))) ' + ' num2str(imag(eigenvalue(end,j))) 'i$'])
-    plot(Nx, err_eigenvalue(:,j)', '-^')
-    xlabel('$N$')
-    ylabel(['$\varepsilon_{\omega_' num2str(j) '}$'])
-end
-
-
-% Eigenvalue maps
-for j = eigenvalues_to_plot
-    figure('Name', ['Eigenvalue #' num2str(j) ' map'], 'NumberTitle', 'off')
-    for i = 1:N_cases
-        plot(real(eigenvalue(i,j)), imag(eigenvalue(i,j)), 'x')
+        figure('Name', ['Eigenvalue #' num2str(j) ' convergence, Nx = ' num2str(Nx)], 'NumberTitle', 'off')
+        title(['$\omega = ' num2str(real(omega(end))) ' + ' num2str(imag(omega(end))) 'i$'])
+        plot(Ny_vec, log(abs(omega-omega(end)))', '-^', 'LineWidth', 0.5)
+        xlabel('$N$')
+        ylabel(['$log\left(\varepsilon_{\omega_' num2str(j) '}\right)$'])
     end
-    xlabel(['$\mathrm{Re}\{\omega_ ' num2str(j) '\}$'])
-    ylabel(['$\mathrm{Im}\{\omega_ ' num2str(j) '\}$'])
 end

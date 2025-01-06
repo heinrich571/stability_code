@@ -5,6 +5,8 @@ if isempty(fieldnames(Report))
 end
 
 Domain = Solution.Domain;
+Nx = length(Domain.vec_X);
+Ny = length(Domain.vec_Y);
 mat_X = Domain.mat_X;
 mat_Y = Domain.mat_Y;
 
@@ -12,6 +14,159 @@ omega = Solution.Eigenvalues;
 beta  = Solution.Physics.Beta;
 
 default_view = [-45 45];
+
+
+%% Matrix A (LHS) equations
+A = Report.Navier_Stokes_Check.A;
+B = Report.Navier_Stokes_Check.B;
+inds.cont = 3*Nx*Ny+1:4*Nx*Ny;
+inds.xmom = 0*Nx*Ny+1:1*Nx*Ny;
+inds.ymom = 1*Nx*Ny+1:2*Nx*Ny;
+inds.zmom = 2*Nx*Ny+1:3*Nx*Ny;
+for i = eigenvalues_inds
+    q = [Solution.Eigenfunctions.u(:,i) ; Solution.Eigenfunctions.v(:,i) ; Solution.Eigenfunctions.w(:,i) ; Solution.Eigenfunctions.p(:,i)];
+    w = Solution.Eigenvalues(i);
+
+    LHS = A*q;
+    RHS = w*B*q;
+    rLHS = real(LHS);
+    iLHS = imag(LHS);
+    rRHS = real(RHS);
+    iRHS = imag(RHS);
+    
+    figure('Name', ['continuity, eigenvalue #' num2str(i)], 'NumberTitle', 'off')
+    subplot(2,2,1)
+    surf(mat_X, mat_Y, reshape(rLHS(inds.cont), Ny, Nx))
+    title(['LNSE - Continuity Re(LHS), $\beta = ' num2str(beta) '$, $\omega_' num2str(i) ' = ' num2str(omega(i)) '$'])
+    xlabel('$x$')
+    ylabel('$y$')
+    zlabel('$\mathrm{Re}\{LHS\}$')
+    view(default_view)
+
+    subplot(2,2,2)
+    surf(mat_X, mat_Y, reshape(rRHS(inds.cont), Ny, Nx))
+    title(['LNSE - Continuity Re(RHS), $\beta = ' num2str(beta) '$, $\omega_' num2str(i) ' = ' num2str(omega(i)) '$'])
+    xlabel('$x$')
+    ylabel('$y$')
+    zlabel('$\mathrm{Re}\{RHS\}$')
+    view(default_view)
+
+    subplot(2,2,3)
+    surf(mat_X, mat_Y, reshape(iLHS(inds.cont), Ny, Nx))
+    title(['LNSE - Continuity Im(LHS), $\beta = ' num2str(beta) '$, $\omega_' num2str(i) ' = ' num2str(omega(i)) '$'])
+    xlabel('$x$')
+    ylabel('$y$')
+    zlabel('$\mathrm{Im}\{LHS\}$')
+    view(default_view)
+
+    subplot(2,2,4)
+    surf(mat_X, mat_Y, reshape(iRHS(inds.cont), Ny, Nx))
+    title(['LNSE - Continuity Im(RHS), $\beta = ' num2str(beta) '$, $\omega_' num2str(i) ' = ' num2str(omega(i)) '$'])
+    xlabel('$x$')
+    ylabel('$y$')
+    zlabel('$\mathrm{Im}\{RHS\}$')
+    view(default_view)
+
+    figure('Name', ['x-momentum, eigenvalue #' num2str(i)], 'NumberTitle', 'off')
+    subplot(2,2,1)
+    surf(mat_X, mat_Y, reshape(rLHS(inds.xmom), Ny, Nx))
+    title(['LNSE - X-Momentum Re(LHS), $\beta = ' num2str(beta) '$, $\omega_' num2str(i) ' = ' num2str(omega(i)) '$'])
+    xlabel('$x$')
+    ylabel('$y$')
+    zlabel('$\mathrm{Re}\{LHS\}$')
+    view(default_view)
+
+    subplot(2,2,2)
+    surf(mat_X, mat_Y, reshape(rRHS(inds.xmom), Ny, Nx))
+    title(['LNSE - X-Momentum Re(RHS), $\beta = ' num2str(beta) '$, $\omega_' num2str(i) ' = ' num2str(omega(i)) '$'])
+    xlabel('$x$')
+    ylabel('$y$')
+    zlabel('$\mathrm{Re}\{RHS\}$')
+    view(default_view)
+
+    subplot(2,2,3)
+    surf(mat_X, mat_Y, reshape(iLHS(inds.xmom), Ny, Nx))
+    title(['LNSE - X-Momentum Im(LHS), $\beta = ' num2str(beta) '$, $\omega_' num2str(i) ' = ' num2str(omega(i)) '$'])
+    xlabel('$x$')
+    ylabel('$y$')
+    zlabel('$\mathrm{Im}\{LHS\}$')
+    view(default_view)
+
+    subplot(2,2,4)
+    surf(mat_X, mat_Y, reshape(iRHS(inds.xmom), Ny, Nx))
+    title(['LNSE - X-Momentum Im(RHS), $\beta = ' num2str(beta) '$, $\omega_' num2str(i) ' = ' num2str(omega(i)) '$'])
+    xlabel('$x$')
+    ylabel('$y$')
+    zlabel('$\mathrm{Im}\{RHS\}$')
+    view(default_view)
+
+    figure('Name', ['y-momentum, eigenvalue #' num2str(i)], 'NumberTitle', 'off')
+    subplot(2,2,1)
+    surf(mat_X, mat_Y, reshape(rLHS(inds.ymom), Ny, Nx))
+    title(['LNSE - Y-Momentum Re(LHS), $\beta = ' num2str(beta) '$, $\omega_' num2str(i) ' = ' num2str(omega(i)) '$'])
+    xlabel('$x$')
+    ylabel('$y$')
+    zlabel('$\mathrm{Re}\{LHS\}$')
+    view(default_view)
+
+    subplot(2,2,2)
+    surf(mat_X, mat_Y, reshape(rRHS(inds.ymom), Ny, Nx))
+    title(['LNSE - Y-Momentum Re(RHS), $\beta = ' num2str(beta) '$, $\omega_' num2str(i) ' = ' num2str(omega(i)) '$'])
+    xlabel('$x$')
+    ylabel('$y$')
+    zlabel('$\mathrm{Re}\{RHS\}$')
+    view(default_view)
+
+    subplot(2,2,3)
+    surf(mat_X, mat_Y, reshape(iLHS(inds.ymom), Ny, Nx))
+    title(['LNSE - Y-Momentum Im(LHS), $\beta = ' num2str(beta) '$, $\omega_' num2str(i) ' = ' num2str(omega(i)) '$'])
+    xlabel('$x$')
+    ylabel('$y$')
+    zlabel('$\mathrm{Im}\{LHS\}$')
+    view(default_view)
+
+    subplot(2,2,4)
+    surf(mat_X, mat_Y, reshape(iRHS(inds.ymom), Ny, Nx))
+    title(['LNSE - Y-Momentum Im(RHS), $\beta = ' num2str(beta) '$, $\omega_' num2str(i) ' = ' num2str(omega(i)) '$'])
+    xlabel('$x$')
+    ylabel('$y$')
+    zlabel('$\mathrm{Im}\{RHS\}$')
+    view(default_view)
+
+    figure('Name', ['z-momentum, eigenvalue #' num2str(i)], 'NumberTitle', 'off')
+    subplot(2,2,1)
+    surf(mat_X, mat_Y, reshape(rLHS(inds.zmom), Ny, Nx))
+    title(['LNSE - Z-Momentum Re(LHS), $\beta = ' num2str(beta) '$, $\omega_' num2str(i) ' = ' num2str(omega(i)) '$'])
+    xlabel('$x$')
+    ylabel('$y$')
+    zlabel('$\mathrm{Re}\{LHS\}$')
+    view(default_view)
+
+    subplot(2,2,2)
+    surf(mat_X, mat_Y, reshape(rRHS(inds.zmom), Ny, Nx))
+    title(['LNSE - Z-Momentum Re(RHS), $\beta = ' num2str(beta) '$, $\omega_' num2str(i) ' = ' num2str(omega(i)) '$'])
+    xlabel('$x$')
+    ylabel('$y$')
+    zlabel('$\mathrm{Re}\{RHS\}$')
+    view(default_view)
+
+    subplot(2,2,3)
+    surf(mat_X, mat_Y, reshape(iLHS(inds.zmom), Ny, Nx))
+    title(['LNSE - Z-Momentum Im(LHS), $\beta = ' num2str(beta) '$, $\omega_' num2str(i) ' = ' num2str(omega(i)) '$'])
+    xlabel('$x$')
+    ylabel('$y$')
+    zlabel('$\mathrm{Im}\{LHS\}$')
+    view(default_view)
+
+    subplot(2,2,4)
+    surf(mat_X, mat_Y, reshape(iRHS(inds.zmom), Ny, Nx))
+    title(['LNSE - Z-Momentum Im(RHS), $\beta = ' num2str(beta) '$, $\omega_' num2str(i) ' = ' num2str(omega(i)) '$'])
+    xlabel('$x$')
+    ylabel('$y$')
+    zlabel('$\mathrm{Im}\{RHS\}$')
+    view(default_view)
+end
+
 
 %% Absolute errors plot - Navier Stokes Check
 % Absolute error maps

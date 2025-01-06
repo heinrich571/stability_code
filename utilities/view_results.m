@@ -115,6 +115,16 @@ for i = 1:length(Eigenvalue_Indices)
     xlim([-x_limit x_limit])
     ylim([0 y_limit])
     view(-50, 10)
+
+    figure('Name', ['#' num2str(i) ' |Pressure|'], 'NumberTitle', 'off')
+    plot(mat_X(1,:)', sqrt(pr(mat_Y == 0,:,i).^2+pi(mat_Y == 0,:,i).^2))
+    xlabel('$x$')
+    ylabel('$y$')
+    zlabel('$|p|$')
+    xlim([-x_limit x_limit])
+    ylim([0 y_limit])
+    view(-50, 10)
+    title(['$\beta = ' num2str(Problem(si).Physics.Beta) '$, $\omega_' num2str(i) ' = ' num2str(omega(i)) '$'] )
 end
 
 

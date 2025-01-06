@@ -36,7 +36,9 @@ for i = 1:length(Paths)
     Solution = repmat(Solution, [length(Problem) 1]);
 
     % Parallel execution
+    disp('Got here!')
     parfor j = 2:length(Problem)
+        disp('Got to parallel computations')
         [Domain(j), Base_Flow(j), Solution(j)] = BiGlobalTemporalSolver(Problem(j));
     end
 
