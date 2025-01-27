@@ -13,9 +13,12 @@ path_manager('add')
 % Results file settings
 Results_Folder = '.\batch_results\Domain_Resolution_Sensitivity_Test\';
 Results_File   = 'Domain_Resolution_Sensitivity_Test_2nd_zero_deriv.mat';
+% Results_File   = 'Domain_Resolution_Sensitivity_Test_linextrap.mat';
 
 % Eigenvalues to plot
-Eigenvalues_To_Plot = [1 2 3 4 5];
+% Eigenvalues_To_Plot = [1 8];
+Eigenvalues_To_Plot = [1 9];
+% Eigenvalues_To_Plot = [1 8];
 
 
 %% Load Results
@@ -85,9 +88,15 @@ end
 % Convergence of eigenvalues
 for i = 1:length(Nx_vec)
     Nx = Nx_vec(i);
+    i_ref_sol = length(Ny_vec)*i;
     for j = Eigenvalues_To_Plot
+        count = length(Ny_vec)*(i-1)+1;
         for n = 1:length(Ny_vec)
-            omega(n) = Solution(n).Eigenvalues(j);
+            domega = Solution(count).Eigenvalues - Solution(i_ref_sol).Eigenvalues(j);
+            d = sqrt(real(domega).^2 + imag(domega).^2);
+            [dmin, i_dmin] = min(d);
+            omega(n,1) = Solution(count).Eigenvalues(i_dmin);
+            count = count + 1;
         end
         figure('Name', ['Eigenvalue #' num2str(j) ' convergence, Nx = ' num2str(Nx)], 'NumberTitle', 'off')
         subplot(1,2,1)
@@ -101,8 +110,8 @@ for i = 1:length(Nx_vec)
 
         figure('Name', ['Eigenvalue #' num2str(j) ' convergence, Nx = ' num2str(Nx)], 'NumberTitle', 'off')
         title(['$\omega = ' num2str(real(omega(end))) ' + ' num2str(imag(omega(end))) 'i$'])
-        plot(Ny_vec, log(abs(omega-omega(end)))', '-^', 'LineWidth', 0.5)
+        plot(Ny_vec, log10(abs(omega-omega(end)))', '-^', 'LineWidth', 0.5)
         xlabel('$N$')
-        ylabel(['$log\left(\varepsilon_{\omega_' num2str(j) '}\right)$'])
+        ylabel(['$\log\left(\varepsilon_{\omega_' num2str(j) '}\right)$'])
     end
 end

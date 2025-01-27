@@ -1,16 +1,17 @@
 %% -------------------------- User toggles --------------------------- %%
 StartupSettings.FontName            = 'Arial';
 StartupSettings.FontWeight          = 'Normal';
-StartupSettings.AxesFontSize        = 14;
+StartupSettings.AxesFontSize        = 18;
 StartupSettings.TitleTextMultiplier = 1.2;
 StartupSettings.LabelTextMultiplier = 1.2;
-StartupSettings.LineWidth           = 1.5;
-StartupSettings.MarkerSize          = 6;
+StartupSettings.LineWidth           = 2;
+StartupSettings.MarkerSize          = 12;
 StartupSettings.LegendLocation      = 'northeast';
-StartupSettings.LegendFontSize      = 14;
+StartupSettings.LegendFontSize      = 18;
 StartupSettings.LegendFontWeight    = 'normal';
-StartupSettings.AxesTickLength      = [0.01 0.01];
+StartupSettings.AxesTickLength      = 0.01*[1 1];
 StartupSettings.AxesTickDir         = 'in';
+StartupSettings.AxesMinorTickStatus = 'off';
 StartupSettings.ColorMap            = jet;
 % StartupSettings.ColorMap            = [ 000 001 042
 %                                         019 050 119
@@ -129,7 +130,7 @@ set(groot, 'defaultAxesColor', 1*ones(1,3))
 set(groot, 'defaultAxesTickDirMode', 'manual')
 set(groot, 'defaultAxesTickDir', StartupSettings.AxesTickDir)
 set(groot, 'defaultAxesTickLength', StartupSettings.AxesTickLength.*ones(1,2))
-set(groot, 'defaultAxesXMinorTick', 'off', 'defaultAxesYMinorTick', 'off', 'defaultAxesZMinorTick', 'off')
+set(groot, 'defaultAxesXMinorTick', StartupSettings.AxesMinorTickStatus, 'defaultAxesYMinorTick', StartupSettings.AxesMinorTickStatus, 'defaultAxesZMinorTick', StartupSettings.AxesMinorTickStatus)
 set(groot, 'defaultAxesNextPlot', 'add')
 set(groot, 'defaultAxesBox', 'on')
 set(groot, 'defaultAxesUnits', 'Normalized')
@@ -274,14 +275,24 @@ setFigureForDocumentButton.CData = setFigureForDocumentButtonImage;
 setFigureForDocumentButton.TooltipString = 'Enlarge data cursors and adjust the font to match the figure''s font';
 setFigureForDocumentButton.ClickedCallback = @enlargeDataCursors;
 
-% Prepare figure for a report document
-setFigureForDocumentButton = uipushtool(toolbar);
+% Calculate datatip relations (sum, diff, mean, etc.)
+calcDatatipsRelationsButton = uipushtool(toolbar);
 [img,map] = imread(fullfile(matlabroot,...
     'toolbox','matlab','icons','book_mat.gif'));
-setFigureForDocumentButtonImage = ind2rgb(img,map);
-setFigureForDocumentButton.CData = setFigureForDocumentButtonImage;
-setFigureForDocumentButton.TooltipString = 'Prepare the figure for a report document';
-setFigureForDocumentButton.ClickedCallback = @prepFigureForDocument;
+calcDatatipsRelationsButtonImage = ind2rgb(img,map);
+calcDatatipsRelationsButton.CData = calcDatatipsRelationsButtonImage;
+calcDatatipsRelationsButton.TooltipString = 'Calculate sum, diff, mean, etc.';
+calcDatatipsRelationsButton.ClickedCallback = @calcDatatipsRelations;
+
+% mark similar datatips on other curves in the plot
+markSimilarDataTipsButton = uipushtool(toolbar);
+[img,map] = imread(fullfile(matlabroot,...
+    'toolbox','matlab','icons','book_link.gif'));
+markSimilarDataTipsButtonImage = ind2rgb(img,map);
+markSimilarDataTipsButton.CData = markSimilarDataTipsButtonImage;
+markSimilarDataTipsButton.TooltipString = 'Precise grid';
+markSimilarDataTipsButton.ClickedCallback = @marksimilardatatips;
+
 
 % use black lines and symbols instead of colors
 setFigureForDocumentButton = uipushtool(toolbar);
@@ -309,6 +320,7 @@ setPreciseGridButtonImage = ind2rgb(img,map);
 toggleMinorGridButton.CData = setPreciseGridButtonImage;
 toggleMinorGridButton.TooltipString = 'Precise grid';
 toggleMinorGridButton.ClickedCallback = @setprecgrid;
+
 
 % supporting functions
     function copyFigure(~,~)
@@ -467,37 +479,33 @@ toggleMinorGridButton.ClickedCallback = @setprecgrid;
         set(AllDataCursors,'FontWeight','Normal')
     end
 
-    function prepFigureForDocument(~,~)
-        FontName = 'Times New Roman';
-        AllDataCursors = findall(gcf,'type','hggroup');
-        set(gca, 'FontSize', 18)
-        set(AllDataCursors,'FontSize',14)
-        set(AllDataCursors,'FontName',FontName)
-        set(AllDataCursors,'FontWeight','Normal')
-        currax = gca;
-        set(currax,'FontName',FontName)
-        set(currax,'FontWeight','normal')
-        set(currax,'TickLabelInterpreter','latex')
-        currax.Title.Interpreter  = 'latex';
-        currax.XLabel.Interpreter = 'latex';
-        currax.YLabel.Interpreter = 'latex';
-        currax.Legend.Interpreter = 'latex';
-        XLabel = get(currax,'XLabel');
-        YLabel = get(currax,'YLabel');
-        XLabel = XLabel.String;
-        YLabel = YLabel.String;
-        ix = strfind(XLabel,'[');
-        iy = strfind(YLabel,'[');
-        % if ~isempty(ix)
-        %     xlabel(['\it{' XLabel(1:ix-1) '}\rm{' XLabel(ix:end) '}'])
-        % else
-        %     xlabel(['\it{' XLabel '}'])
-        % end
-        % if ~isempty(iy)
-        %     ylabel(['\it{' YLabel(1:iy-1) '}\rm{' YLabel(iy:end) '}'])
-        % else
-        %     ylabel(['\it{' YLabel '}'])
-        % end
+    function calcDatatipsRelations(~,~)
+        d = datacursormode(gcf);
+        points = getCursorInfo(d);
+        if isempty(points)
+            return
+        end
+        
+        x = zeros(size(points));
+        y = zeros(size(points));
+        for i = 1:length(points)
+            x(i) = points(i).Position(1);
+            y(i) = points(i).Position(2);
+        end
+        fprintf(['sum of x:\t' num2str(sum(x)) '\n'])
+        fprintf(['sum of y:\t' num2str(sum(y)) '\n'])
+        fprintf('\n')
+        fprintf(['diff of x:\t' num2str(diff(x)) '\n'])
+        fprintf(['diff of y:\t' num2str(diff(y)) '\n'])
+        fprintf('\n')
+        fprintf(['dx./dy:\t' num2str(diff(y)./diff(x)) '\n'])
+        fprintf('\n')
+        fprintf(['mean of x:\t' num2str(mean(x)) '\n'])
+        fprintf(['mean of y:\t' num2str(mean(y)) '\n'])
+        fprintf('\n')
+        fprintf(['std of x:\t' num2str(std(x)) '\n'])
+        fprintf(['std of y:\t' num2str(std(y)) '\n'])
+        fprintf('\n')
     end
 
     function setPlotText(~,~)
@@ -529,13 +537,14 @@ toggleMinorGridButton.ClickedCallback = @setprecgrid;
     end
 
     function setPlotSymbols(~,~)
-        plotLineWidth = 1.5;
         symbolSet = {'o','^','s','d','<','v','>','x','p','+'};
 
         fig = gcf;
         ax = findobj(fig.Children, 'type', 'Axes');
         
         number_of_markers = str2double(inputdlg({'Number of symbols:'}, 'Add symbols', [1 20]));
+        fill_option = questdlg('Choose fill option:', 'Fill Options', 'To fill', 'Or... not to fill', 'Or... not to fill');
+        linewidth = str2double(inputdlg({'LineWidth:'}, 'LineWidth', [1 20]));
         
         for i = 1:length(ax)
             lines = findobj(ax(i), 'type', 'line');
@@ -553,9 +562,15 @@ toggleMinorGridButton.ClickedCallback = @setprecgrid;
                 end
                 lines(n).MarkerIndices = MarkerIndices;
                 lines(n).Marker = symbolSet{N_lines-n+1};
-                lines(n).MarkerFaceColor = line_color;
+                lines(n).MarkerSize = 12;
+                switch fill_option
+                    case 'To fill'
+                        lines(n).MarkerFaceColor = line_color;
+                    otherwise
+                        lines(n).MarkerFaceColor = 'none';
+                end
                 lines(n).MarkerEdgeColor = line_color;
-                lines(n).LineWidth = plotLineWidth;
+                lines(n).LineWidth = linewidth;
             end
         end
     end
@@ -591,6 +606,67 @@ toggleMinorGridButton.ClickedCallback = @setprecgrid;
                 grid(ax(i), 'on')
             end
         end
+    end
+
+    function marksimilardatatips(~, ~)
+        ax = gca;
+
+        % check that there are at least 2 curves
+        lines = findobj(ax, 'type', 'line');
+        if length(lines) < 2
+            warning('You must have at least two curves to use this')
+            return
+        end
+
+        % check that there is a single datatip selected
+        dt = findobj(ax, 'type', 'datatip');
+        if isempty(dt)
+            warning('You must choose a datatip to use this')
+            return
+        end
+
+        % Execute
+        dt = dt(1);
+        x = dt.get.X;
+        y = dt.get.Y;
+        i_line = lines == dt.Parent;
+        lines = lines(~i_line);
+        answer = questdlg('Would you like horizontal or vertical slicing?', 'DataTip Direction', 'Horizontal', 'Vertical', 'Vertical');
+        switch answer
+            case 'Horizontal'
+                for i = 1:length(lines)
+                    dy_vec = lines(i).YData - y;
+                    i0 = find(diff(sign(dy_vec)) ~= 0);
+                    i1 = i0 + 1;
+                    x0 = lines(i).XData(i0);
+                    y0 = lines(i).YData(i0);
+                    x1 = lines(i).XData(i1);
+                    y1 = lines(i).YData(i1);
+                    x2 = x0 + (x1-x0)./(y1-y0).*(y-y0);
+                    if isempty(x0) || isempty(x1)
+                        continue
+                    end
+                    f = (x2-x0)./(x1-x0);
+                    for j = 1:length(i0)
+                        datatip(lines(i), 'DataIndex', i0(j), 'SnapToDataVertex', 'off', 'InterpolationFactor', f(j));
+                    end
+                end
+            otherwise
+                for i = 1:length(lines)
+                    dx_vec = lines(i).XData - x;
+                    i0 = find(diff(sign(dx_vec)) ~= 0);
+                    i1 = i0 + 1;
+                    x0 = lines(i).XData(i0);
+                    x1 = lines(i).XData(i1);
+                    f = (x-x0)./(x1-x0);
+                    for j = 1:length(i0)
+                        datatip(lines(i), 'DataIndex', i0(j), 'SnapToDataVertex', 'off', 'InterpolationFactor', f(j));
+                    end
+                end
+        end
+        
+        % focus on other lines only
+        
     end
 end
 % --------------------------------------------------------------------- %

@@ -1,35 +1,83 @@
 %% -------------------------- User toggles --------------------------- %%
-StartupSettings.FontName            = 'Times New Roman';
+StartupSettings.FontName            = 'Arial';
 StartupSettings.FontWeight          = 'Normal';
-StartupSettings.AxesFontSize        = 20;
-StartupSettings.TitleTextMultiplier = 1.4;
+StartupSettings.AxesFontSize        = 14;
+StartupSettings.TitleTextMultiplier = 1.2;
 StartupSettings.LabelTextMultiplier = 1.2;
-StartupSettings.LineWidth           = 2;
-StartupSettings.MarkerSize          = 9;
+StartupSettings.LineWidth           = 1.5;
+StartupSettings.MarkerSize          = 6;
 StartupSettings.LegendLocation      = 'northeast';
-StartupSettings.LegendFontSize      = 16;
-StartupSettings.LegendFontWeight    = 'Normal';
+StartupSettings.LegendFontSize      = 14;
+StartupSettings.LegendFontWeight    = 'normal';
 StartupSettings.AxesTickLength      = [0.01 0.01];
 StartupSettings.AxesTickDir         = 'in';
 StartupSettings.ColorMap            = jet;
+% StartupSettings.ColorMap            = [ 000 001 042
+%                                         019 050 119
+%                                         034 098 124
+%                                         050 133 119
+%                                         064 146 084
+%                                         101 161 076
+%                                         141 171 086
+%                                         176 181 092
+%                                         189 168 099
+%                                         207 170 132
+%                                         229 199 187]/255;
+% StartupSettings.ColorMap = interp1(linspace(0, 1, size(StartupSettings.ColorMap(:,1),1)), StartupSettings.ColorMap, linspace(0, 1, 1e2));
 StartupSettings.GridMode            = 'on';
 StartupSettings.GridMinorMode       = 'off';
 StartupSettings.ColorOrder          = [ 000, 090, 255
-                                        255, 000, 000                                        
+                                        255, 000, 000
                                         000, 180, 000
-                                        255, 000, 255
-                                        253, 127, 001
+                                        255, 165, 000
+                                        255, 095, 255 
                                         000, 190, 190
                                         176, 080, 255
                                         180, 210, 000
                                         107, 117, 150
                                         170, 170, 170]/255;
+% StartupSettings.ColorOrder          = [ 031 119 180
+%                                         255 126 015
+%                                         044 161 045
+%                                         214 038 041
+%                                         148 102 188
+%                                         140 086 075
+%                                         227 119 194
+%                                         127 126 126
+%                                         189 188 034
+%                                         022 191 207]/255;
+% StartupSettings.ColorOrder          = [ 0.00,0.00,0.00
+%                                         1.00,0.00,0.00
+%                                         0.00,0.80,0.00
+%                                         0.10,0.40,1.00
+%                                         0.85,0.00,1.00
+%                                         0.00,0.80,0.90
+%                                         1.00,0.85,0.00];
+% 
+% StartupSettings.ColorOrder = [1,0,254
+%                               1,128,1
+%                               255,0,0
+%                               1,190,191
+%                               191,1,190
+%                               190,190,0
+%                               64,64,64]/255;
+% StartupSettings.ColorOrder          = [ 228 26 28
+%                                         55 126 184
+%                                         77 175 74
+%                                         152 78 163
+%                                         255 127 0
+%                                         255 255 51
+%                                         166 86 40]/255;
+% --------------------------------------------------------------------- %
+
+%% -------------------- Default numerical display -------------------- %%
+format longg
 % --------------------------------------------------------------------- %
 
 %% ---------------------- Default line settings ---------------------- %%
 set(groot, 'defaultLineLineWidth', StartupSettings.LineWidth)
 set(groot, 'defaultLineMarkerSize', StartupSettings.MarkerSize)
-set(groot, 'defaultLineMarkerFaceColor', ones(3, 1));
+set(groot, 'defaultLineMarkerFaceColor', 'none')
 set(groot, 'defaultErrorBarLineWidth', StartupSettings.LineWidth)
 % --------------------------------------------------------------------- %
 
@@ -69,35 +117,37 @@ set(groot, 'defaultAxesFontSize', StartupSettings.AxesFontSize)
 set(groot, 'defaultAxesLabelFontSizeMultiplier', StartupSettings.LabelTextMultiplier)
 set(groot, 'defaultAxesTitleFontSize', StartupSettings.TitleTextMultiplier)
 set(groot, 'defaultAxesXColor', 0.1*ones(1,3), 'defaultAxesYColor', 0.1*ones(1,3))
-set(groot, 'defaultAxesLineWidth', 1.0)
+set(groot, 'defaultAxesLineWidth', 0.5)
 set(groot, 'defaultAxesXMinorGridMode', 'manual', 'defaultAxesYMinorGridMode', 'manual', 'defaultAxesZMinorGridMode', 'manual')
 set(groot, 'defaultAxesXGrid', StartupSettings.GridMode, 'defaultAxesYGrid', StartupSettings.GridMode, 'defaultAxesZGrid', StartupSettings.GridMode)
 set(groot, 'defaultAxesXMinorGrid', StartupSettings.GridMinorMode, 'defaultAxesYMinorGrid', StartupSettings.GridMinorMode, 'defaultAxesZMinorGrid', StartupSettings.GridMinorMode)
 set(groot, 'defaultAxesGridLineStyle', '-')
-set(groot, 'defaultAxesGridAlpha', 0.05)
-set(groot, 'defaultAxesMinorGridLineStyle', '-')
-set(groot, 'defaultAxesMinorGridAlpha', 0.04)
+set(groot, 'defaultAxesGridAlpha', 0.2)
+set(groot, 'defaultAxesMinorGridLineStyle', ':')
+set(groot, 'defaultAxesMinorGridAlpha', 0.5)
 set(groot, 'defaultAxesColor', 1*ones(1,3))
 set(groot, 'defaultAxesTickDirMode', 'manual')
 set(groot, 'defaultAxesTickDir', StartupSettings.AxesTickDir)
 set(groot, 'defaultAxesTickLength', StartupSettings.AxesTickLength.*ones(1,2))
-set(groot, 'defaultAxesXMinorTick', 'on', 'defaultAxesYMinorTick', 'on', 'defaultAxesZMinorTick', 'on')
+set(groot, 'defaultAxesXMinorTick', 'off', 'defaultAxesYMinorTick', 'off', 'defaultAxesZMinorTick', 'off')
 set(groot, 'defaultAxesNextPlot', 'add')
-set(groot, 'defaultAxesBox', 'off')
+set(groot, 'defaultAxesBox', 'on')
 set(groot, 'defaultAxesUnits', 'Normalized')
 set(groot, 'defaultAxesColorOrder', StartupSettings.ColorOrder)
-set(groot, 'defaultTextInterpreter', 'latex')
 
 set(groot, 'defaultScatterLineWidth', 1.4)
 
-set(groot, 'defaultHistogramFaceAlpha', 1)
+set(groot, 'defaultHistogramFaceAlpha', 0.3)
 
 set(groot, 'defaultContourLineWidth', 0.5)
+set(groot, 'defaultContourFaceAlpha', 0.6)
 set(groot, 'defaultContourLineColor', 0.15*ones(1, 3))
 
 set(groot, 'defaultQuiverAutoScaleFactor', 1.0)
 set(groot, 'defaultQuiverLineWidth', StartupSettings.LineWidth)
 set(groot, 'defaultQuiverMaxHeadSize', 0.1)
+
+set(groot, 'defaultTextInterpreter', 'latex')
 % --------------------------------------------------------------------- %
 
 %% --------------------- Default legend settings --------------------- %%
@@ -105,8 +155,8 @@ set(groot, 'defaultLegendFontSizeMode', 'manual')
 set(groot, 'defaultLegendFontSize', StartupSettings.LegendFontSize)
 set(groot, 'defaultLegendFontWeightMode', 'manual')
 set(groot, 'defaultLegendFontWeight', StartupSettings.LegendFontWeight)
-set(groot, 'defaultLegendColor', 0.99*ones(1,3))
-set(groot, 'defaultLegendEdgeColor', 0.8*ones(1, 3))
+set(groot, 'defaultLegendColor', 1*ones(1,3))
+set(groot, 'defaultLegendEdgeColor', 0*ones(1, 3))
 set(groot, 'defaultLegendLocation', StartupSettings.LegendLocation)
 % --------------------------------------------------------------------- %
 
@@ -224,13 +274,13 @@ setFigureForDocumentButton.CData = setFigureForDocumentButtonImage;
 setFigureForDocumentButton.TooltipString = 'Enlarge data cursors and adjust the font to match the figure''s font';
 setFigureForDocumentButton.ClickedCallback = @enlargeDataCursors;
 
-% Prepare the entire figure for a document
+% Prepare figure for a report document
 setFigureForDocumentButton = uipushtool(toolbar);
 [img,map] = imread(fullfile(matlabroot,...
     'toolbox','matlab','icons','book_mat.gif'));
 setFigureForDocumentButtonImage = ind2rgb(img,map);
 setFigureForDocumentButton.CData = setFigureForDocumentButtonImage;
-setFigureForDocumentButton.TooltipString = 'Prepare the figure for official documents';
+setFigureForDocumentButton.TooltipString = 'Prepare the figure for a report document';
 setFigureForDocumentButton.ClickedCallback = @prepFigureForDocument;
 
 % use black lines and symbols instead of colors
@@ -250,6 +300,15 @@ toggleMinorGridButtonImage = ind2rgb(img,map);
 toggleMinorGridButton.CData = toggleMinorGridButtonImage;
 toggleMinorGridButton.TooltipString = 'Toggle grid';
 toggleMinorGridButton.ClickedCallback = @toggleGrid;
+
+% set precise grid
+toggleMinorGridButton = uitoggletool(toolbar);
+[img,map] = imread(fullfile(matlabroot,...
+    'toolbox','matlab','icons','HDF_SDS.gif'));
+setPreciseGridButtonImage = ind2rgb(img,map);
+toggleMinorGridButton.CData = setPreciseGridButtonImage;
+toggleMinorGridButton.TooltipString = 'Precise grid';
+toggleMinorGridButton.ClickedCallback = @setprecgrid;
 
 % supporting functions
     function copyFigure(~,~)
@@ -387,6 +446,7 @@ toggleMinorGridButton.ClickedCallback = @toggleGrid;
             plot(x,y,'DisplayName','Slope line');
             fprintf('\nLine equation: y(x) = %f*x + %f\n', slope, y0-slope*x0);
             fprintf('\nSlope = %f\n\n', slope);
+            fprintf('\nFree Member = %f\n\n', y0-slope*x0);
         else
             [img,map] = imread(fullfile(matlabroot,...
                 'toolbox','matlab','icons','tool_line.gif'));
@@ -408,12 +468,14 @@ toggleMinorGridButton.ClickedCallback = @toggleGrid;
     end
 
     function prepFigureForDocument(~,~)
+        FontName = 'Times New Roman';
         AllDataCursors = findall(gcf,'type','hggroup');
+        set(gca, 'FontSize', 18)
         set(AllDataCursors,'FontSize',14)
-        set(AllDataCursors,'FontName','Arial')
+        set(AllDataCursors,'FontName',FontName)
         set(AllDataCursors,'FontWeight','Normal')
         currax = gca;
-        set(currax,'FontName','Arial')
+        set(currax,'FontName',FontName)
         set(currax,'FontWeight','normal')
         set(currax,'TickLabelInterpreter','latex')
         currax.Title.Interpreter  = 'latex';
@@ -426,16 +488,16 @@ toggleMinorGridButton.ClickedCallback = @toggleGrid;
         YLabel = YLabel.String;
         ix = strfind(XLabel,'[');
         iy = strfind(YLabel,'[');
-        if ~isempty(ix)
-            xlabel(['$\it{' XLabel(1:ix-1) '}$\rm{' XLabel(ix:end) '}'])
-        else
-            xlabel(['$\it{' XLabel '}$'])
-        end
-        if ~isempty(iy)
-            ylabel(['$\it{' YLabel(1:iy-1) '}$\rm{' YLabel(iy:end) '}'])
-        else
-            ylabel(['$\it{' YLabel '}$'])
-        end
+        % if ~isempty(ix)
+        %     xlabel(['\it{' XLabel(1:ix-1) '}\rm{' XLabel(ix:end) '}'])
+        % else
+        %     xlabel(['\it{' XLabel '}'])
+        % end
+        % if ~isempty(iy)
+        %     ylabel(['\it{' YLabel(1:iy-1) '}\rm{' YLabel(iy:end) '}'])
+        % else
+        %     ylabel(['\it{' YLabel '}'])
+        % end
     end
 
     function setPlotText(~,~)
@@ -467,20 +529,34 @@ toggleMinorGridButton.ClickedCallback = @toggleGrid;
     end
 
     function setPlotSymbols(~,~)
-        plotLineWidth = 1;
-        symbolSet = {'^','s','d','<','o','v','>','x','p','+'};
-        lines = findobj(gcf, 'type', 'line');
-        N_lines = numel(lines);
-        lineSet = {'-' , '-.' , '--'};
-        for n = N_lines:-1:1
-            xdata = lines(n).XData;
-            ydata = lines(n).YData;
-            zdata = lines(n).ZData;
-            
-            n_inds = numel(xdata);
-            lines(n).MarkerIndices = 1:round(n_inds/10):n_inds;
-            lines(n).Marker = symbolSet{N_lines-n+1};
-            lines(n).LineWidth = plotLineWidth;
+        plotLineWidth = 1.5;
+        symbolSet = {'o','^','s','d','<','v','>','x','p','+'};
+
+        fig = gcf;
+        ax = findobj(fig.Children, 'type', 'Axes');
+        
+        number_of_markers = str2double(inputdlg({'Number of symbols:'}, 'Add symbols', [1 20]));
+        
+        for i = 1:length(ax)
+            lines = findobj(ax(i), 'type', 'line');
+            N_lines = numel(lines);
+            for n = N_lines:-1:1
+                line_color = lines(n).Color;
+                xdata = lines(n).XData;
+                n_inds = numel(xdata);
+                
+                if n_inds >= number_of_markers
+                    MarkerIndices = 1:round(n_inds/number_of_markers):n_inds;
+                    MarkerIndices(end) = n_inds;
+                else
+                    MarkerIndices = 1:1:n_inds;
+                end
+                lines(n).MarkerIndices = MarkerIndices;
+                lines(n).Marker = symbolSet{N_lines-n+1};
+                lines(n).MarkerFaceColor = line_color;
+                lines(n).MarkerEdgeColor = line_color;
+                lines(n).LineWidth = plotLineWidth;
+            end
         end
     end
 
@@ -491,6 +567,29 @@ toggleMinorGridButton.ClickedCallback = @toggleGrid;
         else
             grid off
             grid on
+        end
+    end
+    
+    function setprecgrid(src,~)
+        fig = gcf;
+        ax = findobj(fig.Children, 'type', 'Axes');
+
+        for i = 1:length(ax)
+            if strcmp(src.State, 'on')
+                ax(i).GridLineStyle = '--';
+                ax(i).GridAlpha = 1;
+                ax(i).MinorGridLineStyle = ':';
+                ax(i).MinorGridAlpha = 0.5;
+                grid(ax(i), 'on')
+                grid(ax(i), 'minor')
+            else
+                ax(i).GridLineStyle = '-';
+                ax(i).GridAlpha = 0.2;
+                ax(i).MinorGridLineStyle = ':';
+                ax(i).MinorGridAlpha = 0.5;
+                grid(ax(i), 'off')
+                grid(ax(i), 'on')
+            end
         end
     end
 end
