@@ -34,6 +34,8 @@ dirichlet_factor     = -200;
 linear_extrap_factor = -400;
 pressure_compatibility_factor = -500;
 lppe_factor = -500;
+symmetry_factor = 600;
+Anti_Symmetry_factor = 700;
 
 
 %% Wall boundary conditions
@@ -71,17 +73,6 @@ switch Problem.Boundary_Conditions.Wall.v
 
         A(linear_inds)   = dirichlet_factor;
         B(linear_inds)   = -1i;
-
-        % % Enforcing dv/dy = 0 for the continuity equation
-        % row_inds = get_eqn_bottom_inds('continuity', Nx, Ny);
-        % i_opr_B  = get_opr_bottom_inds(Nx, Ny);
-        % 
-        % continuity_zero_dvdy_opr = [Z(i_opr_B,:) , Dy(i_opr_B,:) , Z(i_opr_B,:) , Z(i_opr_B,:)];
-        % 
-        % A(row_inds(:),:) = 0;
-        % B(row_inds(:),:) = 0;
-        % A(row_inds(:),:) = continuity_zero_dvdy_opr;
-        % B(row_inds(:),:) = 0;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Wall.v ' for ''v'' at the wall is invalid or not supported'])
 end
@@ -223,6 +214,8 @@ end
 Right_Side_Options.FD_Extrapolation = {'Linear_Extrapolation' 'Linear-Extrapolation' 'Linear Extrapolation' 'FD_Extrapolation' 'FD Extrapolation' 'Finite Difference Extrapolation' 'finite_difference_extrapolation' 'finite difference extrapolation'};
 Right_Side_Options.Zero_2nd_Derivative_Extrapolation = {'zero_2nd_derivative' 'zero_2nd_derivative_extrapolation'};
 Right_Side_Options.LPPE = {'LPPE' 'Linearized-Pressure-Poisson-Equation' 'Linearized Pressure Poisson Equation'};
+Right_Side_Options.Symmetry = {'Symmetry' 'symmetry' 'sym' 's' 'S' 'Sym'};
+Right_Side_Options.Anti_Symmetry = {'Anti_Symmetry' 'Anti_Symmetry' 'AntiSymmetry' 'Antisymmetry' 'asym' 'as' 'AS' 'a' 'A' 'ASym'};
 
 % u
 switch Problem.Boundary_Conditions.Right.u
@@ -253,6 +246,41 @@ switch Problem.Boundary_Conditions.Right.u
         B(row_inds,:) = 0;
         A(row_inds,:) = linear_extrap_factor*z_2nd_der_opr;
         B(row_inds,:) = -1i*z_2nd_der_opr;
+
+    case Right_Side_Options.Symmetry
+        eqn_right_inds = get_eqn_right_inds('x momentum', Nx, Ny);
+        eqn_right_inds = eqn_right_inds(2:end-1);
+        var_right_inds = get_var_right_inds('u', Nx, Ny);
+        var_right_inds = var_right_inds(2:end-1);
+        var_left_inds = get_var_left_inds('u', Nx, Ny);
+        var_left_inds = var_left_inds(2:end-1);
+
+        var_right_linear_inds = get_linear_indices(A, eqn_right_inds, var_right_inds);
+        var_left_linear_inds = get_linear_indices(A, eqn_right_inds, var_left_inds);
+        
+        A(eqn_right_inds,:) = 0;
+        B(eqn_right_inds,:) = 0;
+        A(var_right_linear_inds) = symmetry_factor;
+        A(var_left_linear_inds) = -symmetry_factor;
+        B(var_right_linear_inds) = -1i;
+        B(var_left_linear_inds) = 1i;
+    case Right_Side_Options.Anti_Symmetry
+        eqn_right_inds = get_eqn_right_inds('x momentum', Nx, Ny);
+        eqn_right_inds = eqn_right_inds(2:end-1);
+        var_right_inds = get_var_right_inds('u', Nx, Ny);
+        var_right_inds = var_right_inds(2:end-1);
+        var_left_inds = get_var_left_inds('u', Nx, Ny);
+        var_left_inds = var_left_inds(2:end-1);
+
+        var_right_linear_inds = get_linear_indices(A, eqn_right_inds, var_right_inds);
+        var_left_linear_inds = get_linear_indices(A, eqn_right_inds, var_left_inds);
+        
+        A(eqn_right_inds,:) = 0;
+        B(eqn_right_inds,:) = 0;
+        A(var_right_linear_inds) = Anti_Symmetry_factor;
+        A(var_left_linear_inds) = Anti_Symmetry_factor;
+        B(var_right_linear_inds) = -1i;
+        B(var_left_linear_inds) = -1i;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Right.u ' for ''u'' at the right side is invalid or not supported'])
 end
@@ -286,6 +314,40 @@ switch Problem.Boundary_Conditions.Right.v
         B(row_inds,:) = 0;
         A(row_inds,:) = linear_extrap_factor*z_2nd_der_opr;
         B(row_inds,:) = -1i*z_2nd_der_opr;
+    case Right_Side_Options.Symmetry
+        eqn_right_inds = get_eqn_right_inds('y momentum', Nx, Ny);
+        eqn_right_inds = eqn_right_inds(2:end-1);
+        var_right_inds = get_var_right_inds('v', Nx, Ny);
+        var_right_inds = var_right_inds(2:end-1);
+        var_left_inds = get_var_left_inds('v', Nx, Ny);
+        var_left_inds = var_left_inds(2:end-1);
+
+        var_right_linear_inds = get_linear_indices(A, eqn_right_inds, var_right_inds);
+        var_left_linear_inds = get_linear_indices(A, eqn_right_inds, var_left_inds);
+        
+        A(eqn_right_inds,:) = 0;
+        B(eqn_right_inds,:) = 0;
+        A(var_right_linear_inds) = symmetry_factor;
+        A(var_left_linear_inds) = -symmetry_factor;
+        B(var_right_linear_inds) = -1i;
+        B(var_left_linear_inds) = 1i;
+    case Right_Side_Options.Anti_Symmetry
+        eqn_right_inds = get_eqn_right_inds('y momentum', Nx, Ny);
+        eqn_right_inds = eqn_right_inds(2:end-1);
+        var_right_inds = get_var_right_inds('v', Nx, Ny);
+        var_right_inds = var_right_inds(2:end-1);
+        var_left_inds = get_var_left_inds('v', Nx, Ny);
+        var_left_inds = var_left_inds(2:end-1);
+
+        var_right_linear_inds = get_linear_indices(A, eqn_right_inds, var_right_inds);
+        var_left_linear_inds = get_linear_indices(A, eqn_right_inds, var_left_inds);
+        
+        A(eqn_right_inds,:) = 0;
+        B(eqn_right_inds,:) = 0;
+        A(var_right_linear_inds) = Anti_Symmetry_factor;
+        A(var_left_linear_inds) = Anti_Symmetry_factor;
+        B(var_right_linear_inds) = -1i;
+        B(var_left_linear_inds) = -1i;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Right.v ' for ''v'' at the right side is invalid or not supported'])
 end
@@ -319,6 +381,40 @@ switch Problem.Boundary_Conditions.Right.w
         B(row_inds,:) = 0;
         A(row_inds,:) = linear_extrap_factor*z_2nd_der_opr;
         B(row_inds,:) = -1i*z_2nd_der_opr;
+    case Right_Side_Options.Symmetry
+        eqn_right_inds = get_eqn_right_inds('z momentum', Nx, Ny);
+        eqn_right_inds = eqn_right_inds(2:end-1);
+        var_right_inds = get_var_right_inds('w', Nx, Ny);
+        var_right_inds = var_right_inds(2:end-1);
+        var_left_inds = get_var_left_inds('w', Nx, Ny);
+        var_left_inds = var_left_inds(2:end-1);
+
+        var_right_linear_inds = get_linear_indices(A, eqn_right_inds, var_right_inds);
+        var_left_linear_inds = get_linear_indices(A, eqn_right_inds, var_left_inds);
+        
+        A(eqn_right_inds,:) = 0;
+        B(eqn_right_inds,:) = 0;
+        A(var_right_linear_inds) = symmetry_factor;
+        A(var_left_linear_inds) = -symmetry_factor;
+        B(var_right_linear_inds) = -1i;
+        B(var_left_linear_inds) = 1i;
+    case Right_Side_Options.Anti_Symmetry
+        eqn_right_inds = get_eqn_right_inds('z momentum', Nx, Ny);
+        eqn_right_inds = eqn_right_inds(2:end-1);
+        var_right_inds = get_var_right_inds('w', Nx, Ny);
+        var_right_inds = var_right_inds(2:end-1);
+        var_left_inds = get_var_left_inds('w', Nx, Ny);
+        var_left_inds = var_left_inds(2:end-1);
+
+        var_right_linear_inds = get_linear_indices(A, eqn_right_inds, var_right_inds);
+        var_left_linear_inds = get_linear_indices(A, eqn_right_inds, var_left_inds);
+        
+        A(eqn_right_inds,:) = 0;
+        B(eqn_right_inds,:) = 0;
+        A(var_right_linear_inds) = Anti_Symmetry_factor;
+        A(var_left_linear_inds) = Anti_Symmetry_factor;
+        B(var_right_linear_inds) = -1i;
+        B(var_left_linear_inds) = -1i;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Right.w ' for ''w'' at the right side is invalid or not supported'])
 end
@@ -369,6 +465,40 @@ switch Problem.Boundary_Conditions.Right.p
         B(row_inds(:),:) = 0;
         A(row_inds(:),:) = lppe_factor*lppe_opr;
         B(row_inds(:),:) = -1i*lppe_opr;
+    case Right_Side_Options.Symmetry
+        eqn_right_inds = get_eqn_right_inds('continuity', Nx, Ny);
+        eqn_right_inds = eqn_right_inds(2:end-1);
+        var_right_inds = get_var_right_inds('p', Nx, Ny);
+        var_right_inds = var_right_inds(2:end-1);
+        var_left_inds = get_var_left_inds('p', Nx, Ny);
+        var_left_inds = var_left_inds(2:end-1);
+
+        var_right_linear_inds = get_linear_indices(A, eqn_right_inds, var_right_inds);
+        var_left_linear_inds = get_linear_indices(A, eqn_right_inds, var_left_inds);
+        
+        A(eqn_right_inds,:) = 0;
+        B(eqn_right_inds,:) = 0;
+        A(var_right_linear_inds) = symmetry_factor;
+        A(var_left_linear_inds) = -symmetry_factor;
+        B(var_right_linear_inds) = -1i;
+        B(var_left_linear_inds) = 1i;
+    case Right_Side_Options.Anti_Symmetry
+        eqn_right_inds = get_eqn_right_inds('continuity', Nx, Ny);
+        eqn_right_inds = eqn_right_inds(2:end-1);
+        var_right_inds = get_var_right_inds('p', Nx, Ny);
+        var_right_inds = var_right_inds(2:end-1);
+        var_left_inds = get_var_left_inds('p', Nx, Ny);
+        var_left_inds = var_left_inds(2:end-1);
+
+        var_right_linear_inds = get_linear_indices(A, eqn_right_inds, var_right_inds);
+        var_left_linear_inds = get_linear_indices(A, eqn_right_inds, var_left_inds);
+        
+        A(eqn_right_inds,:) = 0;
+        B(eqn_right_inds,:) = 0;
+        A(var_right_linear_inds) = Anti_Symmetry_factor;
+        A(var_left_linear_inds) = Anti_Symmetry_factor;
+        B(var_right_linear_inds) = -1i;
+        B(var_left_linear_inds) = -1i;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Right.p ' for ''p'' at the right side is invalid or not supported'])
 end
@@ -379,6 +509,8 @@ end
 Left_Side_Options.FD_Extrapolation = {'Linear_Extrapolation' 'Linear-Extrapolation' 'Linear Extrapolation' 'FD_Extrapolation' 'FD Extrapolation' 'Finite Difference Extrapolation' 'finite_difference_extrapolation' 'finite difference extrapolation'};
 Left_Side_Options.Zero_2nd_Derivative_Extrapolation = {'zero_2nd_derivative' 'zero_2nd_derivative_extrapolation'};
 Left_Side_Options.LPPE = {'LPPE' 'Linearized-Pressure-Poisson-Equation' 'Linearized Pressure Poisson Equation'};
+Left_Side_Options.Symmetry = {'Symmetry' 'symmetry' 'sym' 's' 'S' 'Sym'};
+Left_Side_Options.Anti_Symmetry = {'Anti_Symmetry' 'Anti_Symmetry' 'AntiSymmetry' 'Antisymmetry' 'asym' 'as' 'AS' 'a' 'A' 'ASym'};
 
 % u
 switch Problem.Boundary_Conditions.Left.u
@@ -409,6 +541,40 @@ switch Problem.Boundary_Conditions.Left.u
         B(row_inds,:) = 0;
         A(row_inds,:) = linear_extrap_factor*z_2nd_der_opr;
         B(row_inds,:) = -1i*z_2nd_der_opr;
+    case Left_Side_Options.Symmetry
+        eqn_left_inds = get_eqn_left_inds('x momentum', Nx, Ny);
+        eqn_left_inds = eqn_left_inds(2:end-1);
+        var_right_inds = get_var_right_inds('u', Nx, Ny);
+        var_right_inds = var_right_inds(2:end-1);
+        var_left_inds = get_var_left_inds('u', Nx, Ny);
+        var_left_inds = var_left_inds(2:end-1);
+
+        var_right_linear_inds = get_linear_indices(A, eqn_left_inds, var_right_inds);
+        var_left_linear_inds = get_linear_indices(A, eqn_left_inds, var_left_inds);
+        
+        A(eqn_left_inds,:) = 0;
+        B(eqn_left_inds,:) = 0;
+        A(var_right_linear_inds) = -symmetry_factor;
+        A(var_left_linear_inds) = symmetry_factor;
+        B(var_right_linear_inds) = 1i;
+        B(var_left_linear_inds) = -1i;
+    case Left_Side_Options.Anti_Symmetry
+        eqn_left_inds = get_eqn_left_inds('x momentum', Nx, Ny);
+        eqn_left_inds = eqn_left_inds(2:end-1);
+        var_right_inds = get_var_right_inds('u', Nx, Ny);
+        var_right_inds = var_right_inds(2:end-1);
+        var_left_inds = get_var_left_inds('u', Nx, Ny);
+        var_left_inds = var_left_inds(2:end-1);
+
+        var_right_linear_inds = get_linear_indices(A, eqn_left_inds, var_right_inds);
+        var_left_linear_inds = get_linear_indices(A, eqn_left_inds, var_left_inds);
+        
+        A(eqn_left_inds,:) = 0;
+        B(eqn_left_inds,:) = 0;
+        A(var_right_linear_inds) = Anti_Symmetry_factor;
+        A(var_left_linear_inds) = Anti_Symmetry_factor;
+        B(var_right_linear_inds) = -1i;
+        B(var_left_linear_inds) = -1i;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Left.u ' for ''u'' at the left side is invalid or not supported'])
 end
@@ -442,6 +608,40 @@ switch Problem.Boundary_Conditions.Left.v
         B(row_inds,:) = 0;
         A(row_inds,:) = linear_extrap_factor*z_2nd_der_opr;
         B(row_inds,:) = -1i*z_2nd_der_opr;
+    case Left_Side_Options.Symmetry
+        eqn_left_inds = get_eqn_left_inds('y momentum', Nx, Ny);
+        eqn_left_inds = eqn_left_inds(2:end-1);
+        var_right_inds = get_var_right_inds('v', Nx, Ny);
+        var_right_inds = var_right_inds(2:end-1);
+        var_left_inds = get_var_left_inds('v', Nx, Ny);
+        var_left_inds = var_left_inds(2:end-1);
+
+        var_right_linear_inds = get_linear_indices(A, eqn_left_inds, var_right_inds);
+        var_left_linear_inds = get_linear_indices(A, eqn_left_inds, var_left_inds);
+        
+        A(eqn_left_inds,:) = 0;
+        B(eqn_left_inds,:) = 0;
+        A(var_right_linear_inds) = -symmetry_factor;
+        A(var_left_linear_inds) = symmetry_factor;
+        B(var_right_linear_inds) = 1i;
+        B(var_left_linear_inds) = -1i;
+    case Left_Side_Options.Anti_Symmetry
+        eqn_left_inds = get_eqn_left_inds('y momentum', Nx, Ny);
+        eqn_left_inds = eqn_left_inds(2:end-1);
+        var_right_inds = get_var_right_inds('v', Nx, Ny);
+        var_right_inds = var_right_inds(2:end-1);
+        var_left_inds = get_var_left_inds('v', Nx, Ny);
+        var_left_inds = var_left_inds(2:end-1);
+
+        var_right_linear_inds = get_linear_indices(A, eqn_left_inds, var_right_inds);
+        var_left_linear_inds = get_linear_indices(A, eqn_left_inds, var_left_inds);
+        
+        A(eqn_left_inds,:) = 0;
+        B(eqn_left_inds,:) = 0;
+        A(var_right_linear_inds) = Anti_Symmetry_factor;
+        A(var_left_linear_inds) = Anti_Symmetry_factor;
+        B(var_right_linear_inds) = -1i;
+        B(var_left_linear_inds) = -1i;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Left.v ' for ''v'' at the left side is invalid or not supported'])
 end
@@ -475,6 +675,40 @@ switch Problem.Boundary_Conditions.Left.w
         B(row_inds,:) = 0;
         A(row_inds,:) = linear_extrap_factor*z_2nd_der_opr;
         B(row_inds,:) = -1i*z_2nd_der_opr;
+    case Left_Side_Options.Symmetry
+        eqn_left_inds = get_eqn_left_inds('z momentum', Nx, Ny);
+        eqn_left_inds = eqn_left_inds(2:end-1);
+        var_right_inds = get_var_right_inds('w', Nx, Ny);
+        var_right_inds = var_right_inds(2:end-1);
+        var_left_inds = get_var_left_inds('w', Nx, Ny);
+        var_left_inds = var_left_inds(2:end-1);
+
+        var_right_linear_inds = get_linear_indices(A, eqn_left_inds, var_right_inds);
+        var_left_linear_inds = get_linear_indices(A, eqn_left_inds, var_left_inds);
+        
+        A(eqn_left_inds,:) = 0;
+        B(eqn_left_inds,:) = 0;
+        A(var_right_linear_inds) = -symmetry_factor;
+        A(var_left_linear_inds) = symmetry_factor;
+        B(var_right_linear_inds) = 1i;
+        B(var_left_linear_inds) = -1i;
+    case Left_Side_Options.Anti_Symmetry
+        eqn_left_inds = get_eqn_left_inds('z momentum', Nx, Ny);
+        eqn_left_inds = eqn_left_inds(2:end-1);
+        var_right_inds = get_var_right_inds('w', Nx, Ny);
+        var_right_inds = var_right_inds(2:end-1);
+        var_left_inds = get_var_left_inds('w', Nx, Ny);
+        var_left_inds = var_left_inds(2:end-1);
+
+        var_right_linear_inds = get_linear_indices(A, eqn_left_inds, var_right_inds);
+        var_left_linear_inds = get_linear_indices(A, eqn_left_inds, var_left_inds);
+        
+        A(eqn_left_inds,:) = 0;
+        B(eqn_left_inds,:) = 0;
+        A(var_right_linear_inds) = Anti_Symmetry_factor;
+        A(var_left_linear_inds) = Anti_Symmetry_factor;
+        B(var_right_linear_inds) = -1i;
+        B(var_left_linear_inds) = -1i;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Left.w ' for ''w'' at the left side is invalid or not supported'])
 end
@@ -525,6 +759,40 @@ switch Problem.Boundary_Conditions.Left.p
         B(row_inds(:),:) = 0;
         A(row_inds(:),:) = lppe_factor*lppe_opr;
         B(row_inds(:),:) = -1i*lppe_opr;
+    case Left_Side_Options.Symmetry
+        eqn_left_inds = get_eqn_left_inds('continuity', Nx, Ny);
+        eqn_left_inds = eqn_left_inds(2:end-1);
+        var_right_inds = get_var_right_inds('p', Nx, Ny);
+        var_right_inds = var_right_inds(2:end-1);
+        var_left_inds = get_var_left_inds('p', Nx, Ny);
+        var_left_inds = var_left_inds(2:end-1);
+
+        var_right_linear_inds = get_linear_indices(A, eqn_left_inds, var_right_inds);
+        var_left_linear_inds = get_linear_indices(A, eqn_left_inds, var_left_inds);
+        
+        A(eqn_left_inds,:) = 0;
+        B(eqn_left_inds,:) = 0;
+        A(var_right_linear_inds) = -symmetry_factor;
+        A(var_left_linear_inds) = symmetry_factor;
+        B(var_right_linear_inds) = 1i;
+        B(var_left_linear_inds) = -1i;
+    case Left_Side_Options.Anti_Symmetry
+        eqn_left_inds = get_eqn_left_inds('continuity', Nx, Ny);
+        eqn_left_inds = eqn_left_inds(2:end-1);
+        var_right_inds = get_var_right_inds('p', Nx, Ny);
+        var_right_inds = var_right_inds(2:end-1);
+        var_left_inds = get_var_left_inds('p', Nx, Ny);
+        var_left_inds = var_left_inds(2:end-1);
+
+        var_right_linear_inds = get_linear_indices(A, eqn_left_inds, var_right_inds);
+        var_left_linear_inds = get_linear_indices(A, eqn_left_inds, var_left_inds);
+        
+        A(eqn_left_inds,:) = 0;
+        B(eqn_left_inds,:) = 0;
+        A(var_right_linear_inds) = Anti_Symmetry_factor;
+        A(var_left_linear_inds) = Anti_Symmetry_factor;
+        B(var_right_linear_inds) = -1i;
+        B(var_left_linear_inds) = -1i;
     otherwise
         error(['Boundary condition ' Problem.Boundary_Conditions.Left.p ' for ''p'' at the left side is invalid or not supported'])
 end

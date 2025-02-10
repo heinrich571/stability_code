@@ -11,13 +11,13 @@ startup
 
 Problem.Computation.N_Workers = 1;
 
-Problem.Domain.Nx       = 10;
-Problem.Domain.Ny       = 10;
+Problem.Domain.Nx       = 40;
+Problem.Domain.Ny       = 80;
 Problem.Domain.X_Limit  = 200;
 Problem.Domain.Y_Limit  = 200;
-Problem.Domain.Y_Median = 3*2.4;
+Problem.Domain.Y_Median = 2*2.4;
 
-Problem.Physics.Beta                  = 0.8;
+Problem.Physics.Beta                  = 0.25;
 Problem.Physics.Number_Of_Eigenvalues = 21;
 
 Problem.Base_Flow_Settings.initguess            = 1.23258765682022 + [-1 1]*1e-5;
@@ -37,10 +37,10 @@ Problem.Boundary_Conditions.Right.v = Sides_Boundary_Condition;
 Problem.Boundary_Conditions.Right.w = Sides_Boundary_Condition;
 Problem.Boundary_Conditions.Right.p = Sides_Boundary_Condition;
 
-Problem.Boundary_Conditions.Left.u  = Sides_Boundary_Condition;
-Problem.Boundary_Conditions.Left.v  = Sides_Boundary_Condition;
-Problem.Boundary_Conditions.Left.w  = Sides_Boundary_Condition;
-Problem.Boundary_Conditions.Left.p  = Sides_Boundary_Condition;
+Problem.Boundary_Conditions.Left.u  = 'Symmetry';
+Problem.Boundary_Conditions.Left.v  = 'Anti_Symmetry';
+Problem.Boundary_Conditions.Left.w  = 'Anti_Symmetry';
+Problem.Boundary_Conditions.Left.p  = 'Anti_Symmetry';
 
 Problem.Boundary_Conditions.Wall.u  = 'Dirichlet';
 Problem.Boundary_Conditions.Wall.v  = 'Dirichlet';
@@ -77,7 +77,7 @@ dispstatus()
 
 %% Draw eigenfunctions
 
-Options.Solution_Index = 30;
+Options.Solution_Index = 1;
 Options.X_Limit = Problem(Options.Solution_Index).Domain.X_Limit;
 Options.Y_Limit = Problem(Options.Solution_Index).Domain.Y_Limit;
 
@@ -90,7 +90,8 @@ if Problem(Options.Solution_Index).Flags.Generate_Report
 end
 
 Eigenvalue_Indices = [1];
-view_results(Case_ID, Results_Folder, Eigenvalue_Indices, Options)
+% view_results(Case_ID, Results_Folder, Eigenvalue_Indices, Options)
+plotef(Solution, 1, Eigenvalue_Indices)
 if ~isempty(fieldnames(Report))
     errors_plots(Solution, Report, Eigenvalue_Indices)
 end
