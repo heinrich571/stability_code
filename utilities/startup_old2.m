@@ -1,13 +1,13 @@
 %% -------------------------- User toggles --------------------------- %%
-StartupSettings.FontName            = 'Times New Roman';
-StartupSettings.FontWeight          = 'normal';
-StartupSettings.AxesFontSize        = 14;
+StartupSettings.FontName            = 'Arial';
+StartupSettings.FontWeight          = 'Normal';
+StartupSettings.AxesFontSize        = 18;
 StartupSettings.TitleTextMultiplier = 1.2;
 StartupSettings.LabelTextMultiplier = 1.2;
-StartupSettings.LineWidth           = 2.0;
-StartupSettings.MarkerSize          = 8;
+StartupSettings.LineWidth           = 2;
+StartupSettings.MarkerSize          = 12;
 StartupSettings.LegendLocation      = 'northeast';
-StartupSettings.LegendFontSize      = 14;
+StartupSettings.LegendFontSize      = 18;
 StartupSettings.LegendFontWeight    = 'normal';
 StartupSettings.AxesTickLength      = 0.01*[1 1];
 StartupSettings.AxesTickDir         = 'in';
@@ -30,9 +30,9 @@ StartupSettings.GridMinorMode       = 'off';
 StartupSettings.ColorOrder          = [ 000, 090, 255
                                         255, 000, 000
                                         000, 180, 000
-                                        255, 180, 000
-                                        255, 035, 245 
-                                        000, 225, 215
+                                        255, 165, 000
+                                        255, 095, 255 
+                                        000, 190, 190
                                         176, 080, 255
                                         180, 210, 000
                                         107, 117, 150
@@ -109,7 +109,7 @@ set(groot, 'defaultTextFontName', StartupSettings.FontName)
 % --------------------------------------------------------------------- %
 
 %% ---------------------- Default axes settings ---------------------- %%
-set(groot, 'defaultAxesBox', 'on')
+set(groot, 'defaultAxesBox', 'off')
 set(groot, 'defaultAxesCreateFcn', @(ax,~)set(ax.Toolbar,'Visible','off'))
 set(groot, 'defaultAxesFontName', StartupSettings.FontName)
 set(groot, 'defaultAxesFontWeight', StartupSettings.FontWeight)
@@ -122,8 +122,8 @@ set(groot, 'defaultAxesLineWidth', 0.5)
 set(groot, 'defaultAxesXMinorGridMode', 'manual', 'defaultAxesYMinorGridMode', 'manual', 'defaultAxesZMinorGridMode', 'manual')
 set(groot, 'defaultAxesXGrid', StartupSettings.GridMode, 'defaultAxesYGrid', StartupSettings.GridMode, 'defaultAxesZGrid', StartupSettings.GridMode)
 set(groot, 'defaultAxesXMinorGrid', StartupSettings.GridMinorMode, 'defaultAxesYMinorGrid', StartupSettings.GridMinorMode, 'defaultAxesZMinorGrid', StartupSettings.GridMinorMode)
-set(groot, 'defaultAxesGridLineStyle', ':')
-set(groot, 'defaultAxesGridAlpha', 1.0)
+set(groot, 'defaultAxesGridLineStyle', '-')
+set(groot, 'defaultAxesGridAlpha', 0.2)
 set(groot, 'defaultAxesMinorGridLineStyle', ':')
 set(groot, 'defaultAxesMinorGridAlpha', 0.5)
 set(groot, 'defaultAxesColor', 1*ones(1,3))
@@ -132,13 +132,13 @@ set(groot, 'defaultAxesTickDir', StartupSettings.AxesTickDir)
 set(groot, 'defaultAxesTickLength', StartupSettings.AxesTickLength.*ones(1,2))
 set(groot, 'defaultAxesXMinorTick', StartupSettings.AxesMinorTickStatus, 'defaultAxesYMinorTick', StartupSettings.AxesMinorTickStatus, 'defaultAxesZMinorTick', StartupSettings.AxesMinorTickStatus)
 set(groot, 'defaultAxesNextPlot', 'add')
+set(groot, 'defaultAxesBox', 'on')
 set(groot, 'defaultAxesUnits', 'Normalized')
 set(groot, 'defaultAxesColorOrder', StartupSettings.ColorOrder)
 
 set(groot, 'defaultScatterLineWidth', 1.4)
 
-set(groot, 'defaultHistogramFaceAlpha', 1)
-set(groot, 'defaultHistogramLineWidth', 1.2)
+set(groot, 'defaultHistogramFaceAlpha', 0.3)
 
 set(groot, 'defaultContourLineWidth', 0.5)
 set(groot, 'defaultContourFaceAlpha', 0.6)
@@ -219,7 +219,7 @@ LogXButton = uitoggletool(toolbar);
 [img,map] = imread(fullfile(matlabroot,...
     'toolbox','matlab','icons','plotpicker-semilogx.png'));
 LogXButton.CData = img;
-LogXButton.TooltipString = 'Set X axis to logarithmic scale';
+LogXButton.TooltipString = 'Set Y axis to logarithmic scale';
 LogXButton.ClickedCallback = @logXAxis;
 
 % toggle y axis logarithmic scale
@@ -290,7 +290,7 @@ markSimilarDataTipsButton = uipushtool(toolbar);
     'toolbox','matlab','icons','book_link.gif'));
 markSimilarDataTipsButtonImage = ind2rgb(img,map);
 markSimilarDataTipsButton.CData = markSimilarDataTipsButtonImage;
-markSimilarDataTipsButton.TooltipString = 'Mark similar datatips';
+markSimilarDataTipsButton.TooltipString = 'Precise grid';
 markSimilarDataTipsButton.ClickedCallback = @marksimilardatatips;
 
 
@@ -359,13 +359,13 @@ toggleMinorGridButton.ClickedCallback = @setprecgrid;
             [img,map] = imread(fullfile(matlabroot,...
                 'toolbox','matlab','icons','plotpicker-semilogx.png'));
             LogXButton.CData = img;
-            LogXButton.TooltipString = 'Set X axis to linear scale';
+            LogXButton.TooltipString = 'Set Y axis to linear scale';
         else
             set(currentAxes,'XScale','linear')
             [img,map] = imread(fullfile(matlabroot,...
                 'toolbox','matlab','icons','plotpicker-semilogx.png'));
             LogXButton.CData = img;
-            LogXButton.TooltipString = 'Set X axis to logarithmic scale';
+            LogXButton.TooltipString = 'Set Y axis to logarithmic scale';
         end
         grid minor
     end
@@ -475,7 +475,7 @@ toggleMinorGridButton.ClickedCallback = @setprecgrid;
     function enlargeDataCursors(~,~)
         AllDataCursors = findall(gcf,'type','hggroup');
         set(AllDataCursors,'FontSize',14)
-        set(AllDataCursors,'FontName','Times New Roman')
+        set(AllDataCursors,'FontName','Arial')
         set(AllDataCursors,'FontWeight','Normal')
     end
 
@@ -561,12 +561,8 @@ toggleMinorGridButton.ClickedCallback = @setprecgrid;
                     MarkerIndices = 1:1:n_inds;
                 end
                 lines(n).MarkerIndices = MarkerIndices;
-                if number_of_markers == 0
-                    lines(n).Marker = 'none';
-                else
-                    lines(n).Marker = symbolSet{N_lines-n+1};
-                end
-                lines(n).MarkerSize = 8;
+                lines(n).Marker = symbolSet{N_lines-n+1};
+                lines(n).MarkerSize = 12;
                 switch fill_option
                     case 'To fill'
                         lines(n).MarkerFaceColor = line_color;
@@ -595,15 +591,15 @@ toggleMinorGridButton.ClickedCallback = @setprecgrid;
 
         for i = 1:length(ax)
             if strcmp(src.State, 'on')
-                ax(i).GridLineStyle = '-';
+                ax(i).GridLineStyle = '--';
                 ax(i).GridAlpha = 1;
-                ax(i).MinorGridLineStyle = '-';
+                ax(i).MinorGridLineStyle = ':';
                 ax(i).MinorGridAlpha = 0.5;
                 grid(ax(i), 'on')
                 grid(ax(i), 'minor')
             else
-                ax(i).GridLineStyle = ':';
-                ax(i).GridAlpha = 1;
+                ax(i).GridLineStyle = '-';
+                ax(i).GridAlpha = 0.2;
                 ax(i).MinorGridLineStyle = ':';
                 ax(i).MinorGridAlpha = 0.5;
                 grid(ax(i), 'off')

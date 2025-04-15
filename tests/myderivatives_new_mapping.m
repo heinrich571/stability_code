@@ -7,9 +7,9 @@ clc
 
 %% Define the computational domain
 
-x_limit  = 20;
-y_limit = 20;
-y_median = 2.4;
+x_limit  = 200;
+y_limit = 200;
+y_median = 2.4*2;
 
 Nx = 50;
 Ny = 50;
@@ -29,7 +29,7 @@ a_y = y_median*y_limit/(y_limit-2*y_median);
 b_y = 1+2*a_y/y_limit;
 y = (a_y*(1+yhat)./(b_y-yhat));
 
-f = 1;
+f = 0.2;
 e = 1-f;
 x1 = x_limit*(e*xhat.^3 + f*xhat);
 ix_mid = Nx/2 + 1;
