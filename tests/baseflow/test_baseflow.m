@@ -4,78 +4,141 @@ close all
 clear all
 clc
 
-addpath('..\..\baseflow_definition\')
-addpath('..\..\grid_generation\')
+addpath('../../baseflow_definition/')
+addpath('../../grid_generation/')
 
 
 %% Define Parameters
 
-ymedian  = 3; % value of median y value
+ymax_vec = 300; % values of maximum practical farfield distance from wall
 
-ny_vec   = 10:10:150; % number of wall normal points
-ymax_vec = 20:20:300; % values of maximum practical farfield distance from wall
+
+%% Load Reference Solution Data
+
+refsol = readtable("./hiemenz_flow_data.csv");
 
 
 %% Base Flow Calculation
-
-Problem.Domain.Nx       = 20;
-Problem.Domain.X_Limit  = 100;
-Problem.Domain.Y_Median = ymedian;
 
 Base_Flow_Definitions.initguess            = 1.23258765682022 + [-1 1]*1e-5;
 Base_Flow_Definitions.maxIterations        = 1e2;
 Base_Flow_Definitions.convergenceTolerance = 1e-6;
 
-for i = 1:length(ny_vec)
-    ny = ny_vec(i);
+for i = 1 : length(ymax_vec)
+    ymax = ymax_vec(i);
 
-    for j = 1:length(ymax_vec)
-        ymax = ymax_vec(j);
+    Base_Flow_Definitions.interval = flip([refsol.eta ; ymax]);
 
-        Problem.Domain.Ny      = ny;
-        Problem.Domain.Y_Limit = ymax;
-        Domain = generate_domain(Problem);
+    Base_Flow(i) = get_base_flow(Base_Flow_Definitions);
 
-        Base_Flow_Definitions.interval = Domain.vec_Y;
-        Base_Flow(i,j) = get_base_flow(Base_Flow_Definitions);
-    end
+    Base_Flow(i).eta   = Base_Flow(i).eta(1:end-1);
+    Base_Flow(i).phi   = Base_Flow(i).phi(1:end-1);
+    Base_Flow(i).dphi  = Base_Flow(i).dphi(1:end-1);
+    Base_Flow(i).ddphi = Base_Flow(i).ddphi(1:end-1);
 end
 
 
-%% Process Errors
+%% Errors Calculation
 
-err_max = zeros(size(Base_Flow));
-% dphi_ref = Base_Flow(end,end).dphi(abs(Base_Flow(end,end).eta - ymedian) < 1e-6);
-for i = 1:length(ny_vec)
-    for j = 1:length(ymax_vec)
-        dphi_ref = interp1(Base_Flow(end,end).eta, Base_Flow(end,end).dphi, ymedian, 'pchip');
-        err_max(i,j) = max(abs(Base_Flow(i,j).dphi(abs(Base_Flow(i,j).eta - ymedian) < 1e-6) - dphi_ref));
-    end
+for i = 1 : length(Base_Flow)
+    phi   = Base_Flow(i).phi;
+    dphi  = Base_Flow(i).dphi;
+    ddphi = Base_Flow(i).ddphi;
+
+    err(i).eta   = Base_Flow(i).eta;
+    err(i).phi   = abs(phi   - refsol.phi        );
+    err(i).dphi  = abs(dphi  - refsol.dphi_deta  );
+    err(i).ddphi = abs(ddphi - refsol.d2phi_deta2);
 end
+
 
 
 %% Plots
 
-figure('Name', 'BL Profile')
-for i = 1:length(ny_vec)
-    ny = ny_vec(i);
-    plot(Base_Flow(i,end).dphi, Base_Flow(i,end).eta, '-o', 'DisplayName', ['$N_y = ' num2str(ny) '$'])
+howarth_label = "Howarth, 1939";
+
+% phi(eta)
+figure("Name", "phi(eta)")
+grid on
+hold on
+plot(refsol.eta, refsol.phi, "dk", "MarkerSize", 10, "DisplayName", howarth_label)
+for i = 1 : length(Base_Flow)
+    ymax = ymax_vec(i);
+
+    plot(Base_Flow(i).eta, Base_Flow(i).phi, "-xb", "DisplayName", strcat("Present work, $\eta_{max} = ", num2str(ymax), "$"))
 end
-xlabel('$\phi''$')
-ylabel('$y$')
-legend('interpreter', 'latex', 'location', 'northwest')
-ylim([0 10])
+legend("Interpreter", "latex", "Location", "northwest")
+xlabel("$\eta$", "Interpreter", "latex")
+ylabel("$\phi(\eta)$", "Interpreter", "latex")
+ax = gca;
+ax.YColor = 'b';
+yyaxis right
+ax = gca;
+ax.YColor = 'r';
+for i = 1 : length(err)
+    ymax = ymax_vec(i);
 
-[NY, YMAX] = meshgrid(ny_vec, ymax_vec);
+    plot(err(i).eta, log10(err(i).phi), ":xr", "HandleVisibility", "off")
+end
+ylabel("$\mathrm{log}_{10}\left(\epsilon_{\phi\left(\eta\right)}\right)$", "Interpreter", "latex")
 
-figure('Name', 'log10(error) surface')
-surf(NY, YMAX, err_max')
-xlabel('$N_y$')
-ylabel('$y_{max}$')
-zlabel('$\varepsilon(y_{median})$')
+
+% dphi(eta)
+figure("Name", "dphi(eta)")
+grid on
+hold on
+plot(refsol.eta, refsol.dphi_deta, "dk", "MarkerSize", 10, "DisplayName", howarth_label)
+for i = 1 : length(Base_Flow)
+    ymax = ymax_vec(i);
+
+    plot(Base_Flow(i).eta, Base_Flow(i).dphi, "-xb", "DisplayName", strcat("Present work, $\eta_{max} = ", num2str(ymax), "$"))
+end
+legend("Interpreter", "latex", "Location", "northwest")
+xlabel("$\phi'(\eta)$", "Interpreter", "latex")
+ylabel("$\eta$", "Interpreter", "latex")
+ax = gca;
+ax.YColor = 'b';
+ylim([0 1.2])
+yyaxis right
+ax = gca;
+ax.YColor = 'r';
+for i = 1 : length(err)
+    ymax = ymax_vec(i);
+
+    plot(err(i).eta, log10(err(i).dphi), ":xr", "HandleVisibility", "off")
+end
+ylabel("$\mathrm{log}_{10}\left(\epsilon_{\phi'\left(\eta\right)}\right)$", "Interpreter", "latex")
+
+
+% ddphi(eta)
+figure("Name", "ddphi(eta)")
+grid on
+hold on
+plot(refsol.eta, refsol.d2phi_deta2, "dk", "MarkerSize", 10, "DisplayName", howarth_label)
+for i = 1 : length(Base_Flow)
+    ymax = ymax_vec(i);
+
+    plot(Base_Flow(i).eta, Base_Flow(i).ddphi, "-xb", "DisplayName", strcat("Present work, $\eta_{max} = ", num2str(ymax), "$"))
+end
+legend("Interpreter", "latex", "Location", "northwest")
+xlabel("$\phi''(\eta)$", "Interpreter", "latex")
+ylabel("$\eta$", "Interpreter", "latex")
+ax = gca;
+ax.YColor = 'b';
+yyaxis right
+ax = gca;
+ax.YColor = 'r';
+for i = 1 : length(err)
+    ymax = ymax_vec(i);
+
+    plot(err(i).eta, log10(err(i).ddphi), ":xr", "HandleVisibility", "off")
+end
+ylabel("$\mathrm{log}_{10}\left(\epsilon_{\phi''\left(\eta\right)}\right)$", "Interpreter", "latex")
+
 
 
 %% Cleanup Paths
 
 rmpath('..\..\baseflow_definition\')
 rmpath('..\..\grid_generation\')
+

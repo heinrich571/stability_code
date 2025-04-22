@@ -29,8 +29,6 @@ ymat = Domain.mat_Y;
 analytical = get_analytical_functions(xmat, ymat, casenum);
 f = analytical.f;
 
-surf(xmat, ymat, f)
-
 
 %% Test Derivatives
 % Numerical partial derivatives
@@ -67,6 +65,13 @@ error.d2fdydx = numerical.d2fdydx - analytical.d2fdydx;
 
 %% Plot results
 
+% f
+figure('Name', 'f(x,y)', 'NumberTitle', 'off')
+surf(xmat, ymat, f)
+xlabel('$x$', 'Interpreter', 'Latex')
+ylabel('$y$', 'Interpreter', 'Latex')
+zlabel('$f\left(x,y\right)$', 'Interpreter', 'Latex')
+
 % dfdx
 figure('Name', 'dfdx', 'NumberTitle', 'off')
 subplot(1,2,1)
@@ -74,7 +79,7 @@ surf(xmat, ymat, analytical.dfdx)
 title('Analytical')
 xlabel('$x$', 'Interpreter', 'Latex')
 ylabel('$y$', 'Interpreter', 'Latex')
-zlabel('$(\frac{df}{dx})_{\mathrm{analytical}}$', 'Interpreter', 'Latex')
+zlabel('$\left(\frac{df}{dx}\right)_{\mathrm{analytical}}$', 'Interpreter', 'Latex')
 view(-45,15)
 ax1 = gca;
 subplot(1,2,2)
@@ -82,7 +87,7 @@ surf(xmat, ymat, numerical.dfdx)
 title('Numerical')
 xlabel('$x$', 'Interpreter', 'Latex')
 ylabel('$y$', 'Interpreter', 'Latex')
-zlabel('$(\frac{df}{dx})_{\mathrm{numerical}}$', 'Interpreter', 'Latex')
+zlabel('$\left(\frac{df}{dx}\right)_{\mathrm{numerical}}$', 'Interpreter', 'Latex')
 view(-45,15)
 ax2 = gca;
 linkaxes([ax1 ax2])
@@ -102,7 +107,7 @@ surf(xmat, ymat, analytical.dfdy)
 title('Analytical')
 xlabel('$x$', 'Interpreter', 'Latex')
 ylabel('$y$', 'Interpreter', 'Latex')
-zlabel('$(\frac{df}{dy})_{\mathrm{analytical}}$', 'Interpreter', 'Latex')
+zlabel('$\left(\frac{df}{dy}\right)_{\mathrm{analytical}}$', 'Interpreter', 'Latex')
 view(-45,15)
 ax1 = gca;
 subplot(1,2,2)
@@ -110,7 +115,7 @@ surf(xmat, ymat, numerical.dfdy)
 title('Numerical')
 xlabel('$x$', 'Interpreter', 'Latex')
 ylabel('$y$', 'Interpreter', 'Latex')
-zlabel('$(\frac{df}{dy})_{\mathrm{numerical}}$', 'Interpreter', 'Latex')
+zlabel('$\left(\frac{df}{dy}\right)_{\mathrm{numerical}}$', 'Interpreter', 'Latex')
 view(-45,15)
 ax2 = gca;
 linkaxes([ax1 ax2])
@@ -130,7 +135,7 @@ surf(xmat, ymat, analytical.d2fdx2)
 title('Analytical')
 xlabel('$x$', 'Interpreter', 'Latex')
 ylabel('$y$', 'Interpreter', 'Latex')
-zlabel('$(\frac{d^2f}{dx^2})_{\mathrm{analytical}}$', 'Interpreter', 'Latex')
+zlabel('$\left((\frac{d^2f}{dx^2}\right)_{\mathrm{analytical}}$', 'Interpreter', 'Latex')
 view(-45,15)
 ax1 = gca;
 subplot(1,2,2)
@@ -138,7 +143,7 @@ surf(xmat, ymat, numerical.d2fdx2)
 title('Numerical')
 xlabel('$x$', 'Interpreter', 'Latex')
 ylabel('$y$', 'Interpreter', 'Latex')
-zlabel('$(\frac{d^2f}{dx^2})_{\mathrm{numerical}}$', 'Interpreter', 'Latex')
+zlabel('$\left(\frac{d^2f}{dx^2}\right)_{\mathrm{numerical}}$', 'Interpreter', 'Latex')
 view(-45,15)
 ax2 = gca;
 linkaxes([ax1 ax2])
@@ -158,7 +163,7 @@ surf(xmat, ymat, analytical.d2fdy2)
 title('Analytical')
 xlabel('$x$', 'Interpreter', 'Latex')
 ylabel('$y$', 'Interpreter', 'Latex')
-zlabel('$(\frac{d^2f}{dy^2})_{\mathrm{analytical}}$', 'Interpreter', 'Latex')
+zlabel('$\left(\frac{d^2f}{dy^2}\right)_{\mathrm{analytical}}$', 'Interpreter', 'Latex')
 view(-45,15)
 ax1 = gca;
 subplot(1,2,2)
@@ -166,7 +171,7 @@ surf(xmat, ymat, numerical.d2fdy2)
 title('Numerical')
 xlabel('$x$', 'Interpreter', 'Latex')
 ylabel('$y$', 'Interpreter', 'Latex')
-zlabel('$(\frac{d^2f}{dy^2})_{\mathrm{numerical}}$', 'Interpreter', 'Latex')
+zlabel('$\left(\frac{d^2f}{dy^2}\right)_{\mathrm{numerical}}$', 'Interpreter', 'Latex')
 view(-45,15)
 ax2 = gca;
 linkaxes([ax1 ax2])
@@ -186,7 +191,7 @@ surf(xmat, ymat, analytical.d2fdxdy)
 title('Analytical')
 xlabel('$x$', 'Interpreter', 'Latex')
 ylabel('$y$', 'Interpreter', 'Latex')
-zlabel('$(\frac{d^2f}{dxdy})_{\mathrm{analytical}}$', 'Interpreter', 'Latex')
+zlabel('$\left(\frac{d^2f}{dxdy}\right)_{\mathrm{analytical}}$', 'Interpreter', 'Latex')
 view(-45,15)
 ax1 = gca;
 subplot(1,2,2)
@@ -194,7 +199,7 @@ surf(xmat, ymat, numerical.d2fdxdy)
 title('Numerical')
 xlabel('$x$', 'Interpreter', 'Latex')
 ylabel('$y$', 'Interpreter', 'Latex')
-zlabel('$(\frac{d^2f}{dxdy})_{\mathrm{numerical}}$', 'Interpreter', 'Latex')
+zlabel('$\left(\frac{d^2f}{dxdy}\right)_{\mathrm{numerical}}$', 'Interpreter', 'Latex')
 view(-45,15)
 ax2 = gca;
 linkaxes([ax1 ax2])
@@ -214,7 +219,7 @@ surf(xmat, ymat, analytical.d2fdydx)
 title('Analytical')
 xlabel('$x$', 'Interpreter', 'Latex')
 ylabel('$y$', 'Interpreter', 'Latex')
-zlabel('$(\frac{d^2f}{dydx})_{\mathrm{analytical}}$', 'Interpreter', 'Latex')
+zlabel('$\left(\frac{d^2f}{dydx}\right)_{\mathrm{analytical}}$', 'Interpreter', 'Latex')
 view(-45,15)
 ax1 = gca;
 subplot(1,2,2)
@@ -222,7 +227,7 @@ surf(xmat, ymat, numerical.d2fdydx)
 title('Numerical')
 xlabel('$x$', 'Interpreter', 'Latex')
 ylabel('$y$', 'Interpreter', 'Latex')
-zlabel('$(\frac{d^2f}{dxdy})_{\mathrm{numerical}}$', 'Interpreter', 'Latex')
+zlabel('$\left(\frac{d^2f}{dxdy}\right)_{\mathrm{numerical}}$', 'Interpreter', 'Latex')
 view(-45,15)
 ax2 = gca;
 linkaxes([ax1 ax2])

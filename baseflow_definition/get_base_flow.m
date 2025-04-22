@@ -22,7 +22,7 @@ err         = initializer;
 lam(1)      = lambdaGuesses(1);
 lam(2)      = lambdaGuesses(2);
 
-for n = 1:2
+for n = 1 : 2
     x0          = [phi0 dphi0 lam(n)];
     [~, x]      = ode45(@(eta,x) hiemenzDoteq(eta,x), interval, x0, opts);
     dphi        = x(:,2);
@@ -30,9 +30,9 @@ for n = 1:2
     err(n)      = abs(dphi_inf(n)-dphiInf);
 end
 
-% Execute shoothing method to find the correct solution
-for n = 3:maxIterations
-    lam(n)      = abs(lam(n-1) + (lam(n-1)-lam(n-2))/(dphi_inf(n-1)-dphi_inf(n-2))*(1-dphi_inf(n-1)));
+% Shoothing method to find the correct solution
+for n = 3 : maxIterations
+    lam(n)      = abs(lam(n-1) + (lam(n-1) - lam(n-2)) / (dphi_inf(n-1) - dphi_inf(n-2)) * (1 - dphi_inf(n-1)));
     x0          = [phi0 dphi0 lam(n)];
     [eta, x]    = ode45(@(eta,x) hiemenzDoteq(eta,x), interval, x0, opts);
     dphi        = x(:,2);
@@ -54,10 +54,10 @@ Base_Flow.Converged = ~(n == maxIterations);
 end
 
 
-% === Required functionality === %
+% Supporting functions
 function dx = hiemenzDoteq(~,x)
 
-dx = zeros(numel(x),1);
+dx = zeros(numel(x), 1);
 
 phi   = x(1);
 dphi  = x(2);
@@ -65,6 +65,6 @@ ddphi = x(3);
 
 dx(1) = dphi;
 dx(2) = ddphi;
-dx(3) = dphi^2-phi*ddphi-1;
+dx(3) = dphi^2 - (phi * ddphi) - 1;
 
 end
