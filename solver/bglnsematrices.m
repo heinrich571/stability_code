@@ -33,6 +33,14 @@ Vx = Z;
 Vy = diag(-mat_dphi(:), 0);
 L  = (D2x + D2y - beta^2*I) - U*Dx - V*Dy;
 
+Ux = sparse(Ux);
+Uy = sparse(Uy);
+Vx = sparse(Vx);
+Vy = sparse(Vy);
+L  = sparse(L);
+I  = sparse(I);
+Z  = sparse(Z);
+
 
 % LHS matrix entries
 % x-momentum

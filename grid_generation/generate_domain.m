@@ -16,20 +16,33 @@ Ix = eye(nx + 1);
 Iy = eye(ny + 1);
 
 % x mapping
-f      = 1;
-e      = 1 - f;
-xvec   = xlimit * (e * xhat.^3 + f * xhat);
-dxi_dx = 1 ./ (xlimit * (3 * e * xhat.^2 + f));
+% f      = 1;
+% e      = 1 - f;
+% xvec   = xlimit * (e * xhat.^3 + f * xhat);
+% dxi_dx = 1 ./ (xlimit * (3 * e * xhat.^2 + f));
+
+s      = 4;
+xvec   = xlimit * sinh(s*xhat) / sinh(s);
+dxi_dx = sinh(s) / (s * xlimit) * 1 ./ sqrt(1 + sinh(s)^2 * (xvec / xlimit).^2);
+
 Dx_physical_domain = transform_to_physical_domain(dxi_dx, Dx_cheb);
 D2x_physical_domain = Dx_physical_domain * Dx_physical_domain;
 Dx = kron(Dx_physical_domain, Iy);
 D2x = kron(D2x_physical_domain, Iy);
 
 % y mapping
-ay     = ymedian * ylimit / (ylimit - 2 * ymedian);
-by     = 1 + (2 * ay / ylimit);
-yvec   = ay * (1 + yhat) ./ (by - yhat);
-dxi_dy = ay * (1 + by) ./ ((yvec + ay).^2);
+
+% yvec   = ylimit * yhat;
+% dxi_dy = 1 / ylimit;
+
+% ay     = ymedian * ylimit / (ylimit - 2 * ymedian);
+% by     = 1 + (2 * ay / ylimit);
+% yvec   = ay * (1 + yhat) ./ (by - yhat);
+% dxi_dy = ay * (1 + by) ./ ((yvec + ay).^2);
+
+yvec   = ymedian * ylimit * (1 + yhat) ./ (ylimit - yhat * (ylimit - 2 * ymedian));
+dxi_dy = 2 * ymedian * ylimit * (ylimit - ymedian) ./ ((yvec * (ylimit - 2 * ymedian) + ymedian * ylimit).^2);
+
 Dy_physical_domain = transform_to_physical_domain(dxi_dy, Dy_cheb);
 D2y_physical_domain = Dy_physical_domain * Dy_physical_domain;
 Dy = kron(Ix, Dy_physical_domain);

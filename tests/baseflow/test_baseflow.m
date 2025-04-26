@@ -4,8 +4,9 @@ close all
 clear all
 clc
 
-addpath('../../baseflow_definition/')
-addpath('../../grid_generation/')
+path_manager('add')
+% addpath('../../baseflow_definition/')
+% addpath('../../grid_generation/')
 
 
 %% Define Parameters
@@ -139,6 +140,7 @@ ylabel("$\mathrm{log}_{10}\left(\epsilon_{\phi''\left(\eta\right)}\right)$", "In
 
 %% Cleanup Paths
 
-rmpath('..\..\baseflow_definition\')
-rmpath('..\..\grid_generation\')
+path_manager('remove')
+% rmpath('..\..\baseflow_definition\')
+% rmpath('..\..\grid_generation\')
 

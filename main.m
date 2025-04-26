@@ -11,12 +11,12 @@ startup
 
 Problem.Computation.N_Workers = 1;
 
-Problem.Domain.Nx       = 20;
+Problem.Domain.Nx       = 40;
 Problem.Domain.Ny       = 80;
 Problem.Domain.X_Limit  = 200;
-Problem.Domain.Y_Limit  = 200;
-% Problem.Domain.Y_Median = 2*2.4;
-Problem.Domain.Y_Median = 3;
+Problem.Domain.Y_Limit  = 300;
+Problem.Domain.Y_Median = 15 * 2.4;
+% Problem.Domain.Y_Median = 3;
 
 Problem.Physics.Beta                  = 0.25;
 Problem.Physics.Number_Of_Eigenvalues = 21;
@@ -25,8 +25,8 @@ Problem.Base_Flow_Settings.initguess            = 1.23258765682022 + [-1 1]*1e-5
 Problem.Base_Flow_Settings.maxIterations        = 1e2;
 Problem.Base_Flow_Settings.convergenceTolerance = 1e-6;
 
-% Sides_Boundary_Condition = 'zero_2nd_derivative';
-Sides_Boundary_Condition = 'Linear_Extrapolation';
+Sides_Boundary_Condition = 'zero_2nd_derivative';
+% Sides_Boundary_Condition = 'Linear_Extrapolation';
 
 Problem.Boundary_Conditions.Top.u   = 'Dirichlet';
 Problem.Boundary_Conditions.Top.v   = 'Dirichlet';
@@ -38,15 +38,15 @@ Problem.Boundary_Conditions.Right.v = Sides_Boundary_Condition;
 Problem.Boundary_Conditions.Right.w = Sides_Boundary_Condition;
 Problem.Boundary_Conditions.Right.p = Sides_Boundary_Condition;
 
-Problem.Boundary_Conditions.Left.u  = 'Symmetry';
-Problem.Boundary_Conditions.Left.v  = 'Anti_Symmetry';
-Problem.Boundary_Conditions.Left.w  = 'Anti_Symmetry';
-Problem.Boundary_Conditions.Left.p  = 'Anti_Symmetry';
+Problem.Boundary_Conditions.Left.u  = Sides_Boundary_Condition;
+Problem.Boundary_Conditions.Left.v  = Sides_Boundary_Condition;
+Problem.Boundary_Conditions.Left.w  = Sides_Boundary_Condition;
+Problem.Boundary_Conditions.Left.p  = Sides_Boundary_Condition;
 
 Problem.Boundary_Conditions.Wall.u  = 'Dirichlet';
 Problem.Boundary_Conditions.Wall.v  = 'Dirichlet';
 Problem.Boundary_Conditions.Wall.w  = 'Dirichlet';
-Problem.Boundary_Conditions.Wall.p  = 'PC';
+Problem.Boundary_Conditions.Wall.p  = 'LPPE';
 
 
 Problem.Flags.Display_Domain    = 0;
