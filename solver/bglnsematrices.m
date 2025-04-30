@@ -1,75 +1,49 @@
 function [A, B] = bglnsematrices(Domain, Base_Flow, Problem)
 
-% Initialize matrix elements
-initializer = zeros(size(Domain.Dx));
-Ny  = size(Domain.mat_X, 1);
-Nx  = size(Domain.mat_X, 2);
-Z   = initializer;
-I   = eye(Ny*Nx);
+% Get spanwise wave number
+beta = Problem.Physics.Beta;
 
-% Compute matrix elements
-phi   = flip(Base_Flow.phi);
-dphi  = flip(Base_Flow.dphi);
-ddphi = flip(Base_Flow.ddphi);
+% Build zeros and unity matrices
+Ny = size(Domain.mat_X, 1);
+Nx = size(Domain.mat_X, 2);
+Z  = zeros(Nx * Ny);
+I  = eye(Nx * Ny);
 
-mat_X = Domain.mat_X;
+% Get base flow solution data
+phi   = repmat(flip(Base_Flow.phi), [1 Nx]);
+dphi  = repmat(flip(Base_Flow.dphi), [1 Nx]);
+ddphi = repmat(flip(Base_Flow.ddphi), [1 Nx]);
+
+% Get differentiation matrices
 Dx    = Domain.Dx;
 Dy    = Domain.Dy;
 D2x   = Domain.D2x;
 D2y   = Domain.D2y;
+xmat  = Domain.mat_X;
 
-beta = Problem.Physics.Beta;
-
-mat_phi   = repmat(phi  , [1 Nx]);
-mat_dphi  = repmat(dphi , [1 Nx]);
-mat_ddphi = repmat(ddphi, [1 Nx]);
-U  = mat_X.*mat_dphi;
-U  = diag(U(:), 0);
-V  = diag(-mat_phi(:), 0);
-Ux = diag(mat_dphi(:), 0);
-Uy = mat_X.*mat_ddphi;
-Uy = diag(Uy(:), 0);
-Vx = Z;
-Vy = diag(-mat_dphi(:), 0);
-L  = (D2x + D2y - beta^2*I) - U*Dx - V*Dy;
-
-Ux = sparse(Ux);
-Uy = sparse(Uy);
-Vx = sparse(Vx);
-Vy = sparse(Vy);
-L  = sparse(L);
-I  = sparse(I);
-Z  = sparse(Z);
-
+% Build matrix elements
+U  = sparse(xmat .* dphi);
+U  = sparse(diag(U(:), 0));
+V  = sparse(diag(-phi(:), 0));
+Ux = sparse(diag(dphi(:), 0));
+Uy = sparse(xmat .* ddphi);
+Uy = sparse(diag(Uy(:), 0));
+Vx = sparse(Z);
+Vy = sparse(diag(-dphi(:), 0));
+L  = sparse((D2x + D2y - beta^2*I) - U*Dx - V*Dy);
 
 % LHS matrix entries
 % x-momentum
-a11 = L - Ux; a12 = -Uy; a13 = Z; a14 = -Dx;
+a11 = L - Ux; a12 = -Uy; a13 = Z; a14 = -Dx;    b11 = -1i*I; b12 = Z; b13 = Z; b14 = Z;
 
 % y-momentum
-a21 = -Vx; a22 = L - Vy; a23 = Z; a24 = -Dy;
+a21 = -Vx; a22 = L - Vy; a23 = Z; a24 = -Dy;    b21 = Z; b22 = -1i*I; b23 = Z; b24 = Z;
 
 % z-momentum
-a31 = Z; a32 = Z; a33 = L; a34 = -1i*beta*I;
+a31 = Z; a32 = Z; a33 = L; a34 = -1i*beta*I;    b31 = Z; b32 = Z; b33 = -1i*I; b34 = Z;
 
 % continuity
-a41 = Dx; a42 = Dy; a43 = 1i*beta*I; a44 = Z;
-
-% a44 = a44 + 1e-8*eye(Nx*Ny);
-
-% RHS matrix entries
-% x-momentum
-b11 = -1i*I; b12 = Z; b13 = Z; b14 = Z;
-
-% y-momentum
-b21 = Z; b22 = -1i*I; b23 = Z; b24 = Z;
-
-% z-momentum
-b31 = Z; b32 = Z; b33 = -1i*I; b34 = Z;
-
-% continuity
-b41 = Z; b42 = Z;  b43 = Z; b44 = Z;
-
+a41 = Dx; a42 = Dy; a43 = 1i*beta*I; a44 = Z;   b41 = Z; b42 = Z;  b43 = Z; b44 = Z;
 
 % Build eigenvalue problem A and B matrices
 A = [a11 a12 a13 a14
