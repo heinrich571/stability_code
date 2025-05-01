@@ -11,8 +11,8 @@ startup
 
 Problem.Computation.N_Workers = 1;
 
-Problem.Domain.Nx       = 40;
-Problem.Domain.Ny       = 80;
+Problem.Domain.Nx       = 60;
+Problem.Domain.Ny       = 60;
 Problem.Domain.X_Limit  = 200;
 Problem.Domain.Y_Limit  = 300;
 Problem.Domain.Y_Median = 15 * 2.4;

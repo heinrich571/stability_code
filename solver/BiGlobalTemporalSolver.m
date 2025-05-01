@@ -58,6 +58,21 @@ tic;
                                                                      Problem.Physics.Number_Of_Eigenvalues,...
                                                                      'smallestabs', 'MaxIterations', 400, 'Display', true, ...
                                                                      'Tolerance', 1e-8);
+% Insert u,v,w Dirichlet values at the top and botttom boundary, and
+% Dirichlet p values at the top boundary
+u_top_inds = get_var_top_inds('u', Nx, Ny);
+v_top_inds = get_var_top_inds('v', Nx, Ny);
+w_top_inds = get_var_top_inds('w', Nx, Ny);
+p_top_inds = get_var_top_inds('p', Nx, Ny);
+u_bottom_inds = get_var_bottom_inds('u', Nx, Ny);
+v_bottom_inds = get_var_bottom_inds('v', Nx, Ny);
+w_bottom_inds = get_var_bottom_inds('w', Nx, Ny);
+inds = sort([u_top_inds v_top_inds w_top_inds p_top_inds u_bottom_inds v_bottom_inds w_bottom_inds]);
+sz = size(eigenfunctions_matrix, 2);
+for i = inds
+    eigenfunctions_matrix = [eigenfunctions_matrix(1:i-1,:) ; zeros([1 sz]) ; eigenfunctions_matrix(i:end,:)];
+end
+
 toc;
 
 dispstatus('EIGENVALUES CALCULATION', 1)
