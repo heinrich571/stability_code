@@ -6,8 +6,8 @@ beta = Problem.Physics.Beta;
 % Build zeros and identity matrices
 Ny = size(Domain.mat_X, 1);
 Nx = size(Domain.mat_X, 2);
-Z  = zeros(Nx * Ny);
-I  = eye(Nx * Ny);
+Z  = sparse(zeros(Nx * Ny));
+I  = sparse(eye(Nx * Ny));
 
 % Get base flow solution data
 phi   = repmat(flip(Base_Flow.phi), [1 Nx]);

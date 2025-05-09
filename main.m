@@ -15,7 +15,7 @@ Problem.Domain.Nx       = 60;
 Problem.Domain.Ny       = 60;
 Problem.Domain.X_Limit  = 200;
 Problem.Domain.Y_Limit  = 300;
-Problem.Domain.Y_Median = 15 * 2.4;
+Problem.Domain.Y_Median = 10 * 2.4;
 % Problem.Domain.Y_Median = 3;
 
 Problem.Physics.Beta                  = 0.25;
@@ -46,7 +46,7 @@ Problem.Boundary_Conditions.Left.p  = Sides_Boundary_Condition;
 Problem.Boundary_Conditions.Wall.u  = 'Dirichlet';
 Problem.Boundary_Conditions.Wall.v  = 'Dirichlet';
 Problem.Boundary_Conditions.Wall.w  = 'Dirichlet';
-Problem.Boundary_Conditions.Wall.p  = 'LPPE';
+Problem.Boundary_Conditions.Wall.p  = 'PC';
 
 
 Problem.Flags.Display_Domain    = 0;

@@ -53,25 +53,13 @@ dispstatus('EIGENVALUES CALCULATION')
 dispstatus('EIGENVALUES CALCULATION', 0)
 
 tic;
-[eigenfunctions_matrix, eigenvalues_matrix, convergence_flag] = eigs(sparse(A),...
-                                                                     sparse(B),...
-                                                                     Problem.Physics.Number_Of_Eigenvalues,...
-                                                                     'smallestabs', 'MaxIterations', 400, 'Display', true, ...
-                                                                     'Tolerance', 1e-8);
+[efmat, evmat, convergence_flag] = eigs(A, B, ...
+                                        Problem.Physics.Number_Of_Eigenvalues,...
+                                        'smallestabs', 'MaxIterations', 400, 'Display', true, ...
+                                        'Tolerance', 1e-8);
 % Insert u,v,w Dirichlet values at the top and botttom boundary, and
 % Dirichlet p values at the top boundary
-u_top_inds = get_var_top_inds('u', Nx, Ny);
-v_top_inds = get_var_top_inds('v', Nx, Ny);
-w_top_inds = get_var_top_inds('w', Nx, Ny);
-p_top_inds = get_var_top_inds('p', Nx, Ny);
-u_bottom_inds = get_var_bottom_inds('u', Nx, Ny);
-v_bottom_inds = get_var_bottom_inds('v', Nx, Ny);
-w_bottom_inds = get_var_bottom_inds('w', Nx, Ny);
-inds = sort([u_top_inds v_top_inds w_top_inds p_top_inds u_bottom_inds v_bottom_inds w_bottom_inds]);
-sz = size(eigenfunctions_matrix, 2);
-for i = inds
-    eigenfunctions_matrix = [eigenfunctions_matrix(1:i-1,:) ; zeros([1 sz]) ; eigenfunctions_matrix(i:end,:)];
-end
+efmat = place_trivial_values_at_boundaries(efmat, Nx, Ny);
 
 toc;
 
@@ -79,11 +67,11 @@ dispstatus('EIGENVALUES CALCULATION', 1)
 dispstatus()
 
 % Organize raw output
-Solution_Raw.Eigenvalues      = diag(eigenvalues_matrix);
-Solution_Raw.Eigenfunctions.u = get_eigenfunction_of(eigenfunctions_matrix, 'u', Nx, Ny);
-Solution_Raw.Eigenfunctions.v = get_eigenfunction_of(eigenfunctions_matrix, 'v', Nx, Ny);
-Solution_Raw.Eigenfunctions.w = get_eigenfunction_of(eigenfunctions_matrix, 'w', Nx, Ny);
-Solution_Raw.Eigenfunctions.p = get_eigenfunction_of(eigenfunctions_matrix, 'p', Nx, Ny);
+Solution_Raw.Eigenvalues      = diag(evmat);
+Solution_Raw.Eigenfunctions.u = get_eigenfunction_of(efmat, 'u', Nx, Ny);
+Solution_Raw.Eigenfunctions.v = get_eigenfunction_of(efmat, 'v', Nx, Ny);
+Solution_Raw.Eigenfunctions.w = get_eigenfunction_of(efmat, 'w', Nx, Ny);
+Solution_Raw.Eigenfunctions.p = get_eigenfunction_of(efmat, 'p', Nx, Ny);
 
 % Normalize the solution for consistency, and build output variable
 % nrm = Solution_Raw.Eigenfunctions.p(Ny,:);
@@ -115,5 +103,22 @@ varorder = find(strcmp(varnames, varname), 1, 'first');
 var_inds = (1:(Nx*Ny)) + (varorder-1)*Nx*Ny;
 
 var_eigfun = eigenfunctions_matrix(var_inds,:);
+
+end
+
+function efmat = place_trivial_values_at_boundaries(efmat, Nx, Ny)
+
+u_top_inds = get_var_top_inds('u', Nx, Ny);
+v_top_inds = get_var_top_inds('v', Nx, Ny);
+w_top_inds = get_var_top_inds('w', Nx, Ny);
+p_top_inds = get_var_top_inds('p', Nx, Ny);
+u_bottom_inds = get_var_bottom_inds('u', Nx, Ny);
+v_bottom_inds = get_var_bottom_inds('v', Nx, Ny);
+w_bottom_inds = get_var_bottom_inds('w', Nx, Ny);
+inds = sort([u_top_inds v_top_inds w_top_inds p_top_inds u_bottom_inds v_bottom_inds w_bottom_inds]);
+sz = size(efmat, 2);
+for i = inds
+    efmat = [efmat(1:i-1,:) ; zeros([1 sz]) ; efmat(i:end,:)];
+end
 
 end
