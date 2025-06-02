@@ -1,4 +1,5 @@
 function [A, B] = bglnsematrices(Domain, Base_Flow, Problem)
+% BiGlobal Linear Navier-Stokes Equations matrices
 
 % Get spanwise wave number
 beta = Problem.Physics.Beta;
@@ -10,8 +11,8 @@ Z  = sparse(zeros(Nx * Ny));
 I  = sparse(eye(Nx * Ny));
 
 % Get base flow solution data
-phi   = repmat(flip(Base_Flow.phi), [1 Nx]);
-dphi  = repmat(flip(Base_Flow.dphi), [1 Nx]);
+phi   = repmat(flip(Base_Flow.phi)  , [1 Nx]);
+dphi  = repmat(flip(Base_Flow.dphi) , [1 Nx]);
 ddphi = repmat(flip(Base_Flow.ddphi), [1 Nx]);
 
 % Get differentiation matrices
@@ -23,27 +24,27 @@ xmat  = Domain.mat_X;
 
 % Various matrix elements
 U  = sparse(xmat .* dphi);
-U  = sparse(diag(U(:), 0));
+U  = diag(U(:), 0);
 V  = sparse(diag(-phi(:), 0));
 Ux = sparse(diag(dphi(:), 0));
 Uy = sparse(xmat .* ddphi);
-Uy = sparse(diag(Uy(:), 0));
-Vx = sparse(Z);
+Uy = diag(Uy(:), 0);
+Vx = Z;
 Vy = sparse(diag(-dphi(:), 0));
 L  = sparse((D2x + D2y - beta^2*I) - U*Dx - V*Dy);
 
 % Matrix entries
 % x-momentum
-a11 = L - Ux; a12 = -Uy; a13 = Z; a14 = -Dx;    b11 = -1i*I; b12 = Z; b13 = Z; b14 = Z;
+a11 =  L - Ux; a12 = -Uy    ; a13 = Z        ; a14 = -Dx       ;    b11 = -1i*I; b12 =  Z   ; b13 = Z    ; b14 = Z;
 
 % y-momentum
-a21 = -Vx; a22 = L - Vy; a23 = Z; a24 = -Dy;    b21 = Z; b22 = -1i*I; b23 = Z; b24 = Z;
+a21 = -Vx    ; a22 =  L - Vy; a23 = Z        ; a24 = -Dy       ;    b21 = Z    ; b22 = -1i*I; b23 = Z    ; b24 = Z;
 
 % z-momentum
-a31 = Z; a32 = Z; a33 = L; a34 = -1i*beta*I;    b31 = Z; b32 = Z; b33 = -1i*I; b34 = Z;
+a31 =  Z     ; a32 =  Z     ; a33 = L        ; a34 = -1i*beta*I;    b31 = Z    ; b32 =  Z   ; b33 = -1i*I; b34 = Z;
 
 % Continuity
-a41 = Dx; a42 = Dy; a43 = 1i*beta*I; a44 = Z;   b41 = Z; b42 = Z;  b43 = Z; b44 = Z;
+a41 = Dx     ; a42 =  Dy    ; a43 = 1i*beta*I; a44 = Z         ;    b41 = Z    ; b42 = Z    ; b43 = Z    ; b44 = Z;
 
 % Build EVP A matrix
 A = [a11 a12 a13 a14

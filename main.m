@@ -11,8 +11,8 @@ startup
 
 Problem.Computation.N_Workers = 1;
 
-Problem.Domain.Nx       = 80;
-Problem.Domain.Ny       = 40;
+Problem.Domain.Nx       = 6;
+Problem.Domain.Ny       = 6;
 Problem.Domain.X_Limit  = 200;
 Problem.Domain.Y_Limit  = 300;
 Problem.Domain.Y_Median = 3 * 2.4;
@@ -48,7 +48,7 @@ Problem.Boundary_Conditions.Wall.w  = 'Dirichlet';
 Problem.Boundary_Conditions.Wall.p  = 'LPPE';
 
 
-Problem.Flags.Display_Domain    = 1;
+Problem.Flags.Display_Domain    = 0;
 Problem.Flags.Display_Base_Flow = 0;
 Problem.Flags.Generate_Report   = 0;
 Problem.Flags.Display_Operators = 0;
