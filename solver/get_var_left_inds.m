@@ -9,6 +9,6 @@ function j_var_L = get_var_left_inds(variable_name, Nx, Ny)
 
 j_var_TL = get_var_top_left_ind(variable_name, Nx, Ny);
 j_var_BL = get_var_bottom_left_ind(variable_name, Nx, Ny);
-j_var_L = j_var_TL : j_var_BL;
+j_var_L  = j_var_TL : j_var_BL;
 
 end

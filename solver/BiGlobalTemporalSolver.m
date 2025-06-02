@@ -52,6 +52,10 @@ dispstatus()
 dispstatus('EIGENVALUES CALCULATION')
 dispstatus('EIGENVALUES CALCULATION', 0)
 
+if Problem.Flags.Display_Operators
+    plot_operators(A, B, Domain);
+end
+
 tic;
 [efmat, evmat, convergence_flag] = eigs(A, B, ...
                                         Problem.Physics.Number_Of_Eigenvalues,...
@@ -59,7 +63,7 @@ tic;
                                         'Tolerance', 1e-8);
 % Insert u,v,w Dirichlet values at the top and botttom boundary, and
 % Dirichlet p values at the top boundary
-efmat = place_trivial_values_at_boundaries(efmat, Nx, Ny);
+% efmat = place_trivial_values_at_boundaries(efmat, Nx, Ny);
 
 toc;
 
