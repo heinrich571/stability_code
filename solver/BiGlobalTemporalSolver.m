@@ -63,7 +63,7 @@ tic;
                                         'Tolerance', 1e-8);
 % Insert u,v,w Dirichlet values at the top and botttom boundary, and
 % Dirichlet p values at the top boundary
-% efmat = place_trivial_values_at_boundaries(efmat, Nx, Ny);
+efmat = place_trivial_values_at_boundaries(efmat, Nx, Ny);
 
 toc;
 
@@ -72,15 +72,15 @@ dispstatus()
 
 % Organize raw output
 Solution_Raw.Eigenvalues      = diag(evmat);
-Solution_Raw.Eigenfunctions.u = get_eigenfunction_of(efmat, 'u', Nx, Ny);
-Solution_Raw.Eigenfunctions.v = get_eigenfunction_of(efmat, 'v', Nx, Ny);
-Solution_Raw.Eigenfunctions.w = get_eigenfunction_of(efmat, 'w', Nx, Ny);
-Solution_Raw.Eigenfunctions.p = get_eigenfunction_of(efmat, 'p', Nx, Ny);
+Solution_Raw.Eigenfunctions.u = get_eigenfunction_of('u', efmat, Nx, Ny);
+Solution_Raw.Eigenfunctions.v = get_eigenfunction_of('v', efmat, Nx, Ny);
+Solution_Raw.Eigenfunctions.w = get_eigenfunction_of('w', efmat, Nx, Ny);
+Solution_Raw.Eigenfunctions.p = get_eigenfunction_of('p', efmat, Nx, Ny);
 
 % Normalize the solution for consistency, and build output variable
 % nrm = Solution_Raw.Eigenfunctions.p(Ny,:);
 nrm = zeros([1 length(Solution_Raw.Eigenvalues)]);
-for i = 1:length(Solution_Raw.Eigenvalues)
+for i = 1 : length(Solution_Raw.Eigenvalues)
     abs_p = abs(Solution_Raw.Eigenfunctions.p(:,i));
     ind_max = find(abs_p == max(abs_p), 1, 'first');
     nrm(i) = Solution_Raw.Eigenfunctions.p(ind_max,i);
@@ -100,27 +100,30 @@ end
 
 
 % Supporting functions
-function var_eigfun = get_eigenfunction_of(eigenfunctions_matrix, varname, Nx, Ny)
+function var_eigfun = get_eigenfunction_of(Variable_Name, Eigenfunctions_Matrix, Nx, Ny)
 
 varnames = {'u' , 'v' , 'w' , 'p'};
-varorder = find(strcmp(varnames, varname), 1, 'first');
+varorder = find(strcmp(varnames, Variable_Name), 1, 'first');
 var_inds = (1:(Nx*Ny)) + (varorder-1)*Nx*Ny;
 
-var_eigfun = eigenfunctions_matrix(var_inds,:);
+var_eigfun = Eigenfunctions_Matrix(var_inds,:);
 
 end
 
 function efmat = place_trivial_values_at_boundaries(efmat, Nx, Ny)
 
-u_top_inds = get_var_top_inds('u', Nx, Ny);
-v_top_inds = get_var_top_inds('v', Nx, Ny);
-w_top_inds = get_var_top_inds('w', Nx, Ny);
-p_top_inds = get_var_top_inds('p', Nx, Ny);
-u_bottom_inds = get_var_bottom_inds('u', Nx, Ny);
-v_bottom_inds = get_var_bottom_inds('v', Nx, Ny);
-w_bottom_inds = get_var_bottom_inds('w', Nx, Ny);
-inds = sort([u_top_inds v_top_inds w_top_inds p_top_inds u_bottom_inds v_bottom_inds w_bottom_inds]);
 sz = size(efmat, 2);
+
+u_top_inds    = get_variable_top_indices   ('u', Nx, Ny);
+v_top_inds    = get_variable_top_indices   ('v', Nx, Ny);
+w_top_inds    = get_variable_top_indices   ('w', Nx, Ny);
+p_top_inds    = get_variable_top_indices   ('p', Nx, Ny);
+u_bottom_inds = get_variable_bottom_indices('u', Nx, Ny);
+v_bottom_inds = get_variable_bottom_indices('v', Nx, Ny);
+w_bottom_inds = get_variable_bottom_indices('w', Nx, Ny);
+
+inds = sort([u_top_inds v_top_inds w_top_inds p_top_inds u_bottom_inds v_bottom_inds w_bottom_inds]);
+
 for i = inds
     efmat = [efmat(1:i-1,:) ; zeros([1 sz]) ; efmat(i:end,:)];
 end

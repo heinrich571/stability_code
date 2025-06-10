@@ -118,7 +118,7 @@ switch Problem.Boundary_Conditions.Wall.p
         A(row_inds(:),:) =  0;
         B(row_inds(:),:) =  0;
         A(row_inds(:),:) =  lppe_factor * lppe_opr;
-        B(row_inds(:),:) = -1i*lppe_opr;
+        B(row_inds(:),:) = -1i * lppe_opr;
     otherwise
         warning('No boundary condition applied for the pressure on the wall')
 end
@@ -703,10 +703,10 @@ switch Problem.Boundary_Conditions.Left.p
 
         z_2nd_der_opr = [Z(operator_row_inds,:) Z(operator_row_inds,:) Z(operator_row_inds,:) D2x(operator_row_inds,:)];
 
-        A(row_inds,:) = 0;
-        B(row_inds,:) = 0;
-        A(row_inds,:) = linear_extrap_factor*z_2nd_der_opr;
-        B(row_inds,:) = -1i*z_2nd_der_opr;
+        A(row_inds,:) =  0;
+        B(row_inds,:) =  0;
+        A(row_inds,:) =  linear_extrap_factor * z_2nd_der_opr;
+        B(row_inds,:) = -1i * z_2nd_der_opr;
     case Left_Side_Options.LPPE % LPPE boundary condition
         i_opr_B  = get_operator_left_indices(Nx, Ny);
         row_inds = get_equation_left_indices('continuity', Nx, Ny);
@@ -720,10 +720,10 @@ switch Problem.Boundary_Conditions.Left.p
 
         lppe_opr = [lppe_u(i_opr_B,:) , lppe_v(i_opr_B,:) , lppe_w(i_opr_B,:) , lppe_p(i_opr_B,:)];
 
-        A(row_inds(:),:) = 0;
-        B(row_inds(:),:) = 0;
-        A(row_inds(:),:) = lppe_factor*lppe_opr;
-        B(row_inds(:),:) = -1i*lppe_opr;
+        A(row_inds(:),:) =  0;
+        B(row_inds(:),:) =  0;
+        A(row_inds(:),:) =  lppe_factor * lppe_opr;
+        B(row_inds(:),:) = -1i * lppe_opr;
     case Left_Side_Options.Symmetry
         opr_left_inds = get_operator_whole_left_indices(Nx, Ny);
         eqn_left_inds = get_equation_whole_left_indices('continuity', Nx, Ny);
@@ -792,26 +792,26 @@ switch Problem.Boundary_Conditions.Left.p
         error(['Boundary condition ' Problem.Boundary_Conditions.Left.p ' for ''p'' at the left side is invalid or not supported'])
 end
 
-% % Remove redundant or unnecessary entries
-% % Rows (equations at which flow variables are determined from boundary conditions)
-% xmom_top_row_inds = get_eqn_top_inds('x momentum', Nx, Ny);
-% ymom_top_row_inds = get_eqn_top_inds('y momentum', Nx, Ny);
-% zmom_top_row_inds = get_eqn_top_inds('z momentum', Nx, Ny);
-% cont_top_row_inds = get_eqn_top_inds('continuity', Nx, Ny);
-% xmom_bottom_row_inds = get_eqn_bottom_inds('x momentum', Nx, Ny);
-% ymom_bottom_row_inds = get_eqn_bottom_inds('y momentum', Nx, Ny);
-% zmom_bottom_row_inds = get_eqn_bottom_inds('z momentum', Nx, Ny);
-% row_inds_to_remove = sort([xmom_top_row_inds ymom_top_row_inds zmom_top_row_inds cont_top_row_inds xmom_bottom_row_inds ymom_bottom_row_inds zmom_bottom_row_inds]);
-% A(row_inds_to_remove,:) = []; B(row_inds_to_remove,:) = [];
-% % Columns (variables which are determined from boundary conditions)
-% u_top_column_inds = get_var_top_inds('u', Nx, Ny);
-% v_top_column_inds = get_var_top_inds('v', Nx, Ny);
-% w_top_column_inds = get_var_top_inds('w', Nx, Ny);
-% p_top_column_inds = get_var_top_inds('p', Nx, Ny);
-% u_bottom_column_inds = get_var_bottom_inds('u', Nx, Ny);
-% v_bottom_column_inds = get_var_bottom_inds('v', Nx, Ny);
-% w_bottom_column_inds = get_var_bottom_inds('w', Nx, Ny);
-% column_inds_to_remove = sort([u_top_column_inds v_top_column_inds w_top_column_inds p_top_column_inds u_bottom_column_inds v_bottom_column_inds w_bottom_column_inds]);
-% A(:,column_inds_to_remove) = []; B(:,column_inds_to_remove) = [];
+% Remove redundant or unnecessary entries
+% Rows (equations at which flow variables are determined from boundary conditions)
+xmom_top_row_inds    = get_equation_top_indices   ('x momentum', Nx, Ny);
+ymom_top_row_inds    = get_equation_top_indices   ('y momentum', Nx, Ny);
+zmom_top_row_inds    = get_equation_top_indices   ('z momentum', Nx, Ny);
+cont_top_row_inds    = get_equation_top_indices   ('continuity', Nx, Ny);
+xmom_bottom_row_inds = get_equation_bottom_indices('x momentum', Nx, Ny);
+ymom_bottom_row_inds = get_equation_bottom_indices('y momentum', Nx, Ny);
+zmom_bottom_row_inds = get_equation_bottom_indices('z momentum', Nx, Ny);
+row_inds_to_remove = sort([xmom_top_row_inds ymom_top_row_inds zmom_top_row_inds cont_top_row_inds xmom_bottom_row_inds ymom_bottom_row_inds zmom_bottom_row_inds]);
+A(row_inds_to_remove,:) = []; B(row_inds_to_remove,:) = [];
+% Columns (variables which are determined from boundary conditions)
+u_top_column_inds    = get_variable_top_indices   ('u', Nx, Ny);
+v_top_column_inds    = get_variable_top_indices   ('v', Nx, Ny);
+w_top_column_inds    = get_variable_top_indices   ('w', Nx, Ny);
+p_top_column_inds    = get_variable_top_indices   ('p', Nx, Ny);
+u_bottom_column_inds = get_variable_bottom_indices('u', Nx, Ny);
+v_bottom_column_inds = get_variable_bottom_indices('v', Nx, Ny);
+w_bottom_column_inds = get_variable_bottom_indices('w', Nx, Ny);
+column_inds_to_remove = sort([u_top_column_inds v_top_column_inds w_top_column_inds p_top_column_inds u_bottom_column_inds v_bottom_column_inds w_bottom_column_inds]);
+A(:,column_inds_to_remove) = []; B(:,column_inds_to_remove) = [];
 
 end

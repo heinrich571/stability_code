@@ -33,9 +33,12 @@ pr = real(p) ; pi = imag(p) ;
 
 % Plot eigenspectra (all of the computed eigenvalues)
 figure('Name', 'Eigenspectra', 'NumberTitle', 'off')
-plot(real(Solution(si).Eigenvalues), imag(Solution(si).Eigenvalues), 'o')
+plot(real(Solution(si).Eigenvalues), imag(Solution(si).Eigenvalues), ...
+     'o', 'DisplayName', ['$\beta = ' num2str(Solution.Physics.Beta) '$, $N_x = ' num2str(Nx) '$, $N_y = ' num2str(Ny) '$'])
 xlabel('$\omega_r$')
 ylabel('$\omega_i$')
+title(['$\beta = ' num2str(Solution.Physics.Beta) '$, $N_x = ' num2str(Nx) '$, $N_y = ' num2str(Ny) '$'])
+legend('interpreter', 'latex')
 
 % Plot velocity components (for desired eigenvalues only)
 for i = 1:length(evi)
