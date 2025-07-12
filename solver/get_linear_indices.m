@@ -1,16 +1,28 @@
-function linear_inds = get_linear_indices(mat, row_inds, column_inds)
+function Linear_Indices = get_linear_indices(Matrix, Row_Indices, Column_Indices)
 
 % DESCRIPTION
-%   This function returns the linear indices for the specified matrix based on specified row and column indices.
+%   This function returns the linear indices for the specified matrix
+%   based on specified row and column indices.
+% 
 % INPUT
-%   mat             matrix          [matrix]
-%   row_inds        row indices     [vector]
-%   column_inds     column indices  [vector]
+%   Matrix          matrix          [matrix]
+%   Row_Indices     row indices     [vector]
+%   Column_Indices  column indices  [vector]
+% 
 % OUTPUT
-%   linear_inds     linear indices corresponding to 'row_inds' and 'column_inds' in the input matrix
+%   Linear_Indices  linear indices corresponding to "Row_Indices" and
+%   "Column_Indices" in the "Matrix".
 
-row_inds    = row_inds(:);
-column_inds = column_inds(:);
-linear_inds = sub2ind(size(mat), row_inds, column_inds);
+% Input validation
+if ~isequal(size(Row_Indices), size(Column_Indices))
+    error('get_linear_indices:SizeMismatch', ...
+          'Inputs for "Row_Indices" and "Column_Indices" must be the same size.')
+end
+
+% Calculate linear indices of matrix entries
+row_inds    = Row_Indices(:);
+column_inds = Column_Indices(:);
+
+Linear_Indices = sub2ind(size(Matrix), row_inds, column_inds);
 
 end

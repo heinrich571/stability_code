@@ -16,14 +16,14 @@ Ix = eye(nx + 1);
 Iy = eye(ny + 1);
 
 % x mapping
-f      = 1;
-e      = 1 - f;
-xvec   = xlimit * (e * xhat.^3 + f * xhat);
-dxi_dx = 1 ./ (xlimit * (3 * e * xhat.^2 + f));
+% f      = 1;
+% e      = 1 - f;
+% xvec   = xlimit * (e * xhat.^3 + f * xhat);
+% dxi_dx = 1 ./ (xlimit * (3 * e * xhat.^2 + f));
 
-% s      = 4;
-% xvec   = xlimit * sinh(s*xhat) / sinh(s);
-% dxi_dx = sinh(s) / (s * xlimit) * 1 ./ sqrt(1 + sinh(s)^2 * (xvec / xlimit).^2);
+s      = 4;
+xvec   = xlimit * sinh(s*xhat) / sinh(s);
+dxi_dx = sinh(s) / (s * xlimit) * 1 ./ sqrt(1 + sinh(s)^2 * (xvec / xlimit).^2);
 
 Dx_physical_domain = transform_to_physical_domain(dxi_dx, Dx_cheb);
 D2x_physical_domain = Dx_physical_domain * Dx_physical_domain;
