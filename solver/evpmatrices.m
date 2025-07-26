@@ -1004,26 +1004,26 @@ switch Problem.Boundary_Conditions.Left.p
         error(['Boundary condition ' Problem.Boundary_Conditions.Left.p ' for ''p'' at the left side is invalid or not supported'])
 end
 
-% Remove redundant or unnecessary entries
-% Rows (equations at which flow variables are determined from boundary conditions)
-xmom_top_row_inds    = get_equation_top_indices   ('x momentum', Nx, Ny);
-ymom_top_row_inds    = get_equation_top_indices   ('y momentum', Nx, Ny);
-zmom_top_row_inds    = get_equation_top_indices   ('z momentum', Nx, Ny);
-cont_top_row_inds    = get_equation_top_indices   ('continuity', Nx, Ny);
-xmom_bottom_row_inds = get_equation_bottom_indices('x momentum', Nx, Ny);
-ymom_bottom_row_inds = get_equation_bottom_indices('y momentum', Nx, Ny);
-zmom_bottom_row_inds = get_equation_bottom_indices('z momentum', Nx, Ny);
-row_inds_to_remove = sort([xmom_top_row_inds ymom_top_row_inds zmom_top_row_inds cont_top_row_inds xmom_bottom_row_inds ymom_bottom_row_inds zmom_bottom_row_inds]);
-A(row_inds_to_remove,:) = []; B(row_inds_to_remove,:) = [];
-% Columns (variables which are determined from boundary conditions)
-u_top_column_inds    = get_variable_top_indices   ('u', Nx, Ny);
-v_top_column_inds    = get_variable_top_indices   ('v', Nx, Ny);
-w_top_column_inds    = get_variable_top_indices   ('w', Nx, Ny);
-p_top_column_inds    = get_variable_top_indices   ('p', Nx, Ny);
-u_bottom_column_inds = get_variable_bottom_indices('u', Nx, Ny);
-v_bottom_column_inds = get_variable_bottom_indices('v', Nx, Ny);
-w_bottom_column_inds = get_variable_bottom_indices('w', Nx, Ny);
-column_inds_to_remove = sort([u_top_column_inds v_top_column_inds w_top_column_inds p_top_column_inds u_bottom_column_inds v_bottom_column_inds w_bottom_column_inds]);
-A(:,column_inds_to_remove) = []; B(:,column_inds_to_remove) = [];
+% % Remove redundant or unnecessary entries
+% % Rows (equations at which flow variables are determined from boundary conditions)
+% xmom_top_row_inds    = get_equation_top_indices   ('x momentum', Nx, Ny);
+% ymom_top_row_inds    = get_equation_top_indices   ('y momentum', Nx, Ny);
+% zmom_top_row_inds    = get_equation_top_indices   ('z momentum', Nx, Ny);
+% cont_top_row_inds    = get_equation_top_indices   ('continuity', Nx, Ny);
+% xmom_bottom_row_inds = get_equation_bottom_indices('x momentum', Nx, Ny);
+% ymom_bottom_row_inds = get_equation_bottom_indices('y momentum', Nx, Ny);
+% zmom_bottom_row_inds = get_equation_bottom_indices('z momentum', Nx, Ny);
+% row_inds_to_remove = sort([xmom_top_row_inds ymom_top_row_inds zmom_top_row_inds cont_top_row_inds xmom_bottom_row_inds ymom_bottom_row_inds zmom_bottom_row_inds]);
+% A(row_inds_to_remove,:) = []; B(row_inds_to_remove,:) = [];
+% % Columns (variables which are determined from boundary conditions)
+% u_top_column_inds    = get_variable_top_indices   ('u', Nx, Ny);
+% v_top_column_inds    = get_variable_top_indices   ('v', Nx, Ny);
+% w_top_column_inds    = get_variable_top_indices   ('w', Nx, Ny);
+% p_top_column_inds    = get_variable_top_indices   ('p', Nx, Ny);
+% u_bottom_column_inds = get_variable_bottom_indices('u', Nx, Ny);
+% v_bottom_column_inds = get_variable_bottom_indices('v', Nx, Ny);
+% w_bottom_column_inds = get_variable_bottom_indices('w', Nx, Ny);
+% column_inds_to_remove = sort([u_top_column_inds v_top_column_inds w_top_column_inds p_top_column_inds u_bottom_column_inds v_bottom_column_inds w_bottom_column_inds]);
+% A(:,column_inds_to_remove) = []; B(:,column_inds_to_remove) = [];
 
 end

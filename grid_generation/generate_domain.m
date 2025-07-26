@@ -1,11 +1,12 @@
 function Domain = generate_domain(Problem)
 
 % Expand input structure for convenient code
-nx      = Problem.Domain.Nx;
-ny      = Problem.Domain.Ny;
-xlimit  = Problem.Domain.X_Limit;
-ylimit  = Problem.Domain.Y_Limit;
-ymedian = Problem.Domain.Y_Median;
+nx          = Problem.Domain.Nx;
+ny          = Problem.Domain.Ny;
+xlimit      = Problem.Domain.X_Limit;
+ylimit      = Problem.Domain.Y_Limit;
+ymedian     = Problem.Domain.Y_Median;
+half_domain = Problem.Domain.Is_Half_Domain;
 
 % Generate the Chebyshev interval and derivatives
 [Dx_cheb, xhat] = cheb(nx);
@@ -16,15 +17,19 @@ Ix = eye(nx + 1);
 Iy = eye(ny + 1);
 
 % x mapping
-f      = 1;
-e      = 1 - f;
-xvec   = xlimit * (e * xhat.^3 + f * xhat);
-dxi_dx = 1 ./ (xlimit * (3 * e * xhat.^2 + f));
+if half_domain
+    xvec = xlimit * (xhat + 1);
+    dxi_dx = 1 / xlimit;
+else
+    f      = 1;
+    e      = 1 - f;
+    xvec   = xlimit * (e * xhat.^3 + f * xhat);
+    dxi_dx = 1 ./ (xlimit * (3 * e * xhat.^2 + f));
 
-% s      = 4;
-% xvec   = xlimit * sinh(s*xhat) / sinh(s);
-% dxi_dx = sinh(s) / (s * xlimit) * 1 ./ sqrt(1 + sinh(s)^2 * (xvec / xlimit).^2);
-
+    % s      = 4;
+    % xvec   = xlimit * sinh(s*xhat) / sinh(s);
+    % dxi_dx = sinh(s) / (s * xlimit) * 1 ./ sqrt(1 + sinh(s)^2 * (xvec / xlimit).^2);
+end
 Dx_physical_domain = transform_to_physical_domain(dxi_dx, Dx_cheb);
 D2x_physical_domain = Dx_physical_domain * Dx_physical_domain;
 Dx = kron(Dx_physical_domain, Iy);

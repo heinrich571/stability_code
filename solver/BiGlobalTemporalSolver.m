@@ -65,7 +65,7 @@ tic;
 % convergence_flag = 1;
 % Insert u,v,w Dirichlet values at the top and botttom boundary, and
 % Dirichlet p values at the top boundary
-efmat = place_trivial_values_at_boundaries(efmat, Nx, Ny);
+% efmat = place_trivial_values_at_boundaries(efmat, Nx, Ny);
 
 toc;
 

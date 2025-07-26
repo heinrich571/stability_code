@@ -11,11 +11,12 @@ startup
 
 Problem.Computation.N_Workers = 1;
 
-Problem.Domain.Nx       = 50;
-Problem.Domain.Ny       = 50;
+Problem.Domain.Nx       = 40;
+Problem.Domain.Ny       = 40;
 Problem.Domain.X_Limit  = 150;
 Problem.Domain.Y_Limit  = 100;
 Problem.Domain.Y_Median = 3 * 2.4;
+Problem.Domain.Is_Half_Domain = 0;
 
 Problem.Physics.Beta                  = 0.25;
 Problem.Physics.Number_Of_Eigenvalues = 20;
