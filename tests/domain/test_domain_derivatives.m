@@ -10,10 +10,10 @@ path_manager('add')
 %% Domain Generation
 % Define domain
 Problem.Domain.Nx       = 40;
-Problem.Domain.Ny       = 120;
-Problem.Domain.X_Limit  = 200;
-Problem.Domain.Y_Limit  = 300;
-Problem.Domain.Y_Median = 15 * 2.4;
+Problem.Domain.Ny       = 40;
+Problem.Domain.X_Limit  = 100;
+Problem.Domain.Y_Limit  = 50;
+Problem.Domain.Y_Median = 3 * 2.4;
 
 % Generate domain
 Domain = generate_domain(Problem);

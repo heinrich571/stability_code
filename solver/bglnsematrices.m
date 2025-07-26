@@ -2,9 +2,6 @@ function [A, B] = bglnsematrices(Domain, Base_Flow, Problem)
 
 % BiGlobal Linear Navier-Stokes Equations matrices
 
-% Constants
-continuity_factor = -1000;
-
 % Get spanwise wave number
 beta = Problem.Physics.Beta;
 
@@ -50,7 +47,6 @@ a31 =  Z     ; a32 =  Z     ; a33 = L        ; a34 = -beta * iI;    b31 =  Z ; b
 
 % Continuity
 a41 = Dx     ; a42 =  Dy    ; a43 = beta * iI; a44 =  Z        ;    b41 =  Z ; b42 =  Z ; b43 =  Z ; b44 = Z;
-% a41 = continuity_factor * Dx     ; a42 = continuity_factor * Dy    ; a43 = continuity_factor * beta * iI; a44 =  Z        ;    b41 =  -iI * Dx ; b42 =  -iI * Dy ; b43 =  -iI * beta * iI ; b44 = Z;
 
 % Build EVP A matrix
 A = [a11 a12 a13 a14

@@ -11,21 +11,23 @@ startup
 
 Problem.Computation.N_Workers = 1;
 
-Problem.Domain.Nx       = 60;
-Problem.Domain.Ny       = 60;
-Problem.Domain.X_Limit  = 1000;
+Problem.Domain.Nx       = 50;
+Problem.Domain.Ny       = 50;
+Problem.Domain.X_Limit  = 150;
 Problem.Domain.Y_Limit  = 100;
 Problem.Domain.Y_Median = 3 * 2.4;
 
 Problem.Physics.Beta                  = 0.25;
-Problem.Physics.Number_Of_Eigenvalues = 22;
+Problem.Physics.Number_Of_Eigenvalues = 20;
 
 Problem.Base_Flow_Settings.initguess            = 1.23258765682022 + [-1 1]*1e-5;
 Problem.Base_Flow_Settings.maxIterations        = 1e2;
 Problem.Base_Flow_Settings.convergenceTolerance = 1e-6;
 
-Sides_Boundary_Condition = 'zero_2nd_derivative';
-% Sides_Boundary_Condition = 'Linear_Extrapolation';
+% Sides_Boundary_Condition = 'zero_2nd_derivative';
+Sides_Boundary_Condition = 'Linear_Extrapolation';
+% Sides_Boundary_Condition = 'Neumann';
+% Sides_Boundary_Condition = 'Dirichlet';
 
 Problem.Boundary_Conditions.Top.u   = 'Dirichlet';
 Problem.Boundary_Conditions.Top.v   = 'Dirichlet';
@@ -45,10 +47,11 @@ Problem.Boundary_Conditions.Left.p  = Sides_Boundary_Condition;
 Problem.Boundary_Conditions.Wall.u  = 'Dirichlet';
 Problem.Boundary_Conditions.Wall.v  = 'Dirichlet';
 Problem.Boundary_Conditions.Wall.w  = 'Dirichlet';
-Problem.Boundary_Conditions.Wall.p  = 'LPPE';
+Problem.Boundary_Conditions.Wall.p  = 'PC';
+% Problem.Boundary_Conditions.Wall.p  = 'Neumann';
 
 
-Problem.Flags.Display_Domain    = 0;
+Problem.Flags.Display_Domain    = 1;
 Problem.Flags.Display_Base_Flow = 0;
 Problem.Flags.Generate_Report   = 0;
 Problem.Flags.Display_Operators = 0;
@@ -96,3 +99,4 @@ plotef(Solution, 1, Eigenvalue_Indices)
 if ~isempty(fieldnames(Report))
     errors_plots(Solution, Report, Eigenvalue_Indices)
 end
+test_solution_symmetry(Base_Flow, Solution, 1, Eigenvalue_Indices, Options)

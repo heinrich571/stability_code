@@ -60,7 +60,9 @@ tic;
 [efmat, evmat, convergence_flag] = eigs(A, B, ...
                                         Problem.Physics.Number_Of_Eigenvalues,...
                                         'smallestabs', 'MaxIterations', 400, 'Display', true, ...
-                                        'Tolerance', 1e-8);
+                                        'Tolerance', 1e-14);
+% [efmat, evmat] = eig(full(A), full(B));
+% convergence_flag = 1;
 % Insert u,v,w Dirichlet values at the top and botttom boundary, and
 % Dirichlet p values at the top boundary
 efmat = place_trivial_values_at_boundaries(efmat, Nx, Ny);
@@ -84,6 +86,7 @@ for i = 1 : length(Solution_Raw.Eigenvalues)
     abs_p = abs(Solution_Raw.Eigenfunctions.p(:,i));
     ind_max = find(abs_p == max(abs_p), 1, 'first');
     nrm(i) = Solution_Raw.Eigenfunctions.p(ind_max,i);
+    % nrm(i) = 1;
 end
 
 Solution.Domain           = Domain;
