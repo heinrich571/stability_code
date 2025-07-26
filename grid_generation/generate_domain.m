@@ -18,8 +18,8 @@ Iy = eye(ny + 1);
 
 % x mapping
 if half_domain
-    xvec = xlimit * (xhat + 1);
-    dxi_dx = 1 / xlimit;
+    xvec = xlimit * (xhat + 1) / 2;
+    dxi_dx = 2 / xlimit;
 else
     f      = 1;
     e      = 1 - f;

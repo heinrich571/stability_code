@@ -14,17 +14,7 @@ x_limit = Options.X_Limit;
 y_limit = Options.Y_Limit;
 
 % Get relevant information
-Nx = length(Solution(si).Domain.vec_X);
-Ny = length(Solution(si).Domain.vec_Y);
-
-mat_X = Solution(si).Domain.mat_X;
-mat_Y = Solution(si).Domain.mat_Y;
-
-omega = Solution(si).Eigenvalues(evi);
-u = reshape(Solution(si).Eigenfunctions.u(:,evi), Ny, Nx, length(evi));
-v = reshape(Solution(si).Eigenfunctions.v(:,evi), Ny, Nx, length(evi));
-w = reshape(Solution(si).Eigenfunctions.w(:,evi), Ny, Nx, length(evi));
-p = reshape(Solution(si).Eigenfunctions.p(:,evi), Ny, Nx, length(evi));
+[omega, u, v, w, p, mat_X, mat_Y, Nx, Ny] = parse_solution(Solution, si, evi);
 
 ur = real(u) ; ui = imag(u) ;
 vr = real(v) ; vi = imag(v) ;

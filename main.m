@@ -16,7 +16,7 @@ Problem.Domain.Ny       = 40;
 Problem.Domain.X_Limit  = 150;
 Problem.Domain.Y_Limit  = 100;
 Problem.Domain.Y_Median = 3 * 2.4;
-Problem.Domain.Is_Half_Domain = 0;
+Problem.Domain.Is_Half_Domain = 1;
 
 Problem.Physics.Beta                  = 0.25;
 Problem.Physics.Number_Of_Eigenvalues = 20;
@@ -33,7 +33,7 @@ Sides_Boundary_Condition = 'Linear_Extrapolation';
 Problem.Boundary_Conditions.Top.u   = 'Dirichlet';
 Problem.Boundary_Conditions.Top.v   = 'Dirichlet';
 Problem.Boundary_Conditions.Top.w   = 'Dirichlet';
-Problem.Boundary_Conditions.Top.p   = 'Dirichlet';
+Problem.Boundary_Conditions.Top.p   = 'PC';
 
 Problem.Boundary_Conditions.Right.u = Sides_Boundary_Condition;
 Problem.Boundary_Conditions.Right.v = Sides_Boundary_Condition;
